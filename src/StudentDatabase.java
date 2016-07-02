@@ -10,7 +10,7 @@ import org.apache.commons.io.FileUtils;
 
 public class StudentDatabase {
 	// Pattern: ID,name,nickname
-	private static final Pattern pattern = Pattern.compile("(\\d+),(.+),(.+)");
+	private static final Pattern pattern = Pattern.compile("(\\d+),(.+),(M|F),(.+)");
 
 	private Map<Integer, Student> students = new TreeMap<Integer, Student>();
 	
@@ -24,8 +24,9 @@ public class StudentDatabase {
 					continue;
 				}
 				String name = m.group(2);
-				String nickname = m.group(3);
-				Student student = new Student(ID, name, nickname);
+				String gender = m.group(3);
+				String nickname = m.group(4);
+				Student student = new Student(ID, name, nickname, gender);
 				students.put(ID, student);
 			}
 		}

@@ -26,12 +26,13 @@ public class ScannerDialog extends JFrame {
 	private ScannerListDialog list;
 
 	private JLabel statusLabel;
+	private JTextField field;
 
 	public ScannerDialog() {
 		this.setTitle("Scanner" + (Main.test ? " (Test Mode)" : ""));
 		this.setLayout(new GridLayout(3, 1));
 		this.setSize(400, 140);
-		JTextField field = new JTextField(1);
+		field = new JTextField(1);
 		field.setHorizontalAlignment(JTextField.CENTER);
 		AbstractDocument document = (AbstractDocument) (field.getDocument());
 		document.setDocumentFilter(new DocumentFilter());
@@ -117,6 +118,10 @@ public class ScannerDialog extends JFrame {
 
 	public void setList(ScannerListDialog list) {
 		this.list = list;
+	}
+
+	public JTextField getField() {
+		return field;
 	}
 
 }

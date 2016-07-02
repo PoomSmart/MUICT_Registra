@@ -20,11 +20,12 @@ public class ScannerListDialog extends JFrame {
 	public ScannerListDialog(Map<Integer, Student> students) {
 		this.setTitle("Scanned Codes" + (Main.test ? " (Test Mode)" : ""));
 		this.setLayout(new GridLayout(maxListCount, 1));
-		this.setLocation(1200, 320);
+		this.setLocation(1200, 250);
 		this.setSize(450, 600);
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {}
+			public void windowClosing(WindowEvent e) {
+			}
 		});
 		this.IDs = new Vector<Integer>();
 		this.students = students;
@@ -32,6 +33,24 @@ public class ScannerListDialog extends JFrame {
 
 	public List<Integer> getIDs() {
 		return IDs;
+	}
+
+	private void update() {
+		this.revalidate();
+		this.repaint();
+	}
+
+	public void removeLast() {
+		int count = getContentPane().getComponentCount();
+		if (count > 0) {
+			getContentPane().remove(count - 1);
+			update();
+		}
+	}
+
+	public void removeAll() {
+		this.getContentPane().removeAll();
+		update();
 	}
 
 	public void addID(Integer ID) {
@@ -44,8 +63,7 @@ public class ScannerListDialog extends JFrame {
 		JLabel label = new JLabel(slabel, JLabel.LEFT);
 		IDs.add(ID);
 		this.getContentPane().add(label);
-		this.revalidate();
-		this.repaint();
+		update();
 	}
 
 }

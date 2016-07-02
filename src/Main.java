@@ -9,7 +9,7 @@ public class Main {
 		
 		Map<Integer, Student> students = new StudentDatabase("batch-14.csv").getStudents();
 		
-		ScannerDialog scannerDialog = new ScannerDialog();
+		ScannerDialog scannerDialog = new ScannerDialog(students);
 		scannerDialog.setVisible(true);
 		Thread t1 = new Thread() {
 			public void run() {

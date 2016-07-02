@@ -1,0 +1,5 @@
+5888001,Aero Dynamic,Aero
+5888002,Beta Cephei,Betty
+5888003,Covariant Matrix,Cave
+5888004,Denebola Pegasus,Horn
+5888005,Eta Cepheus,Hax

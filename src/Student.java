@@ -1,5 +1,3 @@
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,12 +36,9 @@ public class Student {
 	 */
 	
 	public Status getCurrentStatus() {
-		Calendar calendar = Calendar.getInstance();
-		Date currentDate = calendar.getTime();
-		SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
 		for (Entry<Date, Status> entry : statuses.entrySet()) {
 			Date date = entry.getKey();
-			if (fmt.format(currentDate).equals(fmt.format(date)))
+			if (DateUtils.getCurrentFormattedDate().equals(DateUtils.formattedDate(date)))
 				return entry.getValue();
 		}
 		return null;
@@ -66,6 +61,10 @@ public class Student {
 	
 	public boolean isNormal() {
 		return getCurrentStatus().getType() == Status.Type.PRESENT;
+	}
+	
+	public void addStatus(Status status) {
+		statuses.put(DateUtils.getCurrentDate(), status);
 	}
 	
 }

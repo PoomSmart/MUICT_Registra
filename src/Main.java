@@ -7,7 +7,7 @@ public class Main {
 
 	public static void main(String[] args) throws InterruptedException, IOException {
 		
-		Map<Integer, Student> students = new StudentDatabase("students-test.txt").getStudents();
+		Map<Integer, Student> students = new StudentDatabase("batch-14.csv").getStudents();
 		
 		ScannerDialog scannerDialog = new ScannerDialog();
 		scannerDialog.setVisible(true);
@@ -42,6 +42,8 @@ public class Main {
 			}
 		};
 		t2.join();
+		scannerDialog.toFront();
+		scannerDialog.getField().requestFocus();
 	}
 
 }

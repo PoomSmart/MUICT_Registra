@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -47,6 +48,12 @@ public class ScannerDialog extends JFrame {
 		list.setVisible(false);
 		list.dispose();
 	}
+	
+	private void cleanup() {
+		IDs.removeAllElements();
+		list.removeAll();
+		setStatus(" ");
+	}
 
 	private void actionPerformWriteForType(String title, String confirmString, String fileExistedString,
 			ScannerSaver.Type type) {
@@ -54,12 +61,14 @@ public class ScannerDialog extends JFrame {
 			int result = JOptionPane.showConfirmDialog(null, confirmString, title, JOptionPane.YES_NO_OPTION);
 			if (result == JOptionPane.YES_OPTION) {
 				ScannerSaver.doneAddingCode(IDs, false, type);
+				cleanup();
 			}
 		} catch (FileAlreadyExistsException ex) {
 			int result = JOptionPane.showConfirmDialog(null, fileExistedString, title, JOptionPane.YES_NO_OPTION);
 			if (result == JOptionPane.YES_OPTION) {
 				try {
 					ScannerSaver.doneAddingCode(IDs, false, type, true);
+					cleanup();
 				} catch (IOException ex2) {
 					ex2.printStackTrace();
 				}
@@ -118,9 +127,7 @@ public class ScannerDialog extends JFrame {
 				boolean removeLabel = false;
 				Matcher m;
 				if (text.equals("flush")) {
-					list.removeAll();
-					IDs.removeAllElements();
-					shouldCleanup = removeLabel = true;
+					cleanup();
 				} else if (text.equals("dellast")) {
 					list.removeLast();
 					IDs.remove(IDs.lastElement());
@@ -165,7 +172,7 @@ public class ScannerDialog extends JFrame {
 					}
 				}
 				if (removeLabel)
-					setStatus("");
+					setStatus(" ");
 				if (shouldCleanup) {
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
@@ -186,8 +193,7 @@ public class ScannerDialog extends JFrame {
 		
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = c.gridy = 0;
-		c.weightx = 1;
-		c.gridwidth = 2;
+		c.gridwidth = 5;
 		c.ipady = 5;
 		this.getContentPane().add(field, c);
 
@@ -195,7 +201,7 @@ public class ScannerDialog extends JFrame {
 		c.gridx = 0;
 		c.gridy = 1;
 		c.weightx = 1;
-		c.gridwidth = 2;
+		c.gridwidth = 5;
 		c.ipady = 10;
 		this.getContentPane().add(des, c);
 		
@@ -203,38 +209,55 @@ public class ScannerDialog extends JFrame {
 		statusLabel.setForeground(Color.gray);
 		c.gridx = 0;
 		c.gridy = 2;
-		c.gridwidth = 2;
+		c.gridwidth = 5;
 		c.ipady = 10;
 		this.getContentPane().add(statusLabel, c);
-
-		confirmRegularBtn = new JButton("Confirm regular data");
+		
+		c.gridx = 0;
+		c.gridy = 3;
+		c.gridwidth = 1;
+		c.ipady = 0;
+		JLabel regularLabel = new JLabel("Regular:");
+		regularLabel.setHorizontalAlignment(JLabel.CENTER);
+		this.getContentPane().add(regularLabel, c);
+		
+		confirmRegularBtn = new JButton("Confirm");
 		confirmRegularBtn.setEnabled(false);
 		confirmRegularBtn.setForeground(Color.blue);
 		confirmRegularBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				actionPerformWriteForType("Scanner", "Confirm writing data?", "File already existed, continue?",
+				actionPerformWriteForType("Scanner", "Confirm writing regular data?", "File already existed, continue?",
 						ScannerSaver.Type.REGULAR);
-			}
-		});
-		c.gridx = 0;
-		c.gridy = 3;
-		c.gridwidth = 1;
-		this.getContentPane().add(confirmRegularBtn, c);
-
-		appendRegularBtn = new JButton("Append regular data");
-		appendRegularBtn.setEnabled(false);
-		appendRegularBtn.setForeground(Color.red);
-		appendRegularBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				actionPerformAppendForType("Scanner", "Confirm append data?", ScannerSaver.Type.REGULAR);
 			}
 		});
 		c.gridx = 1;
 		c.gridy = 3;
-		c.gridwidth = 1;
-		this.getContentPane().add(appendRegularBtn, c);
+		c.gridwidth = 2;
+		c.insets = new Insets(3, 5, 3, 5);
+		this.getContentPane().add(confirmRegularBtn, c);
 
-		confirmNotHereBtn = new JButton("Confirm absence data");
+		appendRegularBtn = new JButton("Append");
+		appendRegularBtn.setEnabled(false);
+		appendRegularBtn.setForeground(Color.red);
+		appendRegularBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionPerformAppendForType("Scanner", "Confirm append regular data?", ScannerSaver.Type.REGULAR);
+			}
+		});
+		c.gridx = 3;
+		c.gridy = 3;
+		c.gridwidth = 2;
+		this.getContentPane().add(appendRegularBtn, c);
+		
+		c.gridx = 0;
+		c.gridy = 4;
+		c.gridwidth = 1;
+		c.insets = new Insets(0, 0, 0, 0);
+		JLabel notHereLabel = new JLabel("Absence:");
+		notHereLabel.setHorizontalAlignment(JLabel.CENTER);
+		this.getContentPane().add(notHereLabel, c);
+
+		confirmNotHereBtn = new JButton("Confirm");
 		confirmNotHereBtn.setEnabled(false);
 		confirmNotHereBtn.setForeground(Color.blue);
 		confirmNotHereBtn.addActionListener(new ActionListener() {
@@ -243,12 +266,13 @@ public class ScannerDialog extends JFrame {
 						ScannerSaver.Type.NOTHERE);
 			}
 		});
-		c.gridx = 0;
+		c.gridx = 1;
 		c.gridy = 4;
-		c.gridwidth = 1;
+		c.gridwidth = 2;
+		c.insets = new Insets(3, 5, 3, 5);
 		this.getContentPane().add(confirmNotHereBtn, c);
 
-		appendNotHereBtn = new JButton("Append absence data");
+		appendNotHereBtn = new JButton("Append");
 		appendNotHereBtn.setEnabled(false);
 		appendNotHereBtn.setForeground(Color.red);
 		appendNotHereBtn.addActionListener(new ActionListener() {
@@ -256,9 +280,9 @@ public class ScannerDialog extends JFrame {
 				actionPerformAppendForType("Scanner", "Confirm append absence data?", ScannerSaver.Type.NOTHERE);
 			}
 		});
-		c.gridx = 1;
+		c.gridx = 3;
 		c.gridy = 4;
-		c.gridwidth = 1;
+		c.gridwidth = 2;
 		this.getContentPane().add(appendNotHereBtn, c);
 
 		this.setLocationRelativeTo(null);

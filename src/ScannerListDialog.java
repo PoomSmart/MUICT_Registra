@@ -1,7 +1,6 @@
 import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -12,57 +11,80 @@ public class ScannerListDialog extends JFrame {
 
 	private static final long serialVersionUID = 212016L;
 
-	private static final Integer maxListCount = 25;
+	private static final Integer defaultMaxListCount = 30;
 
-	private List<Integer> IDs;
+	private Vector<Integer> IDs;
+	private Vector<JLabel> labels;
 	private Map<Integer, Student> students;
 
 	public ScannerListDialog(Map<Integer, Student> students) {
 		this.setTitle("Scanned Codes" + (Main.test ? " (Test Mode)" : ""));
-		this.setLayout(new GridLayout(maxListCount, 1));
+		this.setLayout(new GridLayout(defaultMaxListCount, 1));
 		this.setLocation(1200, 250);
-		this.setSize(450, 600);
+		this.setSize(550, 600);
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 			}
 		});
 		this.IDs = new Vector<Integer>();
+		this.labels = new Vector<JLabel>();
 		this.students = students;
 	}
 
-	public List<Integer> getIDs() {
+	public Vector<Integer> getIDs() {
 		return IDs;
 	}
 
 	private void update() {
+		labels.removeAllElements();
+		getContentPane().removeAll();
+		int i = 0;
+		for (Integer ID : IDs) {
+			JLabel label = labelForStudentID(i++, ID);
+			getContentPane().add(label);
+			labels.addElement(label);
+		}
 		this.revalidate();
 		this.repaint();
 	}
-
-	public void removeLast() {
+	
+	public void removeAtIndex(int index) {
 		int count = getContentPane().getComponentCount();
-		if (count > 0) {
-			getContentPane().remove(count - 1);
+		if (count > index) {
+			getContentPane().remove(index);
+			IDs.remove(index);
 			update();
 		}
 	}
 
-	public void removeAll() {
-		this.getContentPane().removeAll();
-		update();
+	public void removeLast() {
+		removeAtIndex(getContentPane().getComponentCount() - 1);
 	}
 
-	public void addID(Integer ID) {
-		Student student = students.get(ID);
-		String slabel = " " + ID;
+	public void removeAll() {
+		this.getContentPane().removeAll();
+		IDs.removeAllElements();
+		update();
+	}
+	
+	private String labelString(int i, Integer ID, Student student) {
+		String slabel = String.format(" (%d) %d", i, ID);
 		if (student == null)
 			slabel += ": Unknown";
 		else
 			slabel += String.format(": %s (%s)", student.getName(), student.getNickname());
-		JLabel label = new JLabel(slabel, JLabel.LEFT);
+		return slabel;
+	}
+	
+	private JLabel labelForStudentID(int i, Integer ID) {
+		Student student = students.get(ID);
+		return new JLabel(labelString(i, ID, student), JLabel.LEFT);
+	}
+
+	public void addID(Integer ID) {
+		labels.add(labelForStudentID(IDs.size() - 1, ID));
 		IDs.add(ID);
-		this.getContentPane().add(label);
 		update();
 	}
 

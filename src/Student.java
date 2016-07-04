@@ -7,6 +7,8 @@ public class Student {
 	
 	private Integer ID;
 	private String name;
+	private String firstname;
+	private String lastname;
 	private String nickname;
 	private String gender;
 	private Map<Date, Status> statuses;
@@ -14,6 +16,14 @@ public class Student {
 	public Student(Integer ID, String name, String nickname, String gender) {
 		this.ID = ID;
 		this.name = name;
+		String[] x = name.split(" ");
+		if (x.length == 2) {
+			this.firstname = x[0];
+			this.lastname = x[1];
+		} else {
+			this.firstname = name;
+			this.lastname = "";
+		}
 		this.nickname = nickname;
 		this.gender = gender;
 		this.statuses = new TreeMap<Date, Status>();
@@ -29,6 +39,14 @@ public class Student {
 
 	public String getNickname() {
 		return nickname;
+	}
+	
+	public String getFirstname() {
+		return firstname;
+	}
+
+	public String getLastname() {
+		return lastname;
 	}
 	
 	public String getGender() {

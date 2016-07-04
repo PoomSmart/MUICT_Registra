@@ -1,9 +1,14 @@
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
@@ -24,12 +29,16 @@ public class ScannerListDialog extends JFrame {
 		this.setSize(550, 600);
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-			}
+			public void windowClosing(WindowEvent e) {}
 		});
 		this.IDs = new Vector<Integer>();
 		this.labels = new Vector<JLabel>();
 		this.students = students;
+	}
+	
+	public void sort() {
+		Collections.sort(IDs);
+		update();
 	}
 
 	public Vector<Integer> getIDs() {

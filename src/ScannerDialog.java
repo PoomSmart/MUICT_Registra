@@ -143,7 +143,10 @@ public class ScannerDialog extends JFrame {
 				boolean shouldCleanup = false;
 				boolean removeLabel = false;
 				Matcher m;
-				if (Constants.flushStrings.contains(text)) {
+				if (text.equals("sort")) {
+					list.sort();
+					shouldCleanup = true;
+				} else if (Constants.flushStrings.contains(text)) {
 					cleanup();
 					shouldCleanup = true;
 				} else if (Constants.delLastStrings.contains(text)) {

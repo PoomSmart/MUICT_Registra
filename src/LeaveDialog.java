@@ -3,10 +3,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
@@ -23,35 +25,25 @@ public class LeaveDialog extends JFrame {
 		this.setSize(400, 210);
 		CommonUtils.setRelativeCenter(this, 0, 180);
 
-		SpringLayout layout = new SpringLayout();
-		getContentPane().setLayout(layout);
+		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		
+		JPanel panel = new JPanel();
+		panel.setLayout(new SpringLayout());
 		JLabel IDLabel = new JLabel("ID: ", JLabel.TRAILING);
-		this.add(IDLabel);
-		inputField = new JTextField(10);
+		panel.add(IDLabel);
+		inputField = new JTextField();
 		inputField.setHorizontalAlignment(JTextField.LEFT);
 		inputField.setBorder(null);
-		this.add(inputField);
+		panel.add(inputField);
 		IDLabel.setLabelFor(inputField);
-		layout.putConstraint(SpringLayout.WEST, IDLabel, 5, SpringLayout.WEST, getContentPane());
-		layout.putConstraint(SpringLayout.NORTH, IDLabel, 5, SpringLayout.NORTH, getContentPane());
-		// FIXME: Better layout
-		layout.putConstraint(SpringLayout.WEST, inputField, 37, SpringLayout.EAST, IDLabel);
-		layout.putConstraint(SpringLayout.NORTH, inputField, 5, SpringLayout.NORTH, getContentPane());
+		
 		
 		JLabel reasonLabel = new JLabel("Reason: ", JLabel.TRAILING);
-		this.add(reasonLabel);
+		panel.add(reasonLabel);
 		reasonField = new JTextArea();
-		reasonField.setPreferredSize(new Dimension(305, 90));
-		this.add(reasonField);
+		reasonField.setPreferredSize(new Dimension(reasonField.getWidth(), 90));
+		panel.add(reasonField);
 		reasonLabel.setLabelFor(reasonField);
-		layout.putConstraint(SpringLayout.WEST, reasonLabel, 5, SpringLayout.WEST, getContentPane());
-		layout.putConstraint(SpringLayout.NORTH, reasonLabel, 5, SpringLayout.NORTH, getContentPane());
-		layout.putConstraint(SpringLayout.WEST, reasonField, 5, SpringLayout.EAST, reasonLabel);
-		layout.putConstraint(SpringLayout.NORTH, reasonField, 5, SpringLayout.NORTH, getContentPane());
-		
-		layout.putConstraint(SpringLayout.NORTH, reasonField, 5, SpringLayout.SOUTH, inputField);
-		layout.putConstraint(SpringLayout.NORTH, reasonLabel, 9, SpringLayout.SOUTH, IDLabel);
 		
 		JButton saveBtn = new JButton("Save");
 		saveBtn.addActionListener(new ActionListener() {
@@ -93,9 +85,12 @@ public class LeaveDialog extends JFrame {
 				}
 			}
 		});
-		layout.putConstraint(SpringLayout.NORTH, saveBtn, 9, SpringLayout.SOUTH, reasonField);
-		layout.putConstraint(SpringLayout.EAST, saveBtn, -9, SpringLayout.EAST, getContentPane());
-		this.add(saveBtn);
+		JButton nullBtn = new JButton();
+		nullBtn.setVisible(false);
+		panel.add(nullBtn);
+		panel.add(saveBtn);
+		SpringUtilities.makeCompactGrid(panel, 3, 2, 6, 6, 6, 6);
+		this.add(panel);
 		this.setResizable(false);
 	}
 }

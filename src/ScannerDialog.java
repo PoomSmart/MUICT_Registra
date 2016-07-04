@@ -29,8 +29,7 @@ public class ScannerDialog extends JFrame {
 	private static final long serialVersionUID = 2561998L;
 
 	private Vector<Integer> IDs;
-	private static final String pMUICTID = "\\d\\d88\\d\\d\\d";
-	private static final Pattern pDelAtIndex = Pattern.compile("del(\\d+)");
+	private static final Pattern pDelAtIndex = Pattern.compile("(\\d+)del");
 
 	private ScannerListDialog list;
 	private Map<Integer, Student> students;
@@ -70,14 +69,14 @@ public class ScannerDialog extends JFrame {
 		try {
 			int result = JOptionPane.showConfirmDialog(null, confirmString, title, JOptionPane.YES_NO_OPTION);
 			if (result == JOptionPane.YES_OPTION) {
-				ScannerSaver.doneAddingCode(IDs, false, type);
+				ScannerSaver.doneAddingCodes(IDs, false, type);
 				cleanup();
 			}
 		} catch (FileAlreadyExistsException ex) {
 			int result = JOptionPane.showConfirmDialog(null, fileExistedString, title, JOptionPane.YES_NO_OPTION);
 			if (result == JOptionPane.YES_OPTION) {
 				try {
-					ScannerSaver.doneAddingCode(IDs, false, type, true);
+					ScannerSaver.doneAddingCodes(IDs, false, type, true);
 					cleanup();
 				} catch (IOException ex2) {
 					ex2.printStackTrace();
@@ -92,7 +91,7 @@ public class ScannerDialog extends JFrame {
 		try {
 			int result = JOptionPane.showConfirmDialog(null, confirmString, title, JOptionPane.YES_NO_OPTION);
 			if (result == JOptionPane.YES_OPTION) {
-				ScannerSaver.doneAddingCode(IDs, true, type);
+				ScannerSaver.doneAddingCodes(IDs, true, type);
 			}
 		} catch (IOException ex) {
 			ex.printStackTrace();
@@ -167,14 +166,14 @@ public class ScannerDialog extends JFrame {
 					if (!Main.test) {
 						if (stringLength == 14) {
 							ID = text.substring(6, 6 + 7);
-							if (!ID.matches(pMUICTID)) {
+							if (!ID.matches(CommonUtils.pMUICTID)) {
 								cleanupTextField();
 								return;
 							}
 						}
 					} else {
 						if (stringLength == 7) {
-							if (!text.matches(pMUICTID)) {
+							if (!text.matches(CommonUtils.pMUICTID)) {
 								cleanupTextField();
 								return;
 							}
@@ -240,7 +239,7 @@ public class ScannerDialog extends JFrame {
 		c.gridy = 3;
 		c.gridwidth = 1;
 		c.ipady = 0;
-		JLabel regularLabel = new JLabel("Regular:");
+		JLabel regularLabel = new JLabel("Present:");
 		regularLabel.setHorizontalAlignment(JLabel.CENTER);
 		this.getContentPane().add(regularLabel, c);
 
@@ -309,6 +308,7 @@ public class ScannerDialog extends JFrame {
 		this.getContentPane().add(appendNotHereBtn, c);
 
 		this.setLocationRelativeTo(null);
+		this.setLocation(this.getX(), this.getY() - 120);
 		this.IDs = new Vector<Integer>();
 		this.students = students;
 	}

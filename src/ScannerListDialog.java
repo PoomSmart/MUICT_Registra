@@ -50,6 +50,8 @@ public class ScannerListDialog extends JFrame {
 	}
 	
 	public void removeAtIndex(int index) {
+		if (index == -1)
+			return;
 		int count = getContentPane().getComponentCount();
 		if (count > index) {
 			getContentPane().remove(index);

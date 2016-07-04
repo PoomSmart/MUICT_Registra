@@ -5,7 +5,7 @@ public class Status {
 	}
 
 	private Type type;
-	private String reasons;
+	private String reason;
 	
 	public static Type getType(String type) {
 		switch (type) {
@@ -19,9 +19,9 @@ public class Status {
 		return null;
 	}
 
-	public Status(Type type, String reasons) {
+	public Status(Type type, String reason) {
 		this.type = type;
-		this.reasons = reasons;
+		this.reason = reason;
 	}
 
 	public Status(Type type) {
@@ -36,7 +36,7 @@ public class Status {
 		return type;
 	}
 
-	public String getReasons() {
-		return reasons;
+	public String getReason() {
+		return reason;
 	}
 }

@@ -42,6 +42,24 @@ public class Main {
 			}
 		};
 		t2.join();
+		
+		LeaveDialog leaveDialog = new LeaveDialog(students);
+		leaveDialog.setVisible(true);
+		Thread t3 = new Thread() {
+			public void run() {
+				synchronized (leaveDialog) {
+					while (leaveDialog.isVisible()) {
+						try {
+							leaveDialog.wait();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		};
+		t3.join();
+		
 		scannerDialog.toFront();
 		scannerDialog.getField().requestFocus();
 	}

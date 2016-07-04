@@ -13,16 +13,15 @@ import javax.swing.SpringLayout;
 
 public class LeaveDialog extends JFrame {
 
-	private static final long serialVersionUID = 12345L;
+	private static final long serialVersionUID = 1L;
 
 	private JTextField inputField;
 	private JTextArea reasonField;
 
 	public LeaveDialog(Map<Integer, Student> students) {
-		this.setTitle("Leave Form" + (Main.test ? " (Test Mode)" : ""));
+		this.setTitle(CommonUtils.realTitle("Leave Form"));
 		this.setSize(400, 210);
-		this.setLocationRelativeTo(null);
-		this.setLocation(this.getX(), this.getY() + 120);
+		CommonUtils.setRelativeCenter(this, 0, 180);
 
 		SpringLayout layout = new SpringLayout();
 		getContentPane().setLayout(layout);
@@ -60,9 +59,9 @@ public class LeaveDialog extends JFrame {
 				boolean shouldCleanup = true;
 				try {
 					String sID = inputField.getText();
-					if (!sID.matches(CommonUtils.pMUICTID))
+					Integer ID = CommonUtils.getID(sID);
+					if (ID == -1)
 						throw new Exception();
-					Integer ID = Integer.parseInt(sID);
 					if (!students.containsKey(ID)) {
 						JOptionPane.showMessageDialog(null, "ID not found: " + sID);
 						System.out.println("ID not found: " + sID);
@@ -79,7 +78,7 @@ public class LeaveDialog extends JFrame {
 					int result = JOptionPane.showConfirmDialog(null, Constants.COMMON_CONFIRM, "Leave Form", JOptionPane.YES_NO_OPTION);
 					if (result == JOptionPane.YES_OPTION) {
 						System.out.println(String.format("%d - %s", ID, reason));
-						ScannerSaver.doneAddingCode(ID, reason, true, ScannerSaver.Type.NOTHERE);
+						ScannerSaver.doneAddingCode(ID, reason, true, CommonUtils.FileType.NOTHERE);
 					} else
 						shouldCleanup = false;
 				} catch (Exception ex) {
@@ -97,5 +96,6 @@ public class LeaveDialog extends JFrame {
 		layout.putConstraint(SpringLayout.NORTH, saveBtn, 9, SpringLayout.SOUTH, reasonField);
 		layout.putConstraint(SpringLayout.EAST, saveBtn, -9, SpringLayout.EAST, getContentPane());
 		this.add(saveBtn);
+		this.setResizable(false);
 	}
 }

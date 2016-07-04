@@ -18,7 +18,11 @@ public class StudentDatabase {
 		Matcher m;
 		for (String line : lines) {
 			if ((m = pattern.matcher(line)).find()) {
-				Integer ID = Integer.parseInt(m.group(1));
+				Integer ID = CommonUtils.getID(m.group(1));
+				if (ID == -1) {
+					System.out.println("Malformed ID: " + ID + ", ignoring");
+					continue;
+				}
 				if (students.containsKey(ID)) {
 					System.out.println("Duplicate ID: " + ID + ", ignoring");
 					continue;

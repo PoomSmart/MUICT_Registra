@@ -10,7 +10,7 @@ import javax.swing.JLabel;
 
 public class ScannerListDialog extends JFrame {
 
-	private static final long serialVersionUID = 212016L;
+	private static final long serialVersionUID = 1L;
 
 	private static final Integer defaultMaxListCount = 30;
 
@@ -19,11 +19,10 @@ public class ScannerListDialog extends JFrame {
 	private Map<Integer, Student> students;
 
 	public ScannerListDialog(Map<Integer, Student> students) {
-		this.setTitle("Scanned Codes" + (Main.test ? " (Test Mode)" : ""));
+		this.setTitle(CommonUtils.realTitle("Scanned Codes"));
 		this.setLayout(new GridLayout(defaultMaxListCount, 1));
 		this.setSize(550, 600);
-		this.setLocationRelativeTo(null);
-		this.setLocation(this.getX() + 500, this.getY());
+		CommonUtils.setRelativeCenter(this, 500, 0);
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {}

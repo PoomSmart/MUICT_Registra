@@ -32,7 +32,6 @@ public class ScannerDialog extends JFrame {
 	private static final Pattern pDelAtIndex = Pattern.compile("(\\d+)del");
 
 	private ScannerListDialog list;
-	private Map<Integer, Student> students;
 
 	private JLabel statusLabel;
 	private JTextField field;
@@ -65,7 +64,7 @@ public class ScannerDialog extends JFrame {
 	}
 
 	private void actionPerformWriteForType(String title, String confirmString, String fileExistedString,
-			ScannerSaver.Type type) {
+			CommonUtils.FileType type) {
 		try {
 			int result = JOptionPane.showConfirmDialog(null, confirmString, title, JOptionPane.YES_NO_OPTION);
 			if (result == JOptionPane.YES_OPTION) {
@@ -87,7 +86,7 @@ public class ScannerDialog extends JFrame {
 		}
 	}
 
-	private void actionPerformAppendForType(String title, String confirmString, ScannerSaver.Type type) {
+	private void actionPerformAppendForType(String title, String confirmString, CommonUtils.FileType type) {
 		try {
 			int result = JOptionPane.showConfirmDialog(null, confirmString, title, JOptionPane.YES_NO_OPTION);
 			if (result == JOptionPane.YES_OPTION) {
@@ -102,14 +101,12 @@ public class ScannerDialog extends JFrame {
 		boolean isIDNotEmpty = !IDs.isEmpty();
 		confirmRegularBtn.setEnabled(isIDNotEmpty);
 		confirmNotHereBtn.setEnabled(isIDNotEmpty);
-		try {
-			appendRegularBtn.setEnabled(isIDNotEmpty && CommonUtils.fileExistsAtPath(ScannerSaver.attendancePath(ScannerSaver.Type.REGULAR)));
-			appendNotHereBtn.setEnabled(isIDNotEmpty && CommonUtils.fileExistsAtPath(ScannerSaver.attendancePath(ScannerSaver.Type.NOTHERE)));
-		} catch (IOException e) {}
+		appendRegularBtn.setEnabled(isIDNotEmpty && CommonUtils.fileExistsAtPath(CommonUtils.filePath(CommonUtils.FileType.REGULAR)));
+		appendNotHereBtn.setEnabled(isIDNotEmpty && CommonUtils.fileExistsAtPath(CommonUtils.filePath(CommonUtils.FileType.NOTHERE)));
 	}
 
 	public ScannerDialog(Map<Integer, Student> students) {
-		this.setTitle(Constants.SCANNER_DIALOG_TITLE + (Main.test ? " (Test Mode)" : ""));
+		this.setTitle(CommonUtils.realTitle(Constants.SCANNER_DIALOG_TITLE));
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		this.setSize(400, 200);
@@ -161,38 +158,37 @@ public class ScannerDialog extends JFrame {
 						IDs.remove(idx);
 					shouldCleanup = true;
 				} else {
-					String ID = null;
+					Integer ID = -1;
 					int stringLength = text.length();
 					if (!Main.test) {
 						if (stringLength == 14) {
-							ID = text.substring(6, 6 + 7);
-							if (!ID.matches(CommonUtils.pMUICTID)) {
+							ID = CommonUtils.getID(text.substring(6, 6 + 7));
+							if (ID == -1) {
 								cleanupTextField();
 								return;
 							}
 						}
 					} else {
 						if (stringLength == 7) {
-							if (!text.matches(CommonUtils.pMUICTID)) {
+							ID = CommonUtils.getID(text);
+							if (ID == -1) {
 								cleanupTextField();
 								return;
 							}
-							ID = text;
 						}
 					}
-					if (ID != null) {
+					if (ID != -1) {
 						System.out.println("-> " + ID);
-						Integer iID = Integer.parseInt(ID);
-						if (!students.containsKey(iID)) {
+						if (!students.containsKey(ID)) {
 							System.out.println("ID does not exist in database: " + ID);
 							setStatus("Not Added: " + ID);
 						} else {
-							if (IDs.contains(iID)) {
+							if (IDs.contains(ID)) {
 								System.out.println("ID already existed: " + ID);
 								setStatus("Not Added: " + ID);
 							} else {
-								IDs.add(iID);
-								list.addID(iID);
+								IDs.add(ID);
+								list.addID(ID);
 								setStatus("Added " + ID);
 							}
 						}
@@ -249,7 +245,7 @@ public class ScannerDialog extends JFrame {
 		confirmRegularBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				actionPerformWriteForType(Constants.SCANNER_DIALOG_TITLE, Constants.CONFIRM_WRITE_REGULAR, Constants.CONFIRM_OVERWRITE,
-						ScannerSaver.Type.REGULAR);
+						CommonUtils.FileType.REGULAR);
 			}
 		});
 		c.gridx = 1;
@@ -263,7 +259,7 @@ public class ScannerDialog extends JFrame {
 		appendRegularBtn.setForeground(Color.red);
 		appendRegularBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				actionPerformAppendForType(Constants.SCANNER_DIALOG_TITLE, Constants.CONFIRM_APPEND_REGULAR, ScannerSaver.Type.REGULAR);
+				actionPerformAppendForType(Constants.SCANNER_DIALOG_TITLE, Constants.CONFIRM_APPEND_REGULAR, CommonUtils.FileType.REGULAR);
 			}
 		});
 		c.gridx = 3;
@@ -285,7 +281,7 @@ public class ScannerDialog extends JFrame {
 		confirmNotHereBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				actionPerformWriteForType(Constants.SCANNER_DIALOG_TITLE, Constants.CONFIRM_WRITE_ABSENCE, Constants.CONFIRM_OVERWRITE,
-						ScannerSaver.Type.NOTHERE);
+						CommonUtils.FileType.NOTHERE);
 			}
 		});
 		c.gridx = 1;
@@ -299,7 +295,7 @@ public class ScannerDialog extends JFrame {
 		appendNotHereBtn.setForeground(Color.red);
 		appendNotHereBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				actionPerformAppendForType(Constants.SCANNER_DIALOG_TITLE, Constants.CONFIRM_APPEND_ABSENCE, ScannerSaver.Type.NOTHERE);
+				actionPerformAppendForType(Constants.SCANNER_DIALOG_TITLE, Constants.CONFIRM_APPEND_ABSENCE, CommonUtils.FileType.NOTHERE);
 			}
 		});
 		c.gridx = 3;
@@ -307,10 +303,9 @@ public class ScannerDialog extends JFrame {
 		c.gridwidth = 2;
 		this.getContentPane().add(appendNotHereBtn, c);
 
-		this.setLocationRelativeTo(null);
-		this.setLocation(this.getX(), this.getY() - 120);
+		CommonUtils.setRelativeCenter(this, 0, -50);
+		this.setResizable(false);
 		this.IDs = new Vector<Integer>();
-		this.students = students;
 	}
 
 	public Vector<Integer> getIDs() {

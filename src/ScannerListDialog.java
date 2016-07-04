@@ -1,14 +1,10 @@
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Vector;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
@@ -25,8 +21,9 @@ public class ScannerListDialog extends JFrame {
 	public ScannerListDialog(Map<Integer, Student> students) {
 		this.setTitle("Scanned Codes" + (Main.test ? " (Test Mode)" : ""));
 		this.setLayout(new GridLayout(defaultMaxListCount, 1));
-		this.setLocation(1200, 250);
 		this.setSize(550, 600);
+		this.setLocationRelativeTo(null);
+		this.setLocation(this.getX() + 500, this.getY());
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {}

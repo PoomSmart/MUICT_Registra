@@ -53,6 +53,7 @@ public class ScannerDialog extends JFrame {
 		IDs.removeAllElements();
 		list.removeAll();
 		setStatus(" ");
+		updateButtonsState();
 	}
 
 	private void cleanupTextField() {
@@ -97,6 +98,16 @@ public class ScannerDialog extends JFrame {
 			ex.printStackTrace();
 		}
 	}
+	
+	private void updateButtonsState() {
+		boolean isIDNotEmpty = !IDs.isEmpty();
+		confirmRegularBtn.setEnabled(isIDNotEmpty);
+		confirmNotHereBtn.setEnabled(isIDNotEmpty);
+		try {
+			appendRegularBtn.setEnabled(isIDNotEmpty && CommonUtils.fileExistsAtPath(ScannerSaver.attendancePath(ScannerSaver.Type.REGULAR)));
+			appendNotHereBtn.setEnabled(isIDNotEmpty && CommonUtils.fileExistsAtPath(ScannerSaver.attendancePath(ScannerSaver.Type.NOTHERE)));
+		} catch (IOException e) {}
+	}
 
 	public ScannerDialog(Map<Integer, Student> students) {
 		this.setTitle(Constants.SCANNER_DIALOG_TITLE + (Main.test ? " (Test Mode)" : ""));
@@ -127,10 +138,7 @@ public class ScannerDialog extends JFrame {
 			}
 
 			public void validate() {
-				confirmRegularBtn.setEnabled(!IDs.isEmpty());
-				appendRegularBtn.setEnabled(!IDs.isEmpty());
-				confirmNotHereBtn.setEnabled(!IDs.isEmpty());
-				appendNotHereBtn.setEnabled(!IDs.isEmpty());
+				updateButtonsState();
 				String text = field.getText();
 				boolean shouldCleanup = false;
 				boolean removeLabel = false;

@@ -39,4 +39,10 @@ public class Status {
 	public String getReason() {
 		return reason;
 	}
+	
+	public String toString() {
+		if (type == null)
+			return ""; // It should not happen
+		return type.toString();
+	}
 }

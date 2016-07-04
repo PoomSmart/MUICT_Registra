@@ -1,3 +1,5 @@
+import java.awt.Color;
+import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -7,19 +9,38 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
+import javax.swing.SpringLayout;
+import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableRowSorter;
 
 import org.apache.commons.io.FileUtils;
 
 public class StudentTable extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private Map<Integer, Student> students;
-	
+	private JTextField filterText;
+	private JTextArea studentText;
+
+	private TableRowSorter<? extends AbstractTableModel> sorter;
+
 	public Map<Integer, Student> presentStudentMapForDate(Date date) {
 		String mapPath = CommonUtils.filePath(CommonUtils.FileType.REGULAR, date);
 		if (!CommonUtils.fileExistsAtPath(mapPath)) {
@@ -46,30 +67,31 @@ public class StudentTable extends JFrame {
 	}
 
 	private Object[][] toData(Map<Integer, Student> students, int mode) {
-		Object[][] arr = new Object[students.size()][mode == 0 ? 6 : 5];
+		Object[][] arr = new Object[students.size()][mode == 0 ? 7 : 6];
 		Set<Map.Entry<Integer, Student>> entries = students.entrySet();
 		Iterator<Map.Entry<Integer, Student>> entriesIterator = entries.iterator();
 		int i = 0;
 		while (entriesIterator.hasNext()) {
 			Map.Entry<Integer, Student> mapping = (Map.Entry<Integer, Student>) entriesIterator.next();
 			Student student = mapping.getValue();
-			arr[i][0] = student.getFirstname();
-			arr[i][1] = student.getLastname();
-			arr[i][2] = student.getNickname();
-			arr[i][3] = student.getGender();
+			arr[i][0] = student.getID();
+			arr[i][1] = student.getFirstname();
+			arr[i][2] = student.getLastname();
+			arr[i][3] = student.getNickname();
+			arr[i][4] = student.getGender();
 			if (mode == 0) {
-				arr[i][4] = "Test Available";
-				arr[i][5] = "Test Position";
+				arr[i][5] = student.getCurrentStatus();
+				arr[i][6] = "Test Position";
 			} else
-				arr[i][4] = student.getAbsenceCount();
+				arr[i][5] = student.getAbsenceCount();
 			i++;
 		}
 		return arr;
 	}
-	
+
 	private String[] columnNamesForMode(int mode) {
-		String[] names = { "First Name", "Last Name", "Nickname", "Gender", "Status", "Position" };
-		String[] names_global = { "First Name", "Last Name", "Nickname", "Gender", "Total #Absence" };
+		String[] names = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Status", "Position" };
+		String[] names_global = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Total #Absence" };
 		return mode == 0 ? names : names_global;
 	}
 
@@ -80,10 +102,25 @@ public class StudentTable extends JFrame {
 			title += " for " + DateUtils.getCurrentNormalFormattedDate();
 		if (mode > 1)
 			return;
+		JPanel self = new JPanel();
+		self.setLayout(new BoxLayout(self, BoxLayout.Y_AXIS));
 		this.setTitle(CommonUtils.realTitle(title));
 		this.setSize(700, 900);
 		CommonUtils.setCenter(this);
 		Map<Integer, Student> internalStudents = presentStudentMapForDate(DateUtils.getCurrentDate());
+		// Add leave-with-reason students
+		String absenceDBPath = CommonUtils.filePath(CommonUtils.FileType.NOTHERE);
+		AbsenceParser absenceParser = new AbsenceParser(absenceDBPath, students);
+		internalStudents.putAll(absenceParser.getAbsentStudents());
+
+		// Add absent students
+		// FIXME: Possible slow algorithm
+		for (Student student : students.values()) {
+			if (!internalStudents.containsKey(student.getID())) {
+				student.addStatus(new Status(Status.Type.ABSENT));
+				internalStudents.put(student.getID(), student);
+			}
+		}
 
 		class StudentTableModel extends AbstractTableModel {
 
@@ -101,7 +138,7 @@ public class StudentTable extends JFrame {
 			public int getRowCount() {
 				return internalStudents.size();
 			}
-			
+
 			public String getColumnName(int col) {
 				return columnNames[col];
 			}
@@ -117,11 +154,75 @@ public class StudentTable extends JFrame {
 
 		}
 
-		JTable table = new JTable(new StudentTableModel());
+		StudentTableModel model = new StudentTableModel();
+		JTable table = new JTable(model);
 		table.setFillsViewportHeight(true);
 		table.setAutoCreateRowSorter(true);
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		sorter = new TableRowSorter<StudentTableModel>(model);
+		table.setRowSorter(sorter);
+		table.setPreferredScrollableViewportSize(new Dimension(this.getWidth(), this.getHeight() - 200));
 
+		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent event) {
+				int viewRow = table.getSelectedRow();
+				if (viewRow < 0) {
+					studentText.setText("");
+				} else {
+					int modelRow = table.convertRowIndexToModel(viewRow);
+					studentText.setText(internalStudents.get(table.getModel().getValueAt(viewRow, 0)).toString());
+				}
+			}
+		});
+		
 		JScrollPane scrollPane = new JScrollPane(table);
-		getContentPane().add(scrollPane);
+		self.add(scrollPane);
+
+		JPanel form = new JPanel(new SpringLayout());
+		JLabel filterLabel = new JLabel("Filter Text:", SwingConstants.TRAILING);
+		form.add(filterLabel);
+
+		filterText = new JTextField(10);
+		filterText.getDocument().addDocumentListener(new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) {
+				newFilter();
+			}
+
+			public void insertUpdate(DocumentEvent e) {
+				newFilter();
+			}
+
+			public void removeUpdate(DocumentEvent e) {
+				newFilter();
+			}
+		});
+		filterLabel.setLabelFor(filterText);
+		filterText.setBorder(BorderFactory.createLineBorder(Color.gray));
+		form.add(filterText);
+
+		JLabel statusLabel = new JLabel("Student Info:", SwingConstants.TRAILING);
+		form.add(statusLabel);
+		studentText = new JTextArea();
+		statusLabel.setLabelFor(studentText);
+		studentText.setPreferredSize(new Dimension(studentText.getWidth(), 150));
+		studentText.setBorder(BorderFactory.createLineBorder(Color.gray));
+		studentText.setEditable(false);
+		form.add(studentText);
+		
+		SpringUtilities.makeCompactGrid(form, 2, 2, 6, 6, 6, 6);
+		self.add(form);
+		this.setContentPane(self);
+		this.pack();
 	}
+
+	private void newFilter() {
+		RowFilter<? super AbstractTableModel, Object> rf = null;
+		try {
+			rf = RowFilter.regexFilter(filterText.getText(), 0);
+		} catch (java.util.regex.PatternSyntaxException e) {
+			return;
+		}
+		sorter.setRowFilter(rf);
+	}
+
 }

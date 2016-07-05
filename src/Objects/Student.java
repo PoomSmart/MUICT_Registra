@@ -1,5 +1,4 @@
 package Objects;
-import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -14,7 +13,7 @@ public class Student implements Cloneable {
 	private String lastname;
 	private String nickname;
 	private String gender;
-	private Map<Date, Status> statuses;
+	private Map<String, Status> statuses;
 	private Position<Integer, Integer> position;
 
 	public Student(Integer ID, String name, String nickname, String gender) {
@@ -31,7 +30,7 @@ public class Student implements Cloneable {
 		this.nickname = nickname;
 		this.gender = gender;
 		this.position = new Position<Integer, Integer>(-1, -1);
-		this.statuses = new TreeMap<Date, Status>();
+		this.statuses = new TreeMap<String, Status>();
 	}
 
 	public Integer getID() {
@@ -73,9 +72,9 @@ public class Student implements Cloneable {
 	 */
 
 	public Status getCurrentStatus() {
-		for (Entry<Date, Status> entry : statuses.entrySet()) {
-			Date date = entry.getKey();
-			if (DateUtils.getCurrentFormattedDate().equals(DateUtils.formattedDate(date)))
+		for (Entry<String, Status> entry : statuses.entrySet()) {
+			String date = entry.getKey();
+			if (DateUtils.getCurrentFormattedDate().equals(date))
 				return entry.getValue();
 		}
 		return null;
@@ -111,9 +110,23 @@ public class Student implements Cloneable {
 	public boolean isNormal() {
 		return getCurrentStatus().getType() == Status.Type.PRESENT;
 	}
+	
+	/***
+	 * This student has left with reason
+	 * 
+	 * @return
+	 */
+	
+	public boolean isLeft() {
+		return getCurrentStatus().getType() == Status.Type.LEAVE;
+	}
 
 	public void addStatus(Status status) {
-		statuses.put(DateUtils.getCurrentDate(), status);
+		String key = DateUtils.getCurrentFormattedDate();
+		// We shall overwrite status if same date (same key)
+		if (statuses.containsKey(key))
+			statuses.remove(key);
+		statuses.put(key, status);
 	}
 
 	private String getNormalizedGender() {
@@ -149,10 +162,10 @@ public class Student implements Cloneable {
 
 	public Student clone() {
 		Student student = new Student(ID, name, nickname, gender);
-		student.statuses = new TreeMap<Date, Status>();
+		student.statuses = new TreeMap<String, Status>();
 		student.position = position.clone();
-		for (Map.Entry<Date, Status> entry : statuses.entrySet()) {
-			Date date = (Date)entry.getKey().clone();
+		for (Map.Entry<String, Status> entry : statuses.entrySet()) {
+			String date = entry.getKey();
 			Status status = entry.getValue().clone();
 			student.statuses.put(date, status);
 		}

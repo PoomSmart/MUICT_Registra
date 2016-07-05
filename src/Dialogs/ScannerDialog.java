@@ -13,7 +13,6 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -87,8 +86,6 @@ public class ScannerDialog extends JFrame {
 	private void reloadCurrentPresentStudents() {
 		StudentTable table = new StudentTable(students, 0);
 		currentPresentStudents = table.presentStudentMapForDate(DateUtils.getCurrentDate());
-		if (currentPresentStudents == null)
-			currentPresentStudents = new TreeMap<Integer, Student>();
 	}
 
 	private void actionPerformWriteForType(String title, String confirmString, String fileExistedString,

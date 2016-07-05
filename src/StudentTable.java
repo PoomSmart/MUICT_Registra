@@ -2,12 +2,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -40,11 +42,11 @@ public class StudentTable extends JFrame {
 	private JTextArea studentText;
 
 	private TableRowSorter<? extends AbstractTableModel> sorter;
-
-	public Map<Integer, Student> presentStudentMapForDate(Date date) {
-		String mapPath = CommonUtils.filePath(CommonUtils.FileType.REGULAR, date);
+	
+	public Map<Integer, Student> studentMapForDate(Date date, CommonUtils.FileType type) {
+		String mapPath = CommonUtils.filePath(type, date);
 		if (!CommonUtils.fileExistsAtPath(mapPath)) {
-			System.out.println("Map for date " + DateUtils.normalFormattedDate(date) + " not found");
+			System.out.println("Map (" + type + ") for date " + DateUtils.normalFormattedDate(date) + " not found");
 			return null;
 		}
 		Map<Integer, Student> map = new TreeMap<Integer, Student>();
@@ -56,14 +58,37 @@ public class StudentTable extends JFrame {
 			return null;
 		}
 		for (String line : lines) {
-			Integer ID = CommonUtils.getID(line);
+			Integer ID;
+			Matcher m = null;
+			if (type == CommonUtils.FileType.REGULAR)
+				ID = CommonUtils.getID(line);
+			else {
+				m = LeaveParser.pDB.matcher(line);
+				if (!m.find())
+					continue;
+				ID = CommonUtils.getID(m.group(1));
+			}
 			if (ID == -1)
 				continue;
-			Student student = students.get(ID);
-			student.addStatus(new Status());
+			Student student = students.get(ID).clone();
+			if (type == CommonUtils.FileType.REGULAR)
+				student.addStatus(new Status());
+			else {
+				Status.Type statusType = Status.getType(m.group(2));
+				String reason = m.group(3);
+				student.addStatus(new Status(statusType, reason));
+			}
 			map.put(ID, student);
 		}
 		return map;
+	}
+
+	public Map<Integer, Student> presentStudentMapForDate(Date date) {
+		return studentMapForDate(date, CommonUtils.FileType.REGULAR);
+	}
+	
+	public Map<Integer, Student> leaveStudentMapForDate(Date date) {
+		return studentMapForDate(date, CommonUtils.FileType.NOTHERE);
 	}
 
 	private Object[][] toData(Map<Integer, Student> students, int mode) {
@@ -107,18 +132,50 @@ public class StudentTable extends JFrame {
 		this.setTitle(CommonUtils.realTitle(title));
 		this.setSize(700, 900);
 		CommonUtils.setCenter(this);
-		Map<Integer, Student> internalStudents = presentStudentMapForDate(DateUtils.getCurrentDate());
-		// Add leave-with-reason students
-		String absenceDBPath = CommonUtils.filePath(CommonUtils.FileType.NOTHERE);
-		AbsenceParser absenceParser = new AbsenceParser(absenceDBPath, students);
-		internalStudents.putAll(absenceParser.getAbsentStudents());
 
-		// Add absent students
-		// FIXME: Possible slow algorithm
-		for (Student student : students.values()) {
-			if (!internalStudents.containsKey(student.getID())) {
-				student.addStatus(new Status(Status.Type.ABSENT));
-				internalStudents.put(student.getID(), student);
+		Map<Integer, Student> internalStudents;
+
+		if (mode == 0) {
+			internalStudents = presentStudentMapForDate(DateUtils.getCurrentDate());
+			// Add leave-with-reason students
+			String leaveDBPath = CommonUtils.filePath(CommonUtils.FileType.NOTHERE);
+			LeaveParser leaveParser = new LeaveParser(leaveDBPath, students);
+			internalStudents.putAll(leaveParser.getLeaveStudents());
+
+			// Add absent students
+			// FIXME: Possibly slow algorithm
+			for (Student student : students.values()) {
+				if (!internalStudents.containsKey(student.getID())) {
+					Student absentStudent = student.clone();
+					absentStudent.addStatus(new Status(Status.Type.ABSENT));
+					internalStudents.put(absentStudent.getID(), absentStudent);
+				}
+			}
+		} else {
+			internalStudents = new TreeMap<Integer, Student>();
+			for (Map.Entry<Integer, Student> entry : students.entrySet()) {
+				internalStudents.put(entry.getKey(), entry.getValue().clone());
+			}
+			File[] dates = new File("Attendance/").listFiles();
+			for (File date : dates) {
+				if (!date.isDirectory())
+					continue;
+				Date d;
+				try {
+					d = DateUtils.s_fmt.parse(date.getName());
+				} catch (ParseException e) {
+					continue;
+				}
+				Map<Integer, Student> presentStudents = presentStudentMapForDate(d);
+				for (Student presentStudent : presentStudents.values()) {
+					internalStudents.get(presentStudent.getID()).addStatus(presentStudent.getCurrentStatus().clone());
+				}
+				Map<Integer, Student> leaveStudents = leaveStudentMapForDate(d);
+				if (leaveStudents != null) {
+					for (Student leaveStudent : leaveStudents.values()) {
+						internalStudents.get(leaveStudent.getID()).addStatus(leaveStudent.getCurrentStatus().clone());
+					}
+				}
 			}
 		}
 
@@ -166,15 +223,15 @@ public class StudentTable extends JFrame {
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent event) {
 				int viewRow = table.getSelectedRow();
-				if (viewRow < 0) {
+				if (viewRow < 0)
 					studentText.setText("");
-				} else {
+				else {
 					int modelRow = table.convertRowIndexToModel(viewRow);
-					studentText.setText(internalStudents.get(table.getModel().getValueAt(viewRow, 0)).toString());
+					studentText.setText(internalStudents.get(table.getModel().getValueAt(modelRow, 0)).toString(mode));
 				}
 			}
 		});
-		
+
 		JScrollPane scrollPane = new JScrollPane(table);
 		self.add(scrollPane);
 
@@ -208,7 +265,7 @@ public class StudentTable extends JFrame {
 		studentText.setBorder(BorderFactory.createLineBorder(Color.gray));
 		studentText.setEditable(false);
 		form.add(studentText);
-		
+
 		SpringUtilities.makeCompactGrid(form, 2, 2, 6, 6, 6, 6);
 		self.add(form);
 		this.setContentPane(self);
@@ -218,7 +275,7 @@ public class StudentTable extends JFrame {
 	private void newFilter() {
 		RowFilter<? super AbstractTableModel, Object> rf = null;
 		try {
-			rf = RowFilter.regexFilter(filterText.getText(), 0);
+			rf = RowFilter.regexFilter(filterText.getText(), 0, 1, 2, 3, 6);
 		} catch (java.util.regex.PatternSyntaxException e) {
 			return;
 		}

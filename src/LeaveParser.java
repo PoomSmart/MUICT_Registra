@@ -7,31 +7,30 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class AbsenceParser {
+public class LeaveParser {
 
 	// Pattern: ID,type,reason
-	private static final Pattern pDB = Pattern.compile("(\\d+),(.*),(.*)");
+	public static final Pattern pDB = Pattern.compile("(\\d+),leave,(.*)");
 	
-	private Map<Integer, Student> absentStudents;
+	private Map<Integer, Student> leaveStudents;
 
-	public AbsenceParser(String dbPath, Map<Integer, Student> students) {
+	public LeaveParser(String dbPath, Map<Integer, Student> students) {
 		try {
-			absentStudents = new TreeMap<Integer, Student>();
+			leaveStudents = new TreeMap<Integer, Student>();
 			BufferedReader reader = new BufferedReader(new FileReader(new File(dbPath)));
 			String line;
 			Matcher m;
 			while ((line = reader.readLine()) != null) {
 				if ((m = pDB.matcher(line)).find()) {
-					Integer ID = Integer.parseInt(m.group(1));
-					Status.Type type = Status.getType(m.group(2));
-					String reason = m.group(3);
+					Integer ID = CommonUtils.getID(m.group(1));
+					String reason = m.group(2);
 					if (!students.containsKey(ID)) {
 						System.out.println("ID not found: " + ID);
 						System.out.println("I don't think we would face this problem");
 						continue;
 					}
-					students.get(ID).addStatus(new Status(type, reason));
-					absentStudents.put(ID, students.get(ID));
+					students.get(ID).addStatus(new Status(Status.Type.LEAVE, reason));
+					leaveStudents.put(ID, students.get(ID));
 				}
 			}
 			reader.close();
@@ -40,8 +39,8 @@ public class AbsenceParser {
 		}
 	}
 
-	public Map<Integer, Student> getAbsentStudents() {
-		return absentStudents;
+	public Map<Integer, Student> getLeaveStudents() {
+		return leaveStudents;
 	}
 
 }

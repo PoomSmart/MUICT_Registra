@@ -4,8 +4,8 @@ import java.util.Date;
 
 public class DateUtils {
 	
-	private static final SimpleDateFormat s_fmt = new SimpleDateFormat("yyyyMMdd");
-	private static final SimpleDateFormat n_fmt = new SimpleDateFormat("dd/MM/yyyy");
+	public static final SimpleDateFormat s_fmt = new SimpleDateFormat("yyyyMMdd");
+	public static final SimpleDateFormat n_fmt = new SimpleDateFormat("dd/MM/yyyy");
 	
 	public static String formattedDate(Date date) {
 		return s_fmt.format(date);

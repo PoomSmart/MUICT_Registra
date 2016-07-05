@@ -21,8 +21,8 @@ public class ControlCenterDialog extends JFrame {
 
 	public ControlCenterDialog(Map<Integer, Student> students) {
 		this.setTitle(CommonUtils.realTitle("Control Center"));
-		this.setSize(450, 100);
-		CommonUtils.setRelativeCenter(this, 0, -250);
+		this.setSize(450, 75);
+		CommonUtils.setRelativeCenter(this, 0, -200);
 		this.setLayout(new FlowLayout());
 
 		JButton showDBButton = new JButton("Attendance");
@@ -37,7 +37,7 @@ public class ControlCenterDialog extends JFrame {
 				}
 			}
 		});
-		this.getContentPane().add(showDBButton);
+		getContentPane().add(showDBButton);
 
 		JButton showLogButton = new JButton("Log");
 		Object[] logOptions = { "Current", "All" };
@@ -54,24 +54,26 @@ public class ControlCenterDialog extends JFrame {
 				}
 			}
 		});
-		this.getContentPane().add(showLogButton);
+		getContentPane().add(showLogButton);
 		
-		JButton editLogButton = new JButton("Edit Current Log");
+		JButton editLogButton = new JButton("Current Log");
 		editLogButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Logger.showLog(DateUtils.getCurrentDate(), true, true, CommonUtils.filePath(CommonUtils.FileType.LOG, DateUtils.getCurrentDate()));
 			}
 		});
-		this.getContentPane().add(editLogButton);
+		getContentPane().add(editLogButton);
 		
 		JButton showSeatButton = new JButton("Visualize");
 		showSeatButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SeatVisualizer vis = new SeatVisualizer(students);
-				vis.setVisible(true);
+				if (SeatVisualizer.activeVisualizer == null) {
+					SeatVisualizer vis = new SeatVisualizer(students);
+					vis.setVisible(true);
+				}
 			}
 		});
-		this.getContentPane().add(showSeatButton);
+		getContentPane().add(showSeatButton);
 
 		this.setResizable(false);
 	}

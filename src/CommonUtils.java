@@ -1,5 +1,6 @@
 import java.io.File;
 import java.util.Date;
+import java.util.Vector;
 
 import javax.swing.JFrame;
 
@@ -12,9 +13,21 @@ public enum FileType { REGULAR, NOTHERE, LOG }
 		case REGULAR:
 			return "present.csv";
 		case NOTHERE:
-			return "absent.csv";
+			return "leave.csv";
 		case LOG:
 			return "log.txt";
+		}
+		return null;
+	}
+	
+	public static Status.Type typeFromFileType(FileType type) {
+		switch (type) {
+		case REGULAR:
+			return Status.Type.PRESENT;
+		case NOTHERE:
+			return Status.Type.LEAVE;
+		case LOG:
+			return null;
 		}
 		return null;
 	}
@@ -63,5 +76,12 @@ public enum FileType { REGULAR, NOTHERE, LOG }
 
 	public static String realTitle(String title) {
 		return title + (Main.test ? " (Test Mode)" : "");
+	}
+	
+	public static Vector<String> sameReason(String reason, int count) {
+		Vector<String> reasons = new Vector<String>();
+		while (count-- != 0)
+			reasons.add(reason);
+		return reasons;
 	}
 }

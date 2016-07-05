@@ -3,7 +3,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-public class Student {
+public class Student implements Cloneable {
 
 	private Integer ID;
 	private String name;
@@ -67,14 +67,26 @@ public class Student {
 		}
 		return null;
 	}
-
-	public Integer getAbsenceCount() {
+	
+	public Integer getTypeCount(Status.Type type) {
 		Integer count = 0;
 		for (Status status : statuses.values()) {
-			if (status.getType() == Status.Type.ABSENT)
+			if (status.getType() == type)
 				count++;
 		}
 		return count;
+	}
+
+	public Integer getAbsenceCount() {
+		return getTypeCount(Status.Type.ABSENT);
+	}
+	
+	public Integer getPresentCount() {
+		return getTypeCount(Status.Type.PRESENT);
+	}
+	
+	public Integer getLeaveCount() {
+		return getTypeCount(Status.Type.LEAVE);
 	}
 
 	/***
@@ -102,14 +114,34 @@ public class Student {
 		return "Unknown";
 	}
 
-	public String toString() {
+	public String toString(int mode) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("ID: " + ID + "\n");
 		sb.append("Full Name: " + name + " (" + nickname + ")\n");
 		sb.append("Gender: " + getNormalizedGender() + "\n");
-		sb.append("Current Status: " + getCurrentStatus() + "\n");
+		if (mode == 0) {
+			Status status = getCurrentStatus();
+			sb.append("Current Status: " + status + "\n");
+			if (status.getType() == Status.Type.LEAVE)
+				sb.append("Reason: " + status.getReason() + "\n");
+		}
 		sb.append("Total #Absence: " + getAbsenceCount() + "\n");
 		return sb.toString();
+	}
+	
+	public String toString() {
+		return toString(0);
+	}
+
+	public Student clone() {
+		Student student = new Student(ID, name, nickname, gender);
+		student.statuses = new TreeMap<Date, Status>();
+		for (Map.Entry<Date, Status> entry : statuses.entrySet()) {
+			Date date = (Date)entry.getKey().clone();
+			Status status = entry.getValue().clone();
+			student.statuses.put(date, status);
+		}
+		return student;
 	}
 
 }

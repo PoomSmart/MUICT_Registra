@@ -70,7 +70,7 @@ public class Main {
 		LeaveDialog leaveDialog = new LeaveDialog(students);
 		leaveDialog.setVisible(true);
 		runFrame(leaveDialog);
-
+		
 		ControlCenterDialog ccDialog = new ControlCenterDialog(students);
 		ccDialog.setVisible(true);
 		runFrame(ccDialog);

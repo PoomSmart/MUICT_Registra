@@ -13,6 +13,7 @@ import org.apache.commons.io.FileUtils;
 import Dialogs.PlainTextDialog;
 import Objects.Constants;
 import Utilities.CommonUtils;
+import Utilities.CommonUtils.FileType;
 import Utilities.DateUtils;
 
 public class Logger {
@@ -20,19 +21,7 @@ public class Logger {
 	private static final Dimension logSize = new Dimension(500, 500);
 
 	public static String logContentForDate(Date date) throws IOException {
-		return FileUtils.readFileToString(CommonUtils.fileFromType(CommonUtils.FileType.LOG, date));
-	}
-
-	public static void showLog(Date date, boolean editable) {
-		try {
-			PlainTextDialog dialog = new PlainTextDialog("Log for " + date, logSize.width, logSize.height, 5,
-					logContentForDate(date), editable);
-			dialog.setVisible(true);
-		} catch (FileNotFoundException ex) {
-			JOptionPane.showMessageDialog(null, "No log has been created for " + DateUtils.normalFormattedDate(date));
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
+		return FileUtils.readFileToString(CommonUtils.fileFromType(FileType.LOG, date));
 	}
 
 	public static void showLog(Date date, boolean editable, boolean force, String filePath) {
@@ -40,7 +29,7 @@ public class Logger {
 		String title = "Log for " + DateUtils.normalFormattedDate(date);
 		try {
 			dialog = new PlainTextDialog(title, logSize.width, logSize.height, 5, logContentForDate(date),
-					editable);
+					editable, filePath);
 		} catch (FileNotFoundException ex) {
 			if (force)
 				dialog = new PlainTextDialog(title, logSize.width, logSize.height, 5, "", editable, filePath);
@@ -53,6 +42,10 @@ public class Logger {
 			if (dialog != null)
 				dialog.setVisible(true);
 		}
+	}
+	
+	public static void showLog(Date date, boolean editable) {
+		showLog(date, editable, false, null);
 	}
 	
 	public static void showLog(Date date, boolean editable, boolean force) {
@@ -82,6 +75,7 @@ public class Logger {
 				content.append("No content.\n\n");
 			}
 		}
+		content.append("\n\n===========================");
 		dialog.setText(content.toString());
 		dialog.setVisible(true);
 	}

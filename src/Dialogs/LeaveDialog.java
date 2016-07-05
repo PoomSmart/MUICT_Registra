@@ -1,4 +1,6 @@
 package Dialogs;
+
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -7,6 +9,7 @@ import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -17,6 +20,7 @@ import javax.swing.SpringLayout;
 
 import Objects.Constants;
 import Objects.Student;
+import Tables.StudentTable;
 import Utilities.CommonUtils;
 import Utilities.SpringUtilities;
 import Workers.ScannerSaver;
@@ -29,6 +33,22 @@ public class LeaveDialog extends JFrame {
 
 	private JTextField inputField;
 	private JTextArea reasonField;
+	private JComboBox<String> reasonSelector;
+	
+	private int defaultIndex = 2;
+	private String[] commonReasons = { "Sick", "ACM-ICPC", "Urgent Business", "Limited Allowances", "Others" };
+	
+	private boolean othersSelected() {
+		return reasonSelector.getSelectedIndex() == commonReasons.length - 1;
+	}
+	
+	private void updateReasonField() {
+		boolean others = othersSelected();
+		reasonField.setEnabled(others);
+		reasonField.setBackground(others ? Color.white : Color.getHSBColor(0.0f, 0.0f, 0.85f));
+		if (!others)
+			reasonField.setText("");
+	}
 
 	public LeaveDialog(Map<Integer, Student> students) {
 		this.setTitle(CommonUtils.realTitle("Leave Form"));
@@ -39,6 +59,7 @@ public class LeaveDialog extends JFrame {
 
 		JPanel panel = new JPanel();
 		panel.setLayout(new SpringLayout());
+		
 		JLabel IDLabel = new JLabel("ID: ", JLabel.TRAILING);
 		panel.add(IDLabel);
 		inputField = new JTextField();
@@ -50,7 +71,7 @@ public class LeaveDialog extends JFrame {
 		JLabel reasonLabel = new JLabel("Reason: ", JLabel.TRAILING);
 		panel.add(reasonLabel);
 		reasonField = new JTextArea();
-		reasonField.setPreferredSize(new Dimension(reasonField.getWidth(), 90));
+		reasonField.setPreferredSize(new Dimension(reasonField.getWidth(), 50));
 		panel.add(reasonField);
 		reasonLabel.setLabelFor(reasonField);
 
@@ -59,6 +80,7 @@ public class LeaveDialog extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				boolean shouldCleanup = false;
 				try {
+					Map<Integer, Student> currentStudentMap = StudentTable.currentStudentMap(students);
 					String oIDs = inputField.getText();
 					String[] sIDs = oIDs.split(",");
 					Vector<Integer> IDs = new Vector<Integer>();
@@ -70,11 +92,21 @@ public class LeaveDialog extends JFrame {
 							JOptionPane.showMessageDialog(null, "One or more student ID not found");
 							return;
 						}
+						Student realStudent = currentStudentMap.get(ID);
+						if (realStudent.isLeft()) {
+							JOptionPane.showMessageDialog(null, "One or more student has already lefted");
+							return;
+						}
+						if (realStudent.isAbsent()) {
+							JOptionPane.showMessageDialog(null, "One or more student is absent");
+							return;
+						}
 						IDs.add(ID);
 					}
-					String reason = reasonField.getText();
+					boolean others = othersSelected();
+					String reason = !others ? getReason() : reasonField.getText();
 					String reasonCheck = reason.trim().replaceAll("[\n\t\r]", "");
-					if (reasonCheck.length() == 0) {
+					if (reasonCheck.length() == 0 && others) {
 						JOptionPane.showMessageDialog(null, "Couldn't save leave form without reason");
 						System.out.println("null reason field");
 						return;
@@ -83,7 +115,8 @@ public class LeaveDialog extends JFrame {
 					int result = JOptionPane.showConfirmDialog(null, Constants.COMMON_CONFIRM, "Leave Form",
 							JOptionPane.YES_NO_OPTION);
 					if (result == JOptionPane.YES_OPTION) {
-						ScannerSaver.doneAddingCodes(IDs, CommonUtils.sameReason(reason, IDs.size()), true, CommonUtils.FileType.NOTHERE);
+						ScannerSaver.doneAddingCodes(IDs, CommonUtils.sameReason(reason, IDs.size()), true,
+								CommonUtils.FileType.NOTHERE);
 						shouldCleanup = true;
 					}
 				} catch (Exception ex) {
@@ -97,12 +130,34 @@ public class LeaveDialog extends JFrame {
 				}
 			}
 		});
+		
 		JButton nullBtn = new JButton();
 		nullBtn.setVisible(false);
 		panel.add(nullBtn);
+		
+		reasonSelector = new JComboBox<String>(commonReasons);
+		reasonSelector.setSelectedIndex(defaultIndex);
+		reasonSelector.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				updateReasonField();
+			}
+		});
+		panel.add(reasonSelector);
+		
+		nullBtn = new JButton();
+		nullBtn.setVisible(false);
+		panel.add(nullBtn);
+		
 		panel.add(saveBtn);
-		SpringUtilities.makeCompactGrid(panel, 3, 2, 6, 6, 6, 6);
+		
+		updateReasonField();
+		
+		SpringUtilities.makeCompactGrid(panel, 4, 2, 6, 6, 6, 6);
 		this.add(panel);
 		this.setResizable(false);
+	}
+	
+	public String getReason() {
+		return (String)reasonSelector.getSelectedItem();
 	}
 }

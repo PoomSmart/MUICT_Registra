@@ -1,4 +1,6 @@
 package Utilities;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.Date;
 import java.util.TreeSet;
@@ -97,5 +99,12 @@ public enum FileType { REGULAR, NOTHERE, LOG }
 	
 	public static <T> Vector<T> resolveDuplicates(Vector<T> list) {
 		return new Vector<T>(new TreeSet<T>(list));
+	}
+	
+	public static void setDontClose(JFrame frame) {
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {}
+		});
 	}
 }

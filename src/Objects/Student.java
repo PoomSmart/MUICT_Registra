@@ -120,6 +120,16 @@ public class Student implements Cloneable {
 	public boolean isLeft() {
 		return getCurrentStatus().getType() == Status.Type.LEAVE;
 	}
+	
+	/***
+	 * This student is absent
+	 * 
+	 * @return
+	 */
+	
+	public boolean isAbsent() {
+		return getCurrentStatus().getType() == Status.Type.ABSENT;
+	}
 
 	public void addStatus(Status status) {
 		String key = DateUtils.getCurrentFormattedDate();

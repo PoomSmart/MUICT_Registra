@@ -19,8 +19,10 @@ public class ScannerSaver {
 		if (type == CommonUtils.FileType.REGULAR)
 			FileUtils.writeLines(file, IDs, append);
 		else {
-			if (reasons == null)
+			if (reasons == null) {
+				System.out.println("null reason");
 				return;
+			}
 			StringBuilder lists = new StringBuilder();
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file, append));
 			for (int i = 0; i < IDs.size(); i++) {

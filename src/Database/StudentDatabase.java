@@ -9,11 +9,12 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 
+import Objects.Status;
 import Objects.Student;
 import Utilities.CommonUtils;
 
 public class StudentDatabase {
-	// Pattern: ID,name,nickname
+	// Pattern: ID,name,gender,nickname
 	private static final Pattern pattern = Pattern.compile("(\\d+),(.+),(M|F),(.+)");
 
 	private Map<Integer, Student> students = new TreeMap<Integer, Student>();
@@ -35,6 +36,7 @@ public class StudentDatabase {
 				String gender = m.group(3);
 				String nickname = m.group(4);
 				Student student = new Student(ID, name, nickname, gender);
+				student.addStatus(new Status(Status.Type.ABSENT));
 				students.put(ID, student);
 			}
 		}

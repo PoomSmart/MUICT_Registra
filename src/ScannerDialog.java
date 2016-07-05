@@ -37,8 +37,6 @@ public class ScannerDialog extends JFrame {
 	private JTextField field;
 	private JButton confirmRegularBtn;
 	private JButton appendRegularBtn;
-	private JButton confirmNotHereBtn;
-	private JButton appendNotHereBtn;
 
 	private void destroyEverything() {
 		this.setVisible(false);
@@ -100,16 +98,14 @@ public class ScannerDialog extends JFrame {
 	private void updateButtonsState() {
 		boolean isIDNotEmpty = !IDs.isEmpty();
 		confirmRegularBtn.setEnabled(isIDNotEmpty);
-		confirmNotHereBtn.setEnabled(isIDNotEmpty);
 		appendRegularBtn.setEnabled(isIDNotEmpty && CommonUtils.fileExistsAtPath(CommonUtils.filePath(CommonUtils.FileType.REGULAR)));
-		appendNotHereBtn.setEnabled(isIDNotEmpty && CommonUtils.fileExistsAtPath(CommonUtils.filePath(CommonUtils.FileType.NOTHERE)));
 	}
 
 	public ScannerDialog(Map<Integer, Student> students) {
 		this.setTitle(CommonUtils.realTitle(Constants.SCANNER_DIALOG_TITLE));
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-		this.setSize(400, 200);
+		this.setSize(400, 150);
 		field = new JTextField(1);
 		field.setHorizontalAlignment(JTextField.CENTER);
 		AbstractDocument document = (AbstractDocument) (field.getDocument());
@@ -266,42 +262,6 @@ public class ScannerDialog extends JFrame {
 		c.gridy = 3;
 		c.gridwidth = 2;
 		this.getContentPane().add(appendRegularBtn, c);
-
-		c.gridx = 0;
-		c.gridy = 4;
-		c.gridwidth = 1;
-		c.insets = new Insets(0, 0, 0, 0);
-		JLabel notHereLabel = new JLabel("Absence:");
-		notHereLabel.setHorizontalAlignment(JLabel.CENTER);
-		this.getContentPane().add(notHereLabel, c);
-
-		confirmNotHereBtn = new JButton("Confirm");
-		confirmNotHereBtn.setEnabled(false);
-		confirmNotHereBtn.setForeground(Color.blue);
-		confirmNotHereBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				actionPerformWriteForType(Constants.SCANNER_DIALOG_TITLE, Constants.CONFIRM_WRITE_ABSENCE, Constants.CONFIRM_OVERWRITE,
-						CommonUtils.FileType.NOTHERE);
-			}
-		});
-		c.gridx = 1;
-		c.gridy = 4;
-		c.gridwidth = 2;
-		c.insets = new Insets(3, 5, 3, 5);
-		this.getContentPane().add(confirmNotHereBtn, c);
-
-		appendNotHereBtn = new JButton("Append");
-		appendNotHereBtn.setEnabled(false);
-		appendNotHereBtn.setForeground(Color.red);
-		appendNotHereBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				actionPerformAppendForType(Constants.SCANNER_DIALOG_TITLE, Constants.CONFIRM_APPEND_ABSENCE, CommonUtils.FileType.NOTHERE);
-			}
-		});
-		c.gridx = 3;
-		c.gridy = 4;
-		c.gridwidth = 2;
-		this.getContentPane().add(appendNotHereBtn, c);
 
 		CommonUtils.setRelativeCenter(this, 0, -50);
 		this.setResizable(false);

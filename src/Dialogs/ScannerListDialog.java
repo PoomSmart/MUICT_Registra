@@ -1,7 +1,5 @@
 package Dialogs;
 import java.awt.GridLayout;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Vector;
@@ -27,10 +25,6 @@ public class ScannerListDialog extends JFrame {
 		this.setLayout(new GridLayout(defaultMaxListCount, 1));
 		this.setSize(550, 600);
 		CommonUtils.setRelativeCenter(this, 500, 0);
-		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		this.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {}
-		});
 		this.IDs = new Vector<Integer>();
 		this.labels = new Vector<JLabel>();
 		this.students = students;

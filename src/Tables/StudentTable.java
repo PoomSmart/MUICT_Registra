@@ -44,6 +44,9 @@ import Utilities.SpringUtilities;
 import Workers.LeaveParser;
 
 public class StudentTable extends JFrame {
+	
+	// TODO: Reloading table feature
+	// FIXME: Huge algorithm
 
 	private static final long serialVersionUID = 1L;
 
@@ -54,6 +57,11 @@ public class StudentTable extends JFrame {
 	private JTextArea studentText;
 
 	private TableRowSorter<? extends AbstractTableModel> sorter;
+	
+	public static Map<Integer, Student> currentStudentMap(Map<Integer, Student> students) {
+		StudentTable table = new StudentTable(students, 0);
+		return table.getInternalStudents();
+	}
 	
 	public Map<Integer, Student> studentMapForDate(Date date, CommonUtils.FileType type) {
 		String mapPath = CommonUtils.filePath(type, date);

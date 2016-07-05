@@ -2,6 +2,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -26,7 +27,7 @@ public class LeaveDialog extends JFrame {
 		CommonUtils.setRelativeCenter(this, 0, 180);
 
 		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-		
+
 		JPanel panel = new JPanel();
 		panel.setLayout(new SpringLayout());
 		JLabel IDLabel = new JLabel("ID: ", JLabel.TRAILING);
@@ -36,48 +37,50 @@ public class LeaveDialog extends JFrame {
 		inputField.setBorder(null);
 		panel.add(inputField);
 		IDLabel.setLabelFor(inputField);
-		
-		
+
 		JLabel reasonLabel = new JLabel("Reason: ", JLabel.TRAILING);
 		panel.add(reasonLabel);
 		reasonField = new JTextArea();
 		reasonField.setPreferredSize(new Dimension(reasonField.getWidth(), 90));
 		panel.add(reasonField);
 		reasonLabel.setLabelFor(reasonField);
-		
+
 		JButton saveBtn = new JButton("Save");
 		saveBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				boolean shouldCleanup = true;
+				boolean shouldCleanup = false;
 				try {
-					String sID = inputField.getText();
-					Integer ID = CommonUtils.getID(sID);
-					if (ID == -1)
-						throw new Exception();
-					if (!students.containsKey(ID)) {
-						JOptionPane.showMessageDialog(null, "ID not found: " + sID);
-						System.out.println("ID not found: " + sID);
-						shouldCleanup = false;
-						return;
+					String oIDs = inputField.getText();
+					String[] sIDs = oIDs.split(",");
+					Vector<Integer> IDs = new Vector<Integer>();
+					for (String sID : sIDs) {
+						Integer ID = CommonUtils.getID(sID);
+						if (ID == -1)
+							throw new Exception();
+						if (!students.containsKey(ID)) {
+							JOptionPane.showMessageDialog(null, "One or more student ID not found");
+							return;
+						}
+						IDs.add(ID);
 					}
-					String reason = reasonField.getText().replaceAll("\n", "\\\\n");
-					if (reason.length() == 0) {
+					String reason = reasonField.getText();
+					String reasonCheck = reason.trim().replaceAll("[\n\t\r]", "");
+					if (reasonCheck.length() == 0) {
 						JOptionPane.showMessageDialog(null, "Couldn't save leave form without reason");
 						System.out.println("null reason field");
-						shouldCleanup = false;
 						return;
 					}
-					int result = JOptionPane.showConfirmDialog(null, Constants.COMMON_CONFIRM, "Leave Form", JOptionPane.YES_NO_OPTION);
+					reason = reason.replaceAll("\n", "\\\\n");
+					int result = JOptionPane.showConfirmDialog(null, Constants.COMMON_CONFIRM, "Leave Form",
+							JOptionPane.YES_NO_OPTION);
 					if (result == JOptionPane.YES_OPTION) {
-						System.out.println(String.format("%d - %s", ID, reason));
-						ScannerSaver.doneAddingCode(ID, reason, true, CommonUtils.FileType.NOTHERE);
-					} else
-						shouldCleanup = false;
+						ScannerSaver.doneAddingCodes(IDs, CommonUtils.sameReason(reason, IDs.size()), true, CommonUtils.FileType.NOTHERE);
+						shouldCleanup = true;
+					}
 				} catch (Exception ex) {
-					JOptionPane.showMessageDialog(null, "Not saving due to malformed input or any error");
-					System.out.println("malformed input or any error");
-				}
-				finally {
+					JOptionPane.showMessageDialog(null, "Not saving due to malformed input");
+					System.out.println("malformed input");
+				} finally {
 					if (shouldCleanup) {
 						inputField.setText("");
 						reasonField.setText("");

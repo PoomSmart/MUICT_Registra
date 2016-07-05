@@ -1,6 +1,7 @@
 package Utilities;
 import java.io.File;
 import java.util.Date;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -92,5 +93,9 @@ public enum FileType { REGULAR, NOTHERE, LOG }
 		while (count-- != 0)
 			reasons.add(reason);
 		return reasons;
+	}
+	
+	public static <T> Vector<T> resolveDuplicates(Vector<T> list) {
+		return new Vector<T>(new TreeSet<T>(list));
 	}
 }

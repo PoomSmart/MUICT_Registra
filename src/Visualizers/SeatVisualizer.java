@@ -77,7 +77,7 @@ public class SeatVisualizer extends JFrame {
 
 	public static SeatVisualizer activeVisualizer = null;
 
-	public static final Dimension bounds = new Dimension(12, 20);
+	public static final Dimension bounds = new Dimension(14, 20);
 	public static final Dimension tileSize = new Dimension(40, 25);
 	public static final Dimension absoluteSize = new Dimension(bounds.width * tileSize.width,
 			bounds.height * tileSize.height);
@@ -90,29 +90,28 @@ public class SeatVisualizer extends JFrame {
 		this.setTitle(CommonUtils.realTitle("Seat Visualizer"));
 		this.setSize(absoluteSize.width, absoluteSize.height + (int) (tileSize.height * 1.5));
 		getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 0, 1));
-		CommonUtils.setRelativeCenter(this, -480, 0);
+		CommonUtils.setRelativeCenter(this, -this.getWidth() + 45, 0);
 		this.students = students;
 		reloadStudents();
-		if (currentStudents != null) {
-			panel = new SeatPanel(currentStudents);
-			panel.setPreferredSize(this.getSize());
-			this.setPreferredSize(this.getSize());
-			this.setMinimumSize(this.getSize());
-			this.setMaximumSize(this.getSize());
-			this.add(panel);
-			this.setResizable(false);
-			activeVisualizer = this;
-		}
+		panel = new SeatPanel(currentStudents);
+		panel.setPreferredSize(this.getSize());
+		this.setPreferredSize(this.getSize());
+		this.setMinimumSize(this.getSize());
+		this.setMaximumSize(this.getSize());
+		this.add(panel);
+		this.setResizable(false);
+		activeVisualizer = this;
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				activeVisualizer = null;
 			}
 		});
+		
+		// TODO: Panel for Visualizer
 	}
 
 	private void reloadStudents() {
-		StudentTable table = new StudentTable(students, 0);
-		currentStudents = table.getInternalStudents();
+		currentStudents = StudentTable.currentStudentMap(students);
 	}
 
 	public static void updateIfPossible() {

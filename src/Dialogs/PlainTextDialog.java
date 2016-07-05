@@ -44,7 +44,7 @@ public class PlainTextDialog extends JFrame {
 			public void windowClosing(WindowEvent windowEvent) {
 				if (editable && filePath != null) {
 					int result = JOptionPane.showConfirmDialog(null, "Apply changes?", title, JOptionPane.YES_NO_OPTION);
-					if (result != JOptionPane.YES_OPTION) {
+					if (result == JOptionPane.YES_OPTION) {
 						try {
 							FileUtils.write(new File(filePath), textArea.getText());
 						} catch (IOException e) {

@@ -1,3 +1,4 @@
+package Dialogs;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +14,14 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+
+import Objects.Constants;
+import Objects.Student;
+import Utilities.CommonUtils;
+import Utilities.SpringUtilities;
+import Workers.ScannerSaver;
+
+// TODO: Drop down list or radio buttons for common reasons
 
 public class LeaveDialog extends JFrame {
 

@@ -1,15 +1,19 @@
+package Dialogs;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import org.apache.commons.io.FileUtils;
+import Objects.Student;
+import Tables.StudentTable;
+import Utilities.CommonUtils;
+import Utilities.DateUtils;
+import Visualizers.SeatVisualizer;
+import Workers.Logger;
 
 public class ControlCenterDialog extends JFrame {
 
@@ -25,8 +29,8 @@ public class ControlCenterDialog extends JFrame {
 		Object[] dbOptions = { "Today", "All" };
 		showDBButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int n = JOptionPane.showOptionDialog(null, "Select type:", "Attendance Type", JOptionPane.YES_NO_CANCEL_OPTION,
-						JOptionPane.PLAIN_MESSAGE, null, dbOptions, dbOptions[0]);
+				int n = JOptionPane.showOptionDialog(null, "Select type:", "Attendance Type",
+						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, dbOptions, dbOptions[0]);
 				if (n != JOptionPane.CLOSED_OPTION) {
 					StudentTable stuTable = new StudentTable(students, n);
 					stuTable.setVisible(true);
@@ -41,26 +45,33 @@ public class ControlCenterDialog extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				int n = JOptionPane.showOptionDialog(null, "Select type:", "Log Type", JOptionPane.YES_NO_CANCEL_OPTION,
 						JOptionPane.PLAIN_MESSAGE, null, logOptions, logOptions[0]);
-				PlainTextDialog log = null;
-				try {
-					switch (n) {
-					case 0:
-						log = new PlainTextDialog("Log for " + DateUtils.getCurrentDate(), 500, 500, 5,
-								FileUtils.readFileToString(CommonUtils.fileFromType(CommonUtils.FileType.LOG)), false);
-						break;
-					case 1:
-						log = new PlainTextDialog("All Log", 500, 500, 5, "foo", false);
-					}
-				} catch (FileNotFoundException ex) {
-					JOptionPane.showMessageDialog(null, "No log created");
-				} catch (IOException ex) {
-					ex.printStackTrace();
+				switch (n) {
+				case 0:
+					Logger.showLog(DateUtils.getCurrentDate(), false);
+					break;
+				case 1:
+					Logger.showLogs();
 				}
-				if (log != null)
-					log.setVisible(true);
 			}
 		});
 		this.getContentPane().add(showLogButton);
+		
+		JButton editLogButton = new JButton("Edit Current Log");
+		editLogButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Logger.showLog(DateUtils.getCurrentDate(), true, true, CommonUtils.filePath(CommonUtils.FileType.LOG, DateUtils.getCurrentDate()));
+			}
+		});
+		this.getContentPane().add(editLogButton);
+		
+		JButton showSeatButton = new JButton("Visualize");
+		showSeatButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SeatVisualizer vis = new SeatVisualizer(students);
+				vis.setVisible(true);
+			}
+		});
+		this.getContentPane().add(showSeatButton);
 
 		this.setResizable(false);
 	}

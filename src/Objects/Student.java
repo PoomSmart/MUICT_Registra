@@ -1,7 +1,10 @@
+package Objects;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+
+import Utilities.DateUtils;
 
 public class Student implements Cloneable {
 
@@ -12,6 +15,7 @@ public class Student implements Cloneable {
 	private String nickname;
 	private String gender;
 	private Map<Date, Status> statuses;
+	private Position<Integer, Integer> position;
 
 	public Student(Integer ID, String name, String nickname, String gender) {
 		this.ID = ID;
@@ -26,6 +30,7 @@ public class Student implements Cloneable {
 		}
 		this.nickname = nickname;
 		this.gender = gender;
+		this.position = new Position<Integer, Integer>(-1, -1);
 		this.statuses = new TreeMap<Date, Status>();
 	}
 
@@ -51,6 +56,14 @@ public class Student implements Cloneable {
 
 	public String getGender() {
 		return gender;
+	}
+	
+	public Position<Integer, Integer> getPosition() {
+		return position;
+	}
+
+	public void setPosition(Position<Integer, Integer> position) {
+		this.position = position;
 	}
 
 	/***
@@ -124,6 +137,7 @@ public class Student implements Cloneable {
 			sb.append("Current Status: " + status + "\n");
 			if (status.getType() == Status.Type.LEAVE)
 				sb.append("Reason: " + status.getReason() + "\n");
+			sb.append("Current Position: " + position + "\n");
 		}
 		sb.append("Total #Absence: " + getAbsenceCount() + "\n");
 		return sb.toString();
@@ -136,6 +150,7 @@ public class Student implements Cloneable {
 	public Student clone() {
 		Student student = new Student(ID, name, nickname, gender);
 		student.statuses = new TreeMap<Date, Status>();
+		student.position = position.clone();
 		for (Map.Entry<Date, Status> entry : statuses.entrySet()) {
 			Date date = (Date)entry.getKey().clone();
 			Status status = entry.getValue().clone();

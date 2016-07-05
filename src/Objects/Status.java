@@ -1,6 +1,7 @@
+package Objects;
 
 public class Status implements Cloneable {
-	enum Type {
+	public enum Type {
 		PRESENT, ABSENT, LEAVE
 	}
 

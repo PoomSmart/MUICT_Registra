@@ -1,3 +1,4 @@
+package Objects;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,4 +18,6 @@ public class Constants {
 	public static final String SCANNER_DIALOG_TITLE = "Scanner";
 	
 	public static final String COMMON_CONFIRM = "Confirm?";
+	
+	public static final String FILE_ROOT = "Attendance/";
 }

@@ -1,3 +1,5 @@
+package Tables;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
@@ -32,6 +34,14 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 
 import org.apache.commons.io.FileUtils;
+
+import Objects.Constants;
+import Objects.Status;
+import Objects.Student;
+import Utilities.CommonUtils;
+import Utilities.DateUtils;
+import Utilities.SpringUtilities;
+import Workers.LeaveParser;
 
 public class StudentTable extends JFrame {
 
@@ -74,9 +84,8 @@ public class StudentTable extends JFrame {
 			if (type == CommonUtils.FileType.REGULAR)
 				student.addStatus(new Status());
 			else {
-				Status.Type statusType = Status.getType(m.group(2));
-				String reason = m.group(3);
-				student.addStatus(new Status(statusType, reason));
+				String reason = m.group(2);
+				student.addStatus(new Status(Status.Type.LEAVE, reason));
 			}
 			map.put(ID, student);
 		}
@@ -106,7 +115,7 @@ public class StudentTable extends JFrame {
 			arr[i][4] = student.getGender();
 			if (mode == 0) {
 				arr[i][5] = student.getCurrentStatus();
-				arr[i][6] = "Test Position";
+				arr[i][6] = student.getPosition();
 			} else
 				arr[i][5] = student.getAbsenceCount();
 			i++;
@@ -156,14 +165,17 @@ public class StudentTable extends JFrame {
 			for (Map.Entry<Integer, Student> entry : students.entrySet()) {
 				internalStudents.put(entry.getKey(), entry.getValue().clone());
 			}
-			File[] dates = new File("Attendance/").listFiles();
+			File[] dates = new File(Constants.FILE_ROOT).listFiles();
 			for (File date : dates) {
-				if (!date.isDirectory())
+				if (!date.isDirectory()) {
+					System.out.println("Skip directory: " + date.getName());
 					continue;
+				}
 				Date d;
 				try {
 					d = DateUtils.s_fmt.parse(date.getName());
 				} catch (ParseException e) {
+					System.out.println("Invalid folder: " + date.getName());
 					continue;
 				}
 				Map<Integer, Student> presentStudents = presentStudentMapForDate(d);

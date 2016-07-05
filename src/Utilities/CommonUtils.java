@@ -1,8 +1,13 @@
+package Utilities;
 import java.io.File;
 import java.util.Date;
 import java.util.Vector;
 
 import javax.swing.JFrame;
+
+import Main.Main;
+import Objects.Constants;
+import Objects.Status;
 
 public class CommonUtils {
 	
@@ -44,6 +49,10 @@ public enum FileType { REGULAR, NOTHERE, LOG }
 		return new File(filePath(type));
 	}
 	
+	public static File fileFromType(FileType type, Date date) {
+		return new File(filePath(type, date));
+	}
+	
 	public static File fileFromPath(String filePath) {
 		if (filePath == null)
 			return null;
@@ -51,7 +60,7 @@ public enum FileType { REGULAR, NOTHERE, LOG }
 	}
 	
 	public static String filePath(FileType type, Date date) {
-		return "Attendance/" + DateUtils.formattedDate(date) + "/" + filename(type);
+		return Constants.FILE_ROOT + DateUtils.formattedDate(date) + "/" + filename(type);
 	}
 	
 	public static String filePath(FileType type) {

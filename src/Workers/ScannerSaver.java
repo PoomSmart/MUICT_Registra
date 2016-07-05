@@ -1,3 +1,4 @@
+package Workers;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -6,6 +7,8 @@ import java.nio.file.FileAlreadyExistsException;
 import java.util.Vector;
 
 import org.apache.commons.io.FileUtils;
+
+import Utilities.CommonUtils;
 
 public class ScannerSaver {
 	

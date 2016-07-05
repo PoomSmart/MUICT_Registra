@@ -1,3 +1,4 @@
+package Dialogs;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -23,6 +24,12 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.DocumentFilter;
+
+import Main.Main;
+import Objects.Constants;
+import Objects.Student;
+import Utilities.CommonUtils;
+import Workers.ScannerSaver;
 
 public class ScannerDialog extends JFrame {
 

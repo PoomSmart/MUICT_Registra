@@ -1,3 +1,4 @@
+package Dialogs;
 import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -7,6 +8,9 @@ import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+
+import Objects.Student;
+import Utilities.CommonUtils;
 
 public class ScannerListDialog extends JFrame {
 

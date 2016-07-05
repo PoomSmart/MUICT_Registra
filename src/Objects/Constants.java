@@ -16,6 +16,7 @@ public class Constants {
 	public static final String CONFIRM_OVERWRITE = "File already existed, continue?";
 	
 	public static final String SCANNER_DIALOG_TITLE = "Scanner";
+	public static final String SCANNER_DETECTING_MESSAGE = "Detecting scanned code";
 	
 	public static final String COMMON_CONFIRM = "Confirm?";
 	

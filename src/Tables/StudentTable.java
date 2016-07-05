@@ -59,7 +59,7 @@ public class StudentTable extends JFrame {
 		String mapPath = CommonUtils.filePath(type, date);
 		if (!CommonUtils.fileExistsAtPath(mapPath)) {
 			System.out.println("Map (" + type + ") for date " + DateUtils.normalFormattedDate(date) + " not found");
-			return null;
+			return new TreeMap<Integer, Student>();
 		}
 		Map<Integer, Student> map = new TreeMap<Integer, Student>();
 		List<String> lines;
@@ -67,7 +67,7 @@ public class StudentTable extends JFrame {
 			lines = FileUtils.readLines(new File(mapPath));
 		} catch (IOException e) {
 			e.printStackTrace();
-			return null;
+			return new TreeMap<Integer, Student>();
 		}
 		for (String line : lines) {
 			Integer ID;

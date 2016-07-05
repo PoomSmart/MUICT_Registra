@@ -48,6 +48,8 @@ public class StudentTable extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	private Map<Integer, Student> students;
+	private Map<Integer, Student> internalStudents;
+	
 	private JTextField filterText;
 	private JTextArea studentText;
 
@@ -141,8 +143,6 @@ public class StudentTable extends JFrame {
 		this.setTitle(CommonUtils.realTitle(title));
 		this.setSize(700, 900);
 		CommonUtils.setCenter(this);
-
-		Map<Integer, Student> internalStudents;
 
 		if (mode == 0) {
 			internalStudents = presentStudentMapForDate(DateUtils.getCurrentDate());
@@ -292,6 +292,10 @@ public class StudentTable extends JFrame {
 			return;
 		}
 		sorter.setRowFilter(rf);
+	}
+
+	public Map<Integer, Student> getInternalStudents() {
+		return internalStudents;
 	}
 
 }

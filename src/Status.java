@@ -1,5 +1,5 @@
 
-public class Status {
+public class Status implements Cloneable {
 	enum Type {
 		PRESENT, ABSENT, LEAVE
 	}
@@ -21,7 +21,7 @@ public class Status {
 
 	public Status(Type type, String reason) {
 		this.type = type;
-		this.reason = reason;
+		this.reason = reason.replaceAll("\\\\n", "\n");
 	}
 
 	public Status(Type type) {
@@ -44,5 +44,9 @@ public class Status {
 		if (type == null)
 			return ""; // It should not happen
 		return type.toString();
+	}
+	
+	public Status clone() {
+		return new Status(type, reason);
 	}
 }

@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,13 +17,9 @@ public class ControlCenterDialog extends JFrame {
 
 	public ControlCenterDialog(Map<Integer, Student> students) {
 		this.setTitle(CommonUtils.realTitle("Control Center"));
-		this.setSize(450, 150);
+		this.setSize(450, 100);
 		CommonUtils.setRelativeCenter(this, 0, -250);
 		this.setLayout(new FlowLayout());
-
-		JButton finalizeButton = new JButton("Finalize");
-		finalizeButton.setForeground(Color.red);
-		this.getContentPane().add(finalizeButton);
 
 		JButton showDBButton = new JButton("Attendance");
 		Object[] dbOptions = { "Today", "All" };

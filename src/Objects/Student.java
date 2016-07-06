@@ -1,4 +1,5 @@
 package Objects;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -157,17 +158,29 @@ public class Student implements Cloneable {
 
 	public String toString(int mode) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("ID: " + ID + "\n");
-		sb.append("Full Name: " + name + " (" + nickname + ")\n");
-		sb.append("Gender: " + getNormalizedGender() + "\n");
+		sb.append(" ID: " + ID + "\n");
+		sb.append(" Full Name: " + name + "\n");
+		sb.append(" Nickname: " + nickname + "\n");
+		sb.append(" Gender: " + getNormalizedGender() + "\n");
 		if (mode == 0) {
 			Status status = getCurrentStatus();
-			sb.append("Current Status: " + status + "\n");
+			sb.append(" Current Status: " + status + "\n");
 			if (status.getType() == Status.Type.LEAVE)
-				sb.append("Reason: " + status.getReason() + "\n");
-			sb.append("Current Position: " + position + "\n");
+				sb.append(" Reason: " + status.getReason() + "\n");
+			sb.append(" Current Position: " + position + "\n");
 		}
-		sb.append("Total #Absence: " + getAbsenceCount() + "\n");
+		sb.append(String.format(" Present | Leave | Absent: %d, %d, %d\n", getPresentCount(), getLeaveCount(), getAbsenceCount()));
+		sb.append(" Overall Status:\n");
+		for (Entry<String, Status> entry : statuses.entrySet()) {
+			String dateKey = entry.getKey();
+			Date date = null;
+			try {
+				date = DateUtils.s_fmt.parse(dateKey);
+			} catch (ParseException e) {}
+			String realDateKey = DateUtils.n_fmt.format(date);
+			Status status = entry.getValue();
+			sb.append(String.format("  %s: %s\n", realDateKey, status));
+		}
 		return sb.toString();
 	}
 	

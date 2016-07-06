@@ -22,7 +22,7 @@ import Utilities.CommonUtils.FileType;
 public class DBUtils {
 
 	// Pattern: ID,type,reason
-	public static final Pattern pDB = Pattern.compile("(\\d+),leave,(.*)");
+	public static final Pattern pLeave = Pattern.compile("(\\d+),leave,(.*)");
 	
 	
 	/**
@@ -39,7 +39,7 @@ public class DBUtils {
 			String line;
 			Matcher m;
 			while ((line = reader.readLine()) != null) {
-				if ((m = pDB.matcher(line)).find()) {
+				if ((m = pLeave.matcher(line)).find()) {
 					Integer ID = CommonUtils.getID(m.group(1));
 					String reason = m.group(2);
 					if (!Main.db.containsKey(ID)) {

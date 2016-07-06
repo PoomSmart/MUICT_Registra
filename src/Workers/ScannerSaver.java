@@ -8,6 +8,7 @@ import java.util.Vector;
 
 import org.apache.commons.io.FileUtils;
 
+import Tables.StudentTable;
 import Utilities.CommonUtils;
 import Utilities.CommonUtils.FileType;
 import Visualizers.SeatVisualizer;
@@ -45,6 +46,7 @@ public class ScannerSaver {
 		}
 		System.out.println(String.format("(%s mode) %s data to %s", type, (append ? "Append" : "Write"), filePath));
 		SeatVisualizer.updateIfPossible();
+		StudentTable.updateIfPossible();
 	}
 	
 	public static void doneAddingCodes(Vector<Integer> IDs, boolean append, FileType type, boolean force) throws IOException {

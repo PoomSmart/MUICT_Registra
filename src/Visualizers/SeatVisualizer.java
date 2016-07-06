@@ -154,6 +154,8 @@ class SeatPanel extends JPanel {
 							g.setColor(Color.blue);
 						else if (student.isLeft())
 							g.setColor(Color.yellow);
+						else if (student.isAbsent())
+							g.setColor(Color.getHSBColor(0.0f, 0.0f, 0.9f));
 						g.fillRect(shiftLeft + x * tileWidth, shiftTop + y * tileHeight, tileWidth, tileHeight);
 						found = true;
 						break;

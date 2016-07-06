@@ -1,8 +1,8 @@
 package Objects;
 
 public class Position<X, Y> implements Cloneable {
-	public final Integer x;
-	public final Integer y;
+	public Integer x;
+	public Integer y;
 	
 	public static final Position<Integer, Integer> nullPosition = new Position<Integer, Integer>(-1, -1);
 
@@ -11,15 +11,26 @@ public class Position<X, Y> implements Cloneable {
 		this.y = y;
 	}
 	
-	public boolean equals(Position<X, Y> position) {
-		return x == position.x && y == position.y;
-	}
-	
 	public String toString() {
 		return String.format("{%d, %d}", x, y);
 	}
 	
 	public Position<X, Y> clone() {
 		return new Position<X, Y>(x, y);
+	}
+
+	public Integer getX() {
+		return x;
+	}
+
+	public Integer getY() {
+		return y;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		@SuppressWarnings("unchecked")
+		Position<X, Y> position = (Position<X, Y>)obj;
+		return position.x == x && position.y == y;
 	}
 }

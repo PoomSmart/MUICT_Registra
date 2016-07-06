@@ -62,8 +62,12 @@ public enum FileType { REGULAR, NOTHERE, LOG }
 		return new File(filePath);
 	}
 	
+	public static String datePath(Date date) {
+		return Constants.FILE_ROOT + DateUtils.formattedDate(date);
+	}
+	
 	public static String filePath(FileType type, Date date) {
-		return Constants.FILE_ROOT + DateUtils.formattedDate(date) + "/" + filename(type);
+		return datePath(date) + "/" + filename(type);
 	}
 	
 	public static String filePath(FileType type) {

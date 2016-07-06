@@ -66,6 +66,21 @@ public class Student implements Cloneable {
 	public void setPosition(Position<Integer, Integer> position) {
 		this.position = position;
 	}
+	
+	/***
+	 * Get current status of a student in the specific date
+	 * 
+	 * @return
+	 */
+	
+	public Status getStatus(String date) {
+		for (Entry<String, Status> entry : statuses.entrySet()) {
+			String idate = entry.getKey();
+			if (idate.equals(date))
+				return entry.getValue();
+		}
+		return null;
+	}
 
 	/***
 	 * Get current status of a student in the current date
@@ -74,12 +89,7 @@ public class Student implements Cloneable {
 	 */
 
 	public Status getCurrentStatus() {
-		for (Entry<String, Status> entry : statuses.entrySet()) {
-			String date = entry.getKey();
-			if (DateUtils.getCurrentFormattedDate().equals(date))
-				return entry.getValue();
-		}
-		return null;
+		return getStatus(DateUtils.getCurrentFormattedDate());
 	}
 	
 	public Integer getTypeCount(Status.Type type) {

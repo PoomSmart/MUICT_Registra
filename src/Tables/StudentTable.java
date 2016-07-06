@@ -194,13 +194,18 @@ public class StudentTable extends JFrame {
 				// Assign present students
 				for (Student presentStudent : presentStudents.values()) {
 					Integer ID = presentStudent.getID();
-					internalStudents.get(ID).addStatus(presentStudent.getCurrentStatus().clone());
+					internalStudents.get(ID).addStatus(d, new Status());
 				}
 				// Assign leave students
-				Map<Integer, Student> leaveStudents = leaveStudentMapForDate(d);
+				// Fist adding leave-with-reason students
+				String leaveDBPath = CommonUtils.filePath(CommonUtils.FileType.NOTHERE, d);
+				LeaveParser leaveParser = new LeaveParser(leaveDBPath, students, d);
+				Map<Integer, Student> leaveStudents = leaveParser.getLeaveStudents();
 				for (Student leaveStudent : leaveStudents.values()) {
 					Integer ID = leaveStudent.getID();
-					internalStudents.get(ID).addStatus(leaveStudent.getCurrentStatus().clone());
+					Status leaveStatus = leaveStudent.getStatus(DateUtils.formattedDate(d));
+					if (leaveStatus != null)
+						internalStudents.get(ID).addStatus(d, leaveStatus.clone());
 				}
 				// Assign absent students
 				for (Student student : internalStudents.values()) {
@@ -332,7 +337,10 @@ public class StudentTable extends JFrame {
 	private void newFilter() {
 		RowFilter<? super AbstractTableModel, Object> rf = null;
 		try {
-			rf = RowFilter.regexFilter(filterText.getText(), 0, 1, 2, 3, 6);
+			if (mode == 0)
+				rf = RowFilter.regexFilter(filterText.getText(), 0, 1, 2, 3, 6);
+			else
+				rf = RowFilter.regexFilter(filterText.getText(), 0, 1, 2, 3);
 		} catch (java.util.regex.PatternSyntaxException e) {
 			return;
 		}

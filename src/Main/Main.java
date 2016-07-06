@@ -1,6 +1,8 @@
 package Main;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
@@ -15,6 +17,7 @@ import Dialogs.ScannerListDialog;
 import Objects.Position;
 import Objects.Student;
 import Utilities.CommonUtils;
+import Utilities.DateUtils;
 import Visualizers.SeatVisualizer;
 
 public class Main {
@@ -63,7 +66,12 @@ public class Main {
 	public static void main(String[] args) throws InterruptedException, IOException {
 		Map<Integer, Student> students = new StudentDatabase("batch-14.csv").getStudents();
 		randomPosition(students);
-
+		
+		String datePath = CommonUtils.datePath(DateUtils.getCurrentDate());
+		File file = new File(datePath);
+		if (!file.exists())
+			System.out.println("Create directory " + Files.createDirectory(file.toPath()));
+		
 		ScannerDialog scannerDialog = new ScannerDialog(students);
 		scannerDialog.setVisible(true);
 		runFrame(scannerDialog);

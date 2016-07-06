@@ -59,6 +59,9 @@ public class StudentTable extends JFrame {
 
 	private JTable table;
 	private int mode;
+	
+	private static String[] names = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Status", "Position" };
+	private static String[] names_global = { "ID", "First Name", "Last Name", "Nickname", "Gender", "#Present", "#Leave", "#Absence" };
 
 	private TableRowSorter<? extends AbstractTableModel> sorter;
 
@@ -122,7 +125,7 @@ public class StudentTable extends JFrame {
 	}
 
 	private Object[][] toData(Map<Integer, Student> students, int mode) {
-		Object[][] arr = new Object[students.size()][mode == 0 ? 7 : 6];
+		Object[][] arr = new Object[students.size()][mode == 0 ? names.length: names_global.length];
 		Set<Map.Entry<Integer, Student>> entries = students.entrySet();
 		Iterator<Map.Entry<Integer, Student>> entriesIterator = entries.iterator();
 		int i = 0;
@@ -137,16 +140,17 @@ public class StudentTable extends JFrame {
 			if (mode == 0) {
 				arr[i][5] = student.getCurrentStatus();
 				arr[i][6] = student.getPosition();
-			} else
-				arr[i][5] = student.getAbsenceCount();
+			} else {
+				arr[i][5] = student.getPresentCount();
+				arr[i][6] = student.getLeaveCount();
+				arr[i][7] = student.getAbsenceCount();
+			}
 			i++;
 		}
 		return arr;
 	}
 
 	private String[] columnNamesForMode(int mode) {
-		String[] names = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Status", "Position" };
-		String[] names_global = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Total #Absence" };
 		return mode == 0 ? names : names_global;
 	}
 

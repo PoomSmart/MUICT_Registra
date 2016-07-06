@@ -89,16 +89,16 @@ public class LeaveDialog extends JFrame {
 						if (ID == -1)
 							throw new Exception();
 						if (!students.containsKey(ID)) {
-							JOptionPane.showMessageDialog(null, "One or more student ID not found");
+							JOptionPane.showMessageDialog(null, ID + " or more student ID not found");
 							return;
 						}
 						Student realStudent = currentStudentMap.get(ID);
 						if (realStudent.isLeft()) {
-							JOptionPane.showMessageDialog(null, "One or more student has already lefted");
+							JOptionPane.showMessageDialog(null, ID + " or more student has already lefted");
 							return;
 						}
 						if (realStudent.isAbsent()) {
-							JOptionPane.showMessageDialog(null, "One or more student is absent");
+							JOptionPane.showMessageDialog(null, ID + " or more student is absent");
 							return;
 						}
 						IDs.add(ID);

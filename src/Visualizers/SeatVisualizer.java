@@ -17,8 +17,8 @@ import javax.swing.JPanel;
 
 import Objects.Position;
 import Objects.Student;
-import Utilities.CommonUtils;
 import Utilities.DBUtils;
+import Utilities.WindowUtils;
 
 class SeatPanel extends JPanel {
 
@@ -211,10 +211,10 @@ public class SeatVisualizer extends JFrame {
 	private Map<Integer, Student> currentStudents;
 
 	public SeatVisualizer() {
-		this.setTitle(CommonUtils.realTitle("Seat Visualizer"));
+		this.setTitle(WindowUtils.realTitle("Seat Visualizer"));
 		this.setSize(absoluteSize.width + shiftLeft, absoluteSize.height + (int) (tileSize.height * 1.5) + shiftTop);
 		getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 0, 1));
-		CommonUtils.setRelativeCenter(this, -this.getWidth() + 45, 0);
+		WindowUtils.setRelativeCenter(this, -this.getWidth() + 45, 0);
 		reloadStudents();
 		panel = new SeatPanel(currentStudents, shiftLeft, shiftTop);
 		panel.setPreferredSize(this.getSize());

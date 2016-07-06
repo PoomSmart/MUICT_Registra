@@ -40,6 +40,7 @@ import Objects.Student;
 import Utilities.CommonUtils;
 import Utilities.CommonUtils.FileType;
 import Utilities.DBUtils;
+import Utilities.WindowUtils;
 import Workers.ScannerSaver;
 
 public class ScannerDialog extends JFrame {
@@ -169,7 +170,7 @@ public class ScannerDialog extends JFrame {
 	}
 
 	public ScannerDialog() {
-		this.setTitle(CommonUtils.realTitle(Constants.SCANNER_DIALOG_TITLE));
+		this.setTitle(WindowUtils.realTitle(Constants.SCANNER_DIALOG_TITLE));
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		this.setSize(400, 150);
@@ -340,7 +341,7 @@ public class ScannerDialog extends JFrame {
 		c.gridwidth = 2;
 		getContentPane().add(appendRegularBtn, c);
 
-		CommonUtils.setRelativeCenter(this, 0, -50);
+		WindowUtils.setRelativeCenter(this, 0, -50);
 		this.setResizable(false);
 		this.IDs = new Vector<Integer>();
 

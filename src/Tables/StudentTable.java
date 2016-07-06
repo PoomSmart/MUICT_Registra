@@ -35,10 +35,10 @@ import Main.Main;
 import Objects.Constants;
 import Objects.Status;
 import Objects.Student;
-import Utilities.CommonUtils;
 import Utilities.DBUtils;
 import Utilities.DateUtils;
 import Utilities.SpringUtilities;
+import Utilities.WindowUtils;
 
 public class StudentTable extends JFrame {
 
@@ -156,9 +156,9 @@ public class StudentTable extends JFrame {
 			return;
 		JPanel self = new JPanel();
 		self.setLayout(new BoxLayout(self, BoxLayout.Y_AXIS));
-		this.setTitle(CommonUtils.realTitle(title));
+		this.setTitle(WindowUtils.realTitle(title));
 		this.setSize(700, 900);
-		CommonUtils.setCenter(this);
+		WindowUtils.setCenter(this);
 		
 		if (!UI)
 			return;

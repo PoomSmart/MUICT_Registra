@@ -27,6 +27,7 @@ import Objects.Student;
 import Utilities.CommonUtils;
 import Utilities.DBUtils;
 import Utilities.SpringUtilities;
+import Utilities.WindowUtils;
 import Workers.ScannerSaver;
 
 // TODO: Drop down list or radio buttons for common reasons
@@ -55,9 +56,9 @@ public class LeaveDialog extends JFrame {
 	}
 
 	public LeaveDialog() {
-		this.setTitle(CommonUtils.realTitle("Leave Form"));
+		this.setTitle(WindowUtils.realTitle("Leave Form"));
 		this.setSize(400, 210);
-		CommonUtils.setRelativeCenter(this, 0, 180);
+		WindowUtils.setRelativeCenter(this, 0, 180);
 
 		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 

@@ -16,6 +16,7 @@ import Tables.StudentTable;
 import Utilities.CommonUtils;
 import Utilities.CommonUtils.FileType;
 import Utilities.DateUtils;
+import Utilities.WindowUtils;
 import Visualizers.SeatVisualizer;
 import Workers.Logger;
 
@@ -24,9 +25,9 @@ public class ControlCenterDialog extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	public ControlCenterDialog() {
-		this.setTitle(CommonUtils.realTitle("Control Center"));
+		this.setTitle(WindowUtils.realTitle("Control Center"));
 		this.setSize(450, 110);
-		CommonUtils.setRelativeCenter(this, 0, -200);
+		WindowUtils.setRelativeCenter(this, 0, -200);
 		this.setLayout(new FlowLayout());
 
 		JButton showDBButton = new JButton("Attendance");

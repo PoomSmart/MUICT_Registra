@@ -12,7 +12,7 @@ import javax.swing.SpringLayout;
 
 import org.apache.commons.io.FileUtils;
 
-import Utilities.CommonUtils;
+import Utilities.WindowUtils;
 
 public class PlainTextDialog extends JFrame {
 
@@ -27,7 +27,7 @@ public class PlainTextDialog extends JFrame {
 		this.filePath = filePath;
 		this.setTitle(title);
 		this.setSize(width, height);
-		CommonUtils.setCenter(this);
+		WindowUtils.setCenter(this);
 
 		SpringLayout layout = new SpringLayout();
 		getContentPane().setLayout(layout);

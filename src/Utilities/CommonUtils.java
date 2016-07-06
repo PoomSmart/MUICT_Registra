@@ -1,14 +1,9 @@
 package Utilities;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.Date;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import javax.swing.JFrame;
-
-import Main.Main;
 import Objects.Constants;
 import Objects.Status;
 
@@ -80,19 +75,6 @@ public enum FileType { REGULAR, NOTHERE, LOG }
 			return false;
 		return file.exists();
 	}
-
-	public static void setRelativeCenter(JFrame frame, int x, int y) {
-		frame.setLocationRelativeTo(null);
-		frame.setLocation(frame.getX() + x, frame.getY() + y);
-	}
-	
-	public static void setCenter(JFrame frame) {
-		setRelativeCenter(frame, 0, 0);
-	}
-
-	public static String realTitle(String title) {
-		return title + (Main.test ? " (Test Mode)" : "");
-	}
 	
 	public static Vector<String> sameReason(String reason, int count) {
 		Vector<String> reasons = new Vector<String>();
@@ -103,13 +85,6 @@ public enum FileType { REGULAR, NOTHERE, LOG }
 	
 	public static <T> Vector<T> resolveDuplicates(Vector<T> list) {
 		return new Vector<T>(new TreeSet<T>(list));
-	}
-	
-	public static void setDontClose(JFrame frame) {
-		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		frame.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {}
-		});
 	}
 	
 }

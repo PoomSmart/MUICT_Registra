@@ -8,7 +8,7 @@ import javax.swing.JLabel;
 
 import Main.Main;
 import Objects.Student;
-import Utilities.CommonUtils;
+import Utilities.WindowUtils;
 
 public class ScannerListDialog extends JFrame {
 
@@ -20,10 +20,10 @@ public class ScannerListDialog extends JFrame {
 	private Vector<JLabel> labels;
 
 	public ScannerListDialog() {
-		this.setTitle(CommonUtils.realTitle("Scanned Codes"));
+		this.setTitle(WindowUtils.realTitle("Scanned Codes"));
 		this.setLayout(new GridLayout(defaultMaxListCount, 1));
 		this.setSize(550, 600);
-		CommonUtils.setRelativeCenter(this, 500, 0);
+		WindowUtils.setRelativeCenter(this, 500, 0);
 		this.IDs = new Vector<Integer>();
 		this.labels = new Vector<JLabel>();
 	}

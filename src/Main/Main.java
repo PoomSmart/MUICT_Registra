@@ -18,6 +18,7 @@ import Objects.Position;
 import Objects.Student;
 import Utilities.CommonUtils;
 import Utilities.DateUtils;
+import Utilities.WindowUtils;
 import Visualizers.SeatVisualizer;
 
 public class Main {
@@ -27,7 +28,7 @@ public class Main {
 	public static Map<Integer, Student> db;
 
 	private static void runFrame(JFrame frame) throws InterruptedException {
-		CommonUtils.setDontClose(frame);
+		WindowUtils.setDontClose(frame);
 		Thread t = new Thread() {
 			public void run() {
 				synchronized (frame) {

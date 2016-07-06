@@ -180,9 +180,9 @@ public class Student implements Cloneable {
 				sb.append(" Reason: " + status.getReason() + "\n");
 			sb.append(" Current Position: " + position + "\n");
 		}
-		sb.append(String.format(" Present | Leave | Absent: %d, %d, %d\n", getPresentCount(), getLeaveCount(),
-				getAbsenceCount()));
 		if (mode != 0) {
+			sb.append(String.format(" Present | Leave | Absent: %d, %d, %d\n", getPresentCount(), getLeaveCount(),
+					getAbsenceCount()));
 			sb.append(" Overall Status:\n");
 			for (Entry<String, Status> entry : statuses.entrySet()) {
 				String dateKey = entry.getKey();

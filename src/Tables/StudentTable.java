@@ -44,25 +44,36 @@ import Utilities.SpringUtilities;
 import Workers.LeaveParser;
 
 public class StudentTable extends JFrame {
-	
-	// TODO: Reloading table feature
+
 	// FIXME: Huge algorithm
 
 	private static final long serialVersionUID = 1L;
 
+	private static StudentTable activeTable = null;
+
 	private Map<Integer, Student> students;
 	private Map<Integer, Student> internalStudents;
-	
+
 	private JTextField filterText;
 	private JTextArea studentText;
 
+	private JTable table;
+	private int mode;
+
 	private TableRowSorter<? extends AbstractTableModel> sorter;
-	
+
 	public static Map<Integer, Student> currentStudentMap(Map<Integer, Student> students) {
-		StudentTable table = new StudentTable(students, 0);
+		StudentTable table = new StudentTable(students, 0, false);
 		return table.getInternalStudents();
 	}
-	
+
+	public static void updateIfPossible() {
+		if (activeTable != null) {
+			activeTable.updateInternalStudents();
+			((AbstractTableModel)activeTable.table.getModel()).fireTableDataChanged();
+		}
+	}
+
 	public Map<Integer, Student> studentMapForDate(Date date, CommonUtils.FileType type) {
 		String mapPath = CommonUtils.filePath(type, date);
 		if (!CommonUtils.fileExistsAtPath(mapPath)) {
@@ -105,7 +116,7 @@ public class StudentTable extends JFrame {
 	public Map<Integer, Student> presentStudentMapForDate(Date date) {
 		return studentMapForDate(date, CommonUtils.FileType.REGULAR);
 	}
-	
+
 	public Map<Integer, Student> leaveStudentMapForDate(Date date) {
 		return studentMapForDate(date, CommonUtils.FileType.NOTHERE);
 	}
@@ -139,21 +150,10 @@ public class StudentTable extends JFrame {
 		return mode == 0 ? names : names_global;
 	}
 
-	public StudentTable(Map<Integer, Student> students, int mode) {
-		this.students = students;
-		String title = "Attendance";
-		if (mode == 0)
-			title += " for " + DateUtils.getCurrentNormalFormattedDate();
-		if (mode > 1)
-			return;
-		JPanel self = new JPanel();
-		self.setLayout(new BoxLayout(self, BoxLayout.Y_AXIS));
-		this.setTitle(CommonUtils.realTitle(title));
-		this.setSize(700, 900);
-		CommonUtils.setCenter(this);
-
+	private void updateInternalStudents() {
 		if (mode == 0) {
 			internalStudents = presentStudentMapForDate(DateUtils.getCurrentDate());
+			
 			// Add leave-with-reason students
 			String leaveDBPath = CommonUtils.filePath(CommonUtils.FileType.NOTHERE);
 			LeaveParser leaveParser = new LeaveParser(leaveDBPath, students);
@@ -187,24 +187,52 @@ public class StudentTable extends JFrame {
 					continue;
 				}
 				Map<Integer, Student> presentStudents = presentStudentMapForDate(d);
+				// Assign present students
 				for (Student presentStudent : presentStudents.values()) {
-					internalStudents.get(presentStudent.getID()).addStatus(presentStudent.getCurrentStatus().clone());
+					Integer ID = presentStudent.getID();
+					internalStudents.get(ID).addStatus(presentStudent.getCurrentStatus().clone());
 				}
+				// Assign leave students
 				Map<Integer, Student> leaveStudents = leaveStudentMapForDate(d);
-				if (leaveStudents != null) {
-					for (Student leaveStudent : leaveStudents.values()) {
-						internalStudents.get(leaveStudent.getID()).addStatus(leaveStudent.getCurrentStatus().clone());
-					}
+				for (Student leaveStudent : leaveStudents.values()) {
+					Integer ID = leaveStudent.getID();
+					internalStudents.get(ID).addStatus(leaveStudent.getCurrentStatus().clone());
+				}
+				// Assign absent students
+				for (Student student : internalStudents.values()) {
+					Integer ID = student.getID();
+					if (!presentStudents.containsKey(ID))
+						internalStudents.get(ID).addStatus(d, new Status(Status.Type.ABSENT));
 				}
 			}
 		}
+	}
+
+	public StudentTable(Map<Integer, Student> students, int mode, boolean UI) {
+		this.students = students;
+		this.mode = mode;
+
+		updateInternalStudents();
+		
+		String title = "Attendance";
+		if (mode == 0)
+			title += " for " + DateUtils.getCurrentNormalFormattedDate();
+		if (mode > 1)
+			return;
+		JPanel self = new JPanel();
+		self.setLayout(new BoxLayout(self, BoxLayout.Y_AXIS));
+		this.setTitle(CommonUtils.realTitle(title));
+		this.setSize(700, 900);
+		CommonUtils.setCenter(this);
+		
+		if (!UI)
+			return;
 
 		class StudentTableModel extends AbstractTableModel {
 
 			private static final long serialVersionUID = 1L;
 
 			private String[] columnNames = columnNamesForMode(mode);
-			private Object data[][] = toData(internalStudents, mode);
 
 			@Override
 			public int getColumnCount() {
@@ -222,7 +250,7 @@ public class StudentTable extends JFrame {
 
 			@Override
 			public Object getValueAt(int row, int col) {
-				return data[row][col];
+				return toData(internalStudents, mode)[row][col];
 			}
 
 			public Class<? extends Object> getColumnClass(int c) {
@@ -232,7 +260,7 @@ public class StudentTable extends JFrame {
 		}
 
 		StudentTableModel model = new StudentTableModel();
-		JTable table = new JTable(model);
+		table = new JTable(model);
 		table.setFillsViewportHeight(true);
 		table.setAutoCreateRowSorter(true);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -251,7 +279,7 @@ public class StudentTable extends JFrame {
 				}
 			}
 		});
-
+		
 		JScrollPane scrollPane = new JScrollPane(table);
 		self.add(scrollPane);
 
@@ -290,6 +318,11 @@ public class StudentTable extends JFrame {
 		self.add(form);
 		this.setContentPane(self);
 		this.pack();
+		activeTable = this;
+	}
+	
+	public StudentTable(Map<Integer, Student> students, int mode) {
+		this(students, mode, true);
 	}
 
 	private void newFilter() {

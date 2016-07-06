@@ -1,4 +1,5 @@
 package Objects;
+
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class Student implements Cloneable {
 	public String getGender() {
 		return gender;
 	}
-	
+
 	public Position<Integer, Integer> getPosition() {
 		return position;
 	}
@@ -66,13 +67,13 @@ public class Student implements Cloneable {
 	public void setPosition(Position<Integer, Integer> position) {
 		this.position = position;
 	}
-	
+
 	/***
 	 * Get current status of a student in the specific date
 	 * 
 	 * @return
 	 */
-	
+
 	public Status getStatus(String date) {
 		for (Entry<String, Status> entry : statuses.entrySet()) {
 			String idate = entry.getKey();
@@ -91,7 +92,7 @@ public class Student implements Cloneable {
 	public Status getCurrentStatus() {
 		return getStatus(DateUtils.getCurrentFormattedDate());
 	}
-	
+
 	public Integer getTypeCount(Status.Type type) {
 		Integer count = 0;
 		for (Status status : statuses.values()) {
@@ -104,11 +105,11 @@ public class Student implements Cloneable {
 	public Integer getAbsenceCount() {
 		return getTypeCount(Status.Type.ABSENT);
 	}
-	
+
 	public Integer getPresentCount() {
 		return getTypeCount(Status.Type.PRESENT);
 	}
-	
+
 	public Integer getLeaveCount() {
 		return getTypeCount(Status.Type.LEAVE);
 	}
@@ -122,27 +123,27 @@ public class Student implements Cloneable {
 	public boolean isNormal() {
 		return getCurrentStatus().getType() == Status.Type.PRESENT;
 	}
-	
+
 	/***
 	 * This student has left with reason
 	 * 
 	 * @return
 	 */
-	
+
 	public boolean isLeft() {
 		return getCurrentStatus().getType() == Status.Type.LEAVE;
 	}
-	
+
 	/***
 	 * This student is absent
 	 * 
 	 * @return
 	 */
-	
+
 	public boolean isAbsent() {
 		return getCurrentStatus().getType() == Status.Type.ABSENT;
 	}
-	
+
 	public void addStatus(Date date, Status status) {
 		String key = DateUtils.formattedDate(date);
 		// We shall overwrite status if same date (same key)
@@ -179,21 +180,25 @@ public class Student implements Cloneable {
 				sb.append(" Reason: " + status.getReason() + "\n");
 			sb.append(" Current Position: " + position + "\n");
 		}
-		sb.append(String.format(" Present | Leave | Absent: %d, %d, %d\n", getPresentCount(), getLeaveCount(), getAbsenceCount()));
-		sb.append(" Overall Status:\n");
-		for (Entry<String, Status> entry : statuses.entrySet()) {
-			String dateKey = entry.getKey();
-			Date date = null;
-			try {
-				date = DateUtils.s_fmt.parse(dateKey);
-			} catch (ParseException e) {}
-			String realDateKey = DateUtils.n_fmt.format(date);
-			Status status = entry.getValue();
-			sb.append(String.format("  %s: %s\n", realDateKey, status));
+		sb.append(String.format(" Present | Leave | Absent: %d, %d, %d\n", getPresentCount(), getLeaveCount(),
+				getAbsenceCount()));
+		if (mode != 0) {
+			sb.append(" Overall Status:\n");
+			for (Entry<String, Status> entry : statuses.entrySet()) {
+				String dateKey = entry.getKey();
+				Date date = null;
+				try {
+					date = DateUtils.s_fmt.parse(dateKey);
+				} catch (ParseException e) {
+				}
+				String realDateKey = DateUtils.n_fmt.format(date);
+				Status status = entry.getValue();
+				sb.append(String.format("  %s: %s\n", realDateKey, status.getDetailedStatus()));
+			}
 		}
 		return sb.toString();
 	}
-	
+
 	public String toString() {
 		return toString(0);
 	}

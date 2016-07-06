@@ -193,9 +193,6 @@ class SeatPanel extends JPanel {
 
 public class SeatVisualizer extends JFrame {
 
-	// FIXME: Fix bug with leave-with-reason students calculation
-	// TODO: Fix up coloring
-
 	private static final long serialVersionUID = 1L;
 
 	public static SeatVisualizer activeVisualizer = null;
@@ -229,8 +226,6 @@ public class SeatVisualizer extends JFrame {
 				activeVisualizer = null;
 			}
 		});
-
-		// TODO: Panel for Visualizer ?
 	}
 
 	private void reloadStudents() {

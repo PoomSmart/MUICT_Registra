@@ -30,8 +30,6 @@ import Utilities.SpringUtilities;
 import Utilities.WindowUtils;
 import Workers.ScannerSaver;
 
-// TODO: Drop down list or radio buttons for common reasons
-
 public class LeaveDialog extends JFrame {
 
 	private static final long serialVersionUID = 1L;

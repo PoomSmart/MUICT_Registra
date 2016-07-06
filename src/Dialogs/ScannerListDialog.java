@@ -1,12 +1,12 @@
 package Dialogs;
 import java.awt.GridLayout;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import Main.Main;
 import Objects.Student;
 import Utilities.CommonUtils;
 
@@ -18,16 +18,14 @@ public class ScannerListDialog extends JFrame {
 
 	private Vector<Integer> IDs;
 	private Vector<JLabel> labels;
-	private Map<Integer, Student> students;
 
-	public ScannerListDialog(Map<Integer, Student> students) {
+	public ScannerListDialog() {
 		this.setTitle(CommonUtils.realTitle("Scanned Codes"));
 		this.setLayout(new GridLayout(defaultMaxListCount, 1));
 		this.setSize(550, 600);
 		CommonUtils.setRelativeCenter(this, 500, 0);
 		this.IDs = new Vector<Integer>();
 		this.labels = new Vector<JLabel>();
-		this.students = students;
 	}
 	
 	public void sort() {
@@ -83,7 +81,7 @@ public class ScannerListDialog extends JFrame {
 	}
 	
 	private JLabel labelForStudentID(int i, Integer ID) {
-		Student student = students.get(ID);
+		Student student = Main.db.get(ID);
 		return new JLabel(labelString(i, ID, student), JLabel.LEFT);
 	}
 

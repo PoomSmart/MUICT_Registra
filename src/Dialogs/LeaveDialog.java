@@ -21,12 +21,12 @@ import javax.swing.SpringLayout;
 
 import org.apache.commons.io.FileUtils;
 
+import Main.Main;
 import Objects.Constants;
 import Objects.Student;
-import Tables.StudentTable;
 import Utilities.CommonUtils;
+import Utilities.DBUtils;
 import Utilities.SpringUtilities;
-import Workers.LeaveParser;
 import Workers.ScannerSaver;
 
 // TODO: Drop down list or radio buttons for common reasons
@@ -54,7 +54,7 @@ public class LeaveDialog extends JFrame {
 			reasonField.setText("");
 	}
 
-	public LeaveDialog(Map<Integer, Student> students) {
+	public LeaveDialog() {
 		this.setTitle(CommonUtils.realTitle("Leave Form"));
 		this.setSize(400, 210);
 		CommonUtils.setRelativeCenter(this, 0, 180);
@@ -84,7 +84,7 @@ public class LeaveDialog extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				boolean shouldCleanup = false;
 				try {
-					Map<Integer, Student> currentStudentMap = StudentTable.currentStudentMap(students);
+					Map<Integer, Student> currentStudentMap = DBUtils.getCurrentStudents();
 					String oIDs = inputField.getText();
 					String[] sIDs = oIDs.split(",");
 					Vector<Integer> IDs = new Vector<Integer>();
@@ -92,7 +92,7 @@ public class LeaveDialog extends JFrame {
 						Integer ID = CommonUtils.getID(sID);
 						if (ID == -1)
 							throw new Exception();
-						if (!students.containsKey(ID)) {
+						if (!Main.db.containsKey(ID)) {
 							JOptionPane.showMessageDialog(null, ID + " or more student ID not found");
 							return;
 						}
@@ -123,9 +123,7 @@ public class LeaveDialog extends JFrame {
 								CommonUtils.FileType.NOTHERE);
 						// We are supposed to update present.csv since ID there may also exist in leave.csv
 						// Quite recursive with soft focus, actually it should not do that way
-						String leaveDBPath = CommonUtils.filePath(CommonUtils.FileType.NOTHERE);
-						LeaveParser leaveParser = new LeaveParser(leaveDBPath, students);
-						Map<Integer, Student> leaveStudents = leaveParser.getLeaveStudents();
+						Map<Integer, Student> leaveStudents = DBUtils.getCurrentLeaveStudents();
 						List<String> presentIDs = FileUtils.readLines(CommonUtils.fileFromType(CommonUtils.FileType.REGULAR));
 						for (Integer ID : leaveStudents.keySet())
 							presentIDs.remove(String.valueOf(ID));

@@ -17,8 +17,8 @@ import javax.swing.JPanel;
 
 import Objects.Position;
 import Objects.Student;
-import Tables.StudentTable;
 import Utilities.CommonUtils;
+import Utilities.DBUtils;
 
 class SeatPanel extends JPanel {
 
@@ -199,7 +199,7 @@ public class SeatVisualizer extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	public static SeatVisualizer activeVisualizer = null;
-
+	
 	private static final int shiftLeft = 30;
 	private static final int shiftTop = 30;
 	public static final Dimension bounds = new Dimension(14, 20);
@@ -209,14 +209,12 @@ public class SeatVisualizer extends JFrame {
 
 	private SeatPanel panel;
 	private Map<Integer, Student> currentStudents;
-	private Map<Integer, Student> students;
 
-	public SeatVisualizer(Map<Integer, Student> students) {
+	public SeatVisualizer() {
 		this.setTitle(CommonUtils.realTitle("Seat Visualizer"));
 		this.setSize(absoluteSize.width + shiftLeft, absoluteSize.height + (int) (tileSize.height * 1.5) + shiftTop);
 		getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 0, 1));
 		CommonUtils.setRelativeCenter(this, -this.getWidth() + 45, 0);
-		this.students = students;
 		reloadStudents();
 		panel = new SeatPanel(currentStudents, shiftLeft, shiftTop);
 		panel.setPreferredSize(this.getSize());
@@ -236,7 +234,7 @@ public class SeatVisualizer extends JFrame {
 	}
 
 	private void reloadStudents() {
-		currentStudents = StudentTable.currentStudentMap(students);
+		currentStudents = DBUtils.getCurrentStudents();
 	}
 
 	public static void updateIfPossible() {

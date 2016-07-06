@@ -111,4 +111,5 @@ public enum FileType { REGULAR, NOTHERE, LOG }
 			public void windowClosing(WindowEvent e) {}
 		});
 	}
+	
 }

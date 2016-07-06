@@ -12,7 +12,11 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,18 +32,21 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.DocumentFilter;
 
+import org.apache.commons.io.FileUtils;
+
 import Main.Main;
 import Objects.Constants;
 import Objects.Student;
-import Tables.StudentTable;
 import Utilities.CommonUtils;
 import Utilities.CommonUtils.FileType;
-import Utilities.DateUtils;
+import Utilities.DBUtils;
 import Workers.ScannerSaver;
 
 public class ScannerDialog extends JFrame {
 
 	private static final long serialVersionUID = 2561998L;
+	
+	public static ScannerDialog activeScanner = null;
 
 	private Vector<Integer> IDs;
 	private static final Pattern pDelAtIndex = Pattern.compile("(\\d+)del");
@@ -52,7 +59,6 @@ public class ScannerDialog extends JFrame {
 	private JButton confirmRegularBtn;
 	private JButton appendRegularBtn;
 
-	private Map<Integer, Student> students;
 	private Map<Integer, Student> currentPresentStudents;
 
 	private void destroyEverything() {
@@ -84,28 +90,58 @@ public class ScannerDialog extends JFrame {
 	}
 
 	private void reloadCurrentPresentStudents() {
-		StudentTable table = new StudentTable(students, 0);
-		currentPresentStudents = table.presentStudentMapForDate(DateUtils.getCurrentDate());
+		currentPresentStudents = DBUtils.getCurrentPresentStudents();
+	}
+	
+	public static void random(int maxCount) {
+		if (activeScanner != null) {
+			Random r = new Random();
+			List<String> presentIDs = null;
+			try {
+				presentIDs = FileUtils.readLines(CommonUtils.fileFromType(CommonUtils.FileType.REGULAR));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			Vector<Integer> oldIDs = new Vector<Integer>();
+			for (String sID : presentIDs)
+				oldIDs.add(Integer.parseInt(sID));
+			Set<Integer> randomIDs = new HashSet<Integer>();
+			Integer rID;
+			Map<Integer, Student> db = Main.db;
+			while (maxCount-- != 0) {
+				do {
+					rID = 5988001 + r.nextInt(300);
+				} while ((randomIDs.contains(rID) || oldIDs.contains(rID)) && oldIDs.size() != db.size() && !db.containsKey(rID));
+				randomIDs.add(rID);
+			}
+			try {
+				// Clean up leave.csv before adding randomized list
+				FileUtils.write(CommonUtils.fileFromType(FileType.NOTHERE), "");
+				addingCode(activeScanner, new Vector<Integer>(randomIDs), false, FileType.REGULAR, true);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static void addingCode(ScannerDialog dialog, Vector<Integer> IDs, boolean append, FileType type, boolean force) throws IOException {
+		dialog.resolveIDDuplicates();
+		ScannerSaver.doneAddingCodes(IDs, append, type, force);
+		dialog.cleanup();
+		dialog.reloadCurrentPresentStudents();
 	}
 
 	private void actionPerformWriteForType(String title, String confirmString, String fileExistedString,
 			CommonUtils.FileType type) {
 		try {
 			int result = JOptionPane.showConfirmDialog(null, confirmString, title, JOptionPane.YES_NO_OPTION);
-			if (result == JOptionPane.YES_OPTION) {
-				resolveIDDuplicates();
-				ScannerSaver.doneAddingCodes(IDs, false, type);
-				cleanup();
-				reloadCurrentPresentStudents();
-			}
+			if (result == JOptionPane.YES_OPTION)
+				addingCode(this, IDs, false, type, false);
 		} catch (FileAlreadyExistsException ex) {
 			int result = JOptionPane.showConfirmDialog(null, fileExistedString, title, JOptionPane.YES_NO_OPTION);
 			if (result == JOptionPane.YES_OPTION) {
 				try {
-					resolveIDDuplicates();
-					ScannerSaver.doneAddingCodes(IDs, false, type, true);
-					cleanup();
-					reloadCurrentPresentStudents();
+					addingCode(this, IDs, false, type, true);
 				} catch (IOException ex2) {
 					ex2.printStackTrace();
 				}
@@ -118,12 +154,8 @@ public class ScannerDialog extends JFrame {
 	private void actionPerformAppendForType(String title, String confirmString, CommonUtils.FileType type) {
 		try {
 			int result = JOptionPane.showConfirmDialog(null, confirmString, title, JOptionPane.YES_NO_OPTION);
-			if (result == JOptionPane.YES_OPTION) {
-				resolveIDDuplicates();
-				ScannerSaver.doneAddingCodes(IDs, true, type);
-				cleanup();
-				reloadCurrentPresentStudents();
-			}
+			if (result == JOptionPane.YES_OPTION)
+				addingCode(this, IDs, true, type, false);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
@@ -136,8 +168,7 @@ public class ScannerDialog extends JFrame {
 				.setEnabled(isIDNotEmpty && CommonUtils.fileExistsAtPath(CommonUtils.filePath(FileType.REGULAR)));
 	}
 
-	public ScannerDialog(Map<Integer, Student> students) {
-		this.students = students;
+	public ScannerDialog() {
 		this.setTitle(CommonUtils.realTitle(Constants.SCANNER_DIALOG_TITLE));
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -211,7 +242,7 @@ public class ScannerDialog extends JFrame {
 					}
 					if (ID != -1) {
 						System.out.println("-> " + ID);
-						if (!students.containsKey(ID)) {
+						if (!Main.db.containsKey(ID)) {
 							System.out.println("ID does not exist in database: " + ID);
 							setStatus("Not Added: " + ID);
 						} else {
@@ -314,6 +345,7 @@ public class ScannerDialog extends JFrame {
 		this.IDs = new Vector<Integer>();
 
 		reloadCurrentPresentStudents();
+		activeScanner = this;
 	}
 
 	public Vector<Integer> getIDs() {

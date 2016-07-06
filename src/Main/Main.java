@@ -23,6 +23,8 @@ import Visualizers.SeatVisualizer;
 public class Main {
 
 	public static final boolean test = true;
+	
+	public static Map<Integer, Student> db;
 
 	private static void runFrame(JFrame frame) throws InterruptedException {
 		CommonUtils.setDontClose(frame);
@@ -67,30 +69,31 @@ public class Main {
 	public static void main(String[] args) throws InterruptedException, IOException {
 		Map<Integer, Student> students = new StudentDatabase("batch-14.csv").getStudents();
 		randomPosition(students);
+		db = students;
 		
 		String datePath = CommonUtils.datePath(DateUtils.getCurrentDate());
 		File file = new File(datePath);
 		if (!file.exists())
 			System.out.println("Create directory " + Files.createDirectory(file.toPath()));
 		
-		ScannerDialog scannerDialog = new ScannerDialog(students);
+		ScannerDialog scannerDialog = new ScannerDialog();
 		scannerDialog.setVisible(true);
 		runFrame(scannerDialog);
 
-		ScannerListDialog scannerListDialog = new ScannerListDialog(students);
+		ScannerListDialog scannerListDialog = new ScannerListDialog();
 		scannerListDialog.setVisible(true);
 		scannerDialog.setList(scannerListDialog);
 		runFrame(scannerListDialog);
 
-		LeaveDialog leaveDialog = new LeaveDialog(students);
+		LeaveDialog leaveDialog = new LeaveDialog();
 		leaveDialog.setVisible(true);
 		runFrame(leaveDialog);
 		
-		ControlCenterDialog ccDialog = new ControlCenterDialog(students);
+		ControlCenterDialog ccDialog = new ControlCenterDialog();
 		ccDialog.setVisible(true);
 		runFrame(ccDialog);
 		
-		SeatVisualizer vis = new SeatVisualizer(students);
+		SeatVisualizer vis = new SeatVisualizer();
 		vis.setVisible(true);
 		runFrame(vis);
 

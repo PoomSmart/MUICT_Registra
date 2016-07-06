@@ -3,7 +3,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -11,8 +10,8 @@ import javax.swing.JOptionPane;
 
 import org.apache.commons.io.FileUtils;
 
+import Main.Main;
 import Objects.Constants;
-import Objects.Student;
 import Tables.StudentTable;
 import Utilities.CommonUtils;
 import Utilities.CommonUtils.FileType;
@@ -24,9 +23,9 @@ public class ControlCenterDialog extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
-	public ControlCenterDialog(Map<Integer, Student> students) {
+	public ControlCenterDialog() {
 		this.setTitle(CommonUtils.realTitle("Control Center"));
-		this.setSize(450, 75);
+		this.setSize(450, 110);
 		CommonUtils.setRelativeCenter(this, 0, -200);
 		this.setLayout(new FlowLayout());
 
@@ -37,7 +36,7 @@ public class ControlCenterDialog extends JFrame {
 				int result = JOptionPane.showOptionDialog(null, "Select type:", "Attendance Type",
 						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, dbOptions, dbOptions[0]);
 				if (result != JOptionPane.CLOSED_OPTION) {
-					StudentTable stuTable = new StudentTable(students, result);
+					StudentTable stuTable = new StudentTable(result);
 					stuTable.setVisible(true);
 				}
 			}
@@ -69,6 +68,8 @@ public class ControlCenterDialog extends JFrame {
 					System.out.println("Clear current present.csv");
 					try {
 						FileUtils.write(CommonUtils.fileFromType(FileType.REGULAR), "");
+						// empty present.csv = empty leave.csv
+						FileUtils.write(CommonUtils.fileFromType(FileType.NOTHERE), "");
 						SeatVisualizer.updateIfPossible();
 					} catch (IOException ex) {
 						ex.printStackTrace();
@@ -94,6 +95,16 @@ public class ControlCenterDialog extends JFrame {
 			}
 		});
 		getContentPane().add(clearLeaveButton);
+		
+		if (Main.test) {
+			JButton randomPresentButton = new JButton("Random Present");
+			randomPresentButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					ScannerDialog.random(40);
+				}
+			});
+			getContentPane().add(randomPresentButton);
+		}
 
 		this.setResizable(false);
 	}

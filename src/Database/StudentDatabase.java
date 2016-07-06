@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 
-import Objects.Status;
 import Objects.Student;
 import Utilities.CommonUtils;
 
@@ -36,7 +35,6 @@ public class StudentDatabase {
 				String gender = m.group(3);
 				String nickname = m.group(4);
 				Student student = new Student(ID, name, nickname, gender);
-				student.addStatus(new Status(Status.Type.ABSENT));
 				students.put(ID, student);
 			}
 		}

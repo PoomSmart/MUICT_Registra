@@ -3,15 +3,13 @@ package Tables;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -33,25 +31,21 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 
-import org.apache.commons.io.FileUtils;
-
+import Main.Main;
 import Objects.Constants;
 import Objects.Status;
 import Objects.Student;
 import Utilities.CommonUtils;
+import Utilities.DBUtils;
 import Utilities.DateUtils;
 import Utilities.SpringUtilities;
-import Workers.LeaveParser;
 
 public class StudentTable extends JFrame {
 
-	// FIXME: Huge algorithm
-
 	private static final long serialVersionUID = 1L;
 
-	private static StudentTable activeTable = null;
+	public static StudentTable activeTable = null;
 
-	private Map<Integer, Student> students;
 	private Map<Integer, Student> internalStudents;
 
 	private JTextField filterText;
@@ -60,68 +54,23 @@ public class StudentTable extends JFrame {
 	private JTable table;
 	private int mode;
 	
-	private static String[] names = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Status", "Position" };
-	private static String[] names_global = { "ID", "First Name", "Last Name", "Nickname", "Gender", "#Present", "#Leave", "#Absence" };
+	private static final String[] names = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Status", "Position" };
+	private static final String[] names_global = { "ID", "First Name", "Last Name", "Nickname", "Gender", "#Present", "#Leave", "#Absence" };
 
 	private TableRowSorter<? extends AbstractTableModel> sorter;
 
-	public static Map<Integer, Student> currentStudentMap(Map<Integer, Student> students) {
-		StudentTable table = new StudentTable(students, 0, false);
+	public static Map<Integer, Student> currentStudentMap() {
+		StudentTable table = new StudentTable(0, false);
 		return table.getInternalStudents();
 	}
 
 	public static void updateIfPossible() {
 		if (activeTable != null) {
+			System.out.println("Update StudentTable");
 			activeTable.updateInternalStudents();
 			((AbstractTableModel)activeTable.table.getModel()).fireTableDataChanged();
-		}
-	}
-
-	public Map<Integer, Student> studentMapForDate(Date date, CommonUtils.FileType type) {
-		String mapPath = CommonUtils.filePath(type, date);
-		if (!CommonUtils.fileExistsAtPath(mapPath)) {
-			System.out.println("Map (" + type + ") for date " + DateUtils.normalFormattedDate(date) + " not found");
-			return new TreeMap<Integer, Student>();
-		}
-		Map<Integer, Student> map = new TreeMap<Integer, Student>();
-		List<String> lines;
-		try {
-			lines = FileUtils.readLines(new File(mapPath));
-		} catch (IOException e) {
-			e.printStackTrace();
-			return new TreeMap<Integer, Student>();
-		}
-		for (String line : lines) {
-			Integer ID;
-			Matcher m = null;
-			if (type == CommonUtils.FileType.REGULAR)
-				ID = CommonUtils.getID(line);
-			else {
-				m = LeaveParser.pDB.matcher(line);
-				if (!m.find())
-					continue;
-				ID = CommonUtils.getID(m.group(1));
-			}
-			if (ID == -1)
-				continue;
-			Student student = students.get(ID).clone();
-			if (type == CommonUtils.FileType.REGULAR)
-				student.addStatus(new Status());
-			else {
-				String reason = m.group(2);
-				student.addStatus(new Status(Status.Type.LEAVE, reason));
-			}
-			map.put(ID, student);
-		}
-		return map;
-	}
-
-	public Map<Integer, Student> presentStudentMapForDate(Date date) {
-		return studentMapForDate(date, CommonUtils.FileType.REGULAR);
-	}
-
-	public Map<Integer, Student> leaveStudentMapForDate(Date date) {
-		return studentMapForDate(date, CommonUtils.FileType.NOTHERE);
+		} else
+			System.out.println("Null StudentTable");
 	}
 
 	private Object[][] toData(Map<Integer, Student> students, int mode) {
@@ -154,29 +103,13 @@ public class StudentTable extends JFrame {
 		return mode == 0 ? names : names_global;
 	}
 
-	private void updateInternalStudents() {
-		if (mode == 0) {
-			internalStudents = presentStudentMapForDate(DateUtils.getCurrentDate());
-			
-			// Add leave-with-reason students
-			String leaveDBPath = CommonUtils.filePath(CommonUtils.FileType.NOTHERE);
-			LeaveParser leaveParser = new LeaveParser(leaveDBPath, students);
-			internalStudents.putAll(leaveParser.getLeaveStudents());
-
-			// Add absent students
-			// FIXME: Possibly slow algorithm
-			for (Student student : students.values()) {
-				if (!internalStudents.containsKey(student.getID())) {
-					Student absentStudent = student.clone();
-					absentStudent.addStatus(new Status(Status.Type.ABSENT));
-					internalStudents.put(absentStudent.getID(), absentStudent);
-				}
-			}
-		} else {
+	public void updateInternalStudents() {
+		if (mode == 0)
+			internalStudents = DBUtils.getCurrentStudents();
+		else {
 			internalStudents = new TreeMap<Integer, Student>();
-			for (Map.Entry<Integer, Student> entry : students.entrySet()) {
+			for (Entry<Integer, Student> entry : Main.db.entrySet())
 				internalStudents.put(entry.getKey(), entry.getValue().clone());
-			}
 			File[] dates = new File(Constants.FILE_ROOT).listFiles();
 			for (File date : dates) {
 				if (!date.isDirectory()) {
@@ -190,35 +123,28 @@ public class StudentTable extends JFrame {
 					System.out.println("Invalid folder: " + date.getName());
 					continue;
 				}
-				Map<Integer, Student> presentStudents = presentStudentMapForDate(d);
-				// Assign present students
-				for (Student presentStudent : presentStudents.values()) {
-					Integer ID = presentStudent.getID();
-					internalStudents.get(ID).addStatus(d, new Status());
+				// Assigning present and absent students
+				Map<Integer, Student> presentStudents = DBUtils.getPresentStudents(d);
+				for (Integer ID : Main.db.keySet()) {
+					if (presentStudents.containsKey(ID))
+						internalStudents.get(ID).addStatus(d, new Status());
+					else
+						internalStudents.get(ID).addStatus(d, new Status(Status.Type.ABSENT));
 				}
-				// Assign leave students
-				// Fist adding leave-with-reason students
-				String leaveDBPath = CommonUtils.filePath(CommonUtils.FileType.NOTHERE, d);
-				LeaveParser leaveParser = new LeaveParser(leaveDBPath, students, d);
-				Map<Integer, Student> leaveStudents = leaveParser.getLeaveStudents();
-				for (Student leaveStudent : leaveStudents.values()) {
-					Integer ID = leaveStudent.getID();
-					Status leaveStatus = leaveStudent.getStatus(DateUtils.formattedDate(d));
+				// Assigning leave-with-reason students
+				Map<Integer, Student> leaveStudents = DBUtils.getLeaveStudents(d);
+				for (Entry<Integer, Student> entry : leaveStudents.entrySet()) {
+					Integer ID = entry.getKey();
+					Student student = entry.getValue();
+					Status leaveStatus = student.getStatus(DateUtils.formattedDate(d));
 					if (leaveStatus != null)
 						internalStudents.get(ID).addStatus(d, leaveStatus.clone());
-				}
-				// Assign absent students
-				for (Student student : internalStudents.values()) {
-					Integer ID = student.getID();
-					if (!presentStudents.containsKey(ID))
-						internalStudents.get(ID).addStatus(d, new Status(Status.Type.ABSENT));
 				}
 			}
 		}
 	}
 
-	public StudentTable(Map<Integer, Student> students, int mode, boolean UI) {
-		this.students = students;
+	public StudentTable(int mode, boolean UI) {
 		this.mode = mode;
 
 		updateInternalStudents();
@@ -330,8 +256,8 @@ public class StudentTable extends JFrame {
 		activeTable = this;
 	}
 	
-	public StudentTable(Map<Integer, Student> students, int mode) {
-		this(students, mode, true);
+	public StudentTable(int mode) {
+		this(mode, true);
 	}
 
 	private void newFilter() {

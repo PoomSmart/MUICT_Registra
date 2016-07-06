@@ -1,4 +1,5 @@
 package Objects;
+import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -130,13 +131,17 @@ public class Student implements Cloneable {
 	public boolean isAbsent() {
 		return getCurrentStatus().getType() == Status.Type.ABSENT;
 	}
-
-	public void addStatus(Status status) {
-		String key = DateUtils.getCurrentFormattedDate();
+	
+	public void addStatus(Date date, Status status) {
+		String key = DateUtils.formattedDate(date);
 		// We shall overwrite status if same date (same key)
 		if (statuses.containsKey(key))
 			statuses.remove(key);
 		statuses.put(key, status);
+	}
+
+	public void addStatus(Status status) {
+		addStatus(DateUtils.getCurrentDate(), status);
 	}
 
 	private String getNormalizedGender() {

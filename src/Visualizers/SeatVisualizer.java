@@ -115,7 +115,7 @@ public class SeatVisualizer extends JFrame {
 	}
 
 	public static void updateIfPossible() {
-		System.out.println("Updating SeatVisualizer");
+		System.out.println("Update SeatVisualizer");
 		if (activeVisualizer != null) {
 			activeVisualizer.reloadStudents();
 			activeVisualizer.panel.setStudents(activeVisualizer.currentStudents);

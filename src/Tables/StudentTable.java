@@ -59,11 +59,6 @@ public class StudentTable extends JFrame {
 
 	private TableRowSorter<? extends AbstractTableModel> sorter;
 
-	public static Map<Integer, Student> currentStudentMap() {
-		StudentTable table = new StudentTable(0, false);
-		return table.getInternalStudents();
-	}
-
 	public static void updateIfPossible() {
 		if (activeTable != null) {
 			System.out.println("Update StudentTable");
@@ -144,7 +139,7 @@ public class StudentTable extends JFrame {
 		}
 	}
 
-	public StudentTable(int mode, boolean UI) {
+	public StudentTable(int mode) {
 		this.mode = mode;
 
 		updateInternalStudents();
@@ -159,9 +154,6 @@ public class StudentTable extends JFrame {
 		this.setTitle(WindowUtils.realTitle(title));
 		this.setSize(700, 900);
 		WindowUtils.setCenter(this);
-		
-		if (!UI)
-			return;
 
 		class StudentTableModel extends AbstractTableModel {
 
@@ -255,10 +247,6 @@ public class StudentTable extends JFrame {
 		this.pack();
 		activeTable = this;
 	}
-	
-	public StudentTable(int mode) {
-		this(mode, true);
-	}
 
 	private void newFilter() {
 		RowFilter<? super AbstractTableModel, Object> rf = null;
@@ -271,10 +259,6 @@ public class StudentTable extends JFrame {
 			return;
 		}
 		sorter.setRowFilter(rf);
-	}
-
-	public Map<Integer, Student> getInternalStudents() {
-		return internalStudents;
 	}
 
 }

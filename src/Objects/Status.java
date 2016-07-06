@@ -47,6 +47,13 @@ public class Status implements Cloneable {
 		return type.toString();
 	}
 	
+	public String getDetailedStatus() {
+		String detail = toString();
+		if (type == Type.LEAVE)
+			detail += " - " + getReason();
+		return detail;
+	}
+	
 	public Status clone() {
 		return new Status(type, reason);
 	}

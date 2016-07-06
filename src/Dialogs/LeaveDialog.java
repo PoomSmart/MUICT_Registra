@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -18,11 +19,14 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
+import org.apache.commons.io.FileUtils;
+
 import Objects.Constants;
 import Objects.Student;
 import Tables.StudentTable;
 import Utilities.CommonUtils;
 import Utilities.SpringUtilities;
+import Workers.LeaveParser;
 import Workers.ScannerSaver;
 
 // TODO: Drop down list or radio buttons for common reasons
@@ -117,9 +121,22 @@ public class LeaveDialog extends JFrame {
 					if (result == JOptionPane.YES_OPTION) {
 						ScannerSaver.doneAddingCodes(IDs, CommonUtils.sameReason(reason, IDs.size()), true,
 								CommonUtils.FileType.NOTHERE);
+						// We are supposed to update present.csv since ID there may also exist in leave.csv
+						// Quite recursive with soft focus, actually it should not do that way
+						String leaveDBPath = CommonUtils.filePath(CommonUtils.FileType.NOTHERE);
+						LeaveParser leaveParser = new LeaveParser(leaveDBPath, students);
+						Map<Integer, Student> leaveStudents = leaveParser.getLeaveStudents();
+						List<String> presentIDs = FileUtils.readLines(CommonUtils.fileFromType(CommonUtils.FileType.REGULAR));
+						for (Integer ID : leaveStudents.keySet())
+							presentIDs.remove(String.valueOf(ID));
+						Vector<Integer> spresentIDs = new Vector<Integer>();
+						for (String sID : presentIDs)
+							spresentIDs.add(Integer.parseInt(sID));
+						ScannerSaver.doneAddingCodes(spresentIDs, false, CommonUtils.FileType.REGULAR, true);
 						shouldCleanup = true;
 					}
 				} catch (Exception ex) {
+					ex.printStackTrace();
 					JOptionPane.showMessageDialog(null, "Not saving due to malformed input");
 					System.out.println("malformed input");
 				} finally {

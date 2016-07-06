@@ -17,11 +17,10 @@ public class LeaveParser {
 	// Pattern: ID,type,reason
 	public static final Pattern pDB = Pattern.compile("(\\d+),leave,(.*)");
 	
-	private Map<Integer, Student> leaveStudents;
+	private Map<Integer, Student> leaveStudents = new TreeMap<Integer, Student>();
 
 	public LeaveParser(String dbPath, Map<Integer, Student> students) {
 		try {
-			leaveStudents = new TreeMap<Integer, Student>();
 			BufferedReader reader = new BufferedReader(new FileReader(new File(dbPath)));
 			String line;
 			Matcher m;
@@ -40,7 +39,7 @@ public class LeaveParser {
 			}
 			reader.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("leave.csv for today not found");
 		}
 	}
 

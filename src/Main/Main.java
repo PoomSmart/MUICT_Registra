@@ -47,16 +47,17 @@ public class Main {
 		Integer width = SeatVisualizer.bounds.width;
 		Integer height = SeatVisualizer.bounds.height;
 		if (width * height < students.size()) {
-			System.out.println("Couldn't random (W x H < Map Size)");
+			System.out.println("Couldn't random (Columns x Rows < Map Size)");
 			return;
 		}
 		Random r = new Random();
 		Vector<Position<Integer, Integer>> positions = new Vector<Position<Integer, Integer>>();
 		for (Student student : students.values()) {
 			if (student.getPosition().equals(Position.nullPosition)) {
-				Position<Integer, Integer> position = new Position<>(r.nextInt(width), r.nextInt(height));
-				if (positions.contains(position))
-					continue;
+				Position<Integer, Integer> position;
+				do {
+					position = new Position<>(r.nextInt(width), r.nextInt(height));
+				} while (positions.contains(position));
 				positions.add(position);
 				student.setPosition(position);
 			}

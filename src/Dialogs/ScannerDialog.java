@@ -13,7 +13,6 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -97,15 +96,10 @@ public class ScannerDialog extends JFrame {
 	public static void random(int maxCount) {
 		if (activeScanner != null) {
 			Random r = new Random();
-			List<String> presentIDs = null;
-			try {
-				presentIDs = FileUtils.readLines(CommonUtils.fileFromType(CommonUtils.FileType.REGULAR));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			Vector<Integer> presentIDs = new Vector<Integer>(DBUtils.getCurrentPresentStudents().keySet());
 			Vector<Integer> oldIDs = new Vector<Integer>();
-			for (String sID : presentIDs)
-				oldIDs.add(Integer.parseInt(sID));
+			for (Integer ID : presentIDs)
+				oldIDs.add(ID);
 			Set<Integer> randomIDs = new HashSet<Integer>();
 			Integer rID;
 			while (maxCount-- != 0) {

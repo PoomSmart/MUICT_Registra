@@ -55,7 +55,6 @@ public class PlainTextDialog extends JFrame {
 								FileUtils.write(new File(filePath), newText);
 							} catch (IOException e) {
 								JOptionPane.showMessageDialog(null, "Error saving file to Path: " + filePath);
-								e.printStackTrace();
 							}
 						}
 					}

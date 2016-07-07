@@ -97,7 +97,7 @@ public class LeaveDialog extends JFrame {
 						}
 						Student realStudent = currentStudentMap.get(ID);
 						if (realStudent.isLeft()) {
-							JOptionPane.showMessageDialog(null, ID + " or more student has already lefted");
+							JOptionPane.showMessageDialog(null, ID + " or more student has already left");
 							return;
 						}
 						if (realStudent.isAbsent()) {
@@ -111,7 +111,7 @@ public class LeaveDialog extends JFrame {
 					String reasonCheck = reason.trim().replaceAll("[\n\t\r]", "");
 					if (reasonCheck.length() == 0 && others) {
 						JOptionPane.showMessageDialog(null, "Couldn't save leave form without reason");
-						System.out.println("null reason field");
+						System.out.println("Null reason field");
 						return;
 					}
 					reason = reason.replaceAll("\n", "\\\\n");
@@ -121,7 +121,6 @@ public class LeaveDialog extends JFrame {
 						ScannerSaver.doneAddingCodes(IDs, CommonUtils.sameReason(reason, IDs.size()), true,
 								CommonUtils.FileType.NOTHERE);
 						// We are supposed to update present.csv since ID there may also exist in leave.csv
-						// Quite recursive with soft focus, actually it should not do that way
 						Map<Integer, Student> leaveStudents = DBUtils.getCurrentLeaveStudents();
 						List<String> presentIDs = FileUtils.readLines(CommonUtils.fileFromType(CommonUtils.FileType.REGULAR));
 						for (Integer ID : leaveStudents.keySet())
@@ -135,7 +134,7 @@ public class LeaveDialog extends JFrame {
 				} catch (Exception ex) {
 					ex.printStackTrace();
 					JOptionPane.showMessageDialog(null, "Not saving due to malformed input");
-					System.out.println("malformed input");
+					System.out.println("Malformed input");
 				} finally {
 					if (shouldCleanup) {
 						inputField.setText("");

@@ -58,7 +58,7 @@ public enum FileType { REGULAR, NOTHERE, LOG }
 	}
 	
 	public static String datePath(Date date) {
-		return Constants.FILE_ROOT + DateUtils.formattedDate(date);
+		return Constants.FILE_ROOT + DateUtils.getFormattedDate(date);
 	}
 	
 	public static String filePath(FileType type, Date date) {

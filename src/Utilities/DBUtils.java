@@ -57,7 +57,7 @@ public class DBUtils {
 			}
 			reader.close();
 		} catch (IOException e) {
-			System.out.println("leave.csv for " + DateUtils.normalFormattedDate(date) + " not found");
+			System.out.println("leave.csv for " + DateUtils.getNormalFormattedDate(date) + " not found");
 		}
 		return leaveStudents;
 	}
@@ -91,8 +91,7 @@ public class DBUtils {
 				presentStudents.put(ID, student);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("present.csv for " + DateUtils.normalFormattedDate(date) + " not found");
+			System.out.println("present.csv for " + DateUtils.getNormalFormattedDate(date) + " not found");
 		}
 		return presentStudents;
 	}

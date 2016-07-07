@@ -41,6 +41,8 @@ import Utilities.SpringUtilities;
 import Utilities.WindowUtils;
 
 public class StudentTable extends JFrame {
+	
+	// TODO: Disallow table windows duplication
 
 	private static final long serialVersionUID = 1L;
 
@@ -131,7 +133,7 @@ public class StudentTable extends JFrame {
 				for (Entry<Integer, Student> entry : leaveStudents.entrySet()) {
 					Integer ID = entry.getKey();
 					Student student = entry.getValue();
-					Status leaveStatus = student.getStatus(DateUtils.formattedDate(d));
+					Status leaveStatus = student.getStatus(DateUtils.getFormattedDate(d));
 					if (leaveStatus != null)
 						internalStudents.get(ID).addStatus(d, leaveStatus.clone());
 				}

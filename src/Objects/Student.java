@@ -145,7 +145,7 @@ public class Student implements Cloneable {
 	}
 
 	public void addStatus(Date date, Status status) {
-		String key = DateUtils.formattedDate(date);
+		String key = DateUtils.getFormattedDate(date);
 		// We shall overwrite status if same date (same key)
 		if (statuses.containsKey(key))
 			statuses.remove(key);

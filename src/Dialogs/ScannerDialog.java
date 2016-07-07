@@ -108,11 +108,10 @@ public class ScannerDialog extends JFrame {
 				oldIDs.add(Integer.parseInt(sID));
 			Set<Integer> randomIDs = new HashSet<Integer>();
 			Integer rID;
-			Map<Integer, Student> db = Main.db;
 			while (maxCount-- != 0) {
 				do {
 					rID = 5988001 + r.nextInt(300);
-				} while ((randomIDs.contains(rID) || oldIDs.contains(rID)) && oldIDs.size() != db.size() && !db.containsKey(rID));
+				} while ((randomIDs.contains(rID) || oldIDs.contains(rID)) && oldIDs.size() != Main.db.size() && !Main.db.containsKey(rID));
 				randomIDs.add(rID);
 			}
 			try {
@@ -217,7 +216,7 @@ public class ScannerDialog extends JFrame {
 				} else if ((m = (pDelAtIndex.matcher(text))).find()) {
 					int idx = Integer.parseInt(m.group(1));
 					list.removeAtIndex(idx);
-					removeLabel = idx == IDs.size() - 1;
+					removeLabel = idx == (IDs.size() - 1);
 					if (idx < IDs.size())
 						IDs.remove(idx);
 					shouldCleanup = true;

@@ -26,7 +26,7 @@ public class Logger {
 
 	public static void showLog(Date date, boolean editable, boolean force, String filePath) {
 		PlainTextDialog dialog = null;
-		String title = "Log for " + DateUtils.normalFormattedDate(date);
+		String title = "Log for " + DateUtils.getNormalFormattedDate(date);
 		try {
 			dialog = new PlainTextDialog(title, logSize.width, logSize.height, 5, logContentForDate(date),
 					editable, filePath);
@@ -35,7 +35,7 @@ public class Logger {
 				dialog = new PlainTextDialog(title, logSize.width, logSize.height, 5, "", editable, filePath);
 			else
 				JOptionPane.showMessageDialog(null,
-						"No log has been created for " + DateUtils.normalFormattedDate(date));
+						"No log has been created for " + DateUtils.getNormalFormattedDate(date));
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		} finally {
@@ -68,7 +68,7 @@ public class Logger {
 				System.out.println("Invalid folder: " + date.getName());
 				continue;
 			}
-			content.append(DateUtils.normalFormattedDate(d) + "\n");
+			content.append(DateUtils.getNormalFormattedDate(d) + "\n");
 			try {
 				content.append(logContentForDate(d));
 			} catch (IOException e) {

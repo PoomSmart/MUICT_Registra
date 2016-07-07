@@ -8,7 +8,7 @@ public class DateUtils {
 	public static final SimpleDateFormat s_fmt = new SimpleDateFormat("yyyyMMdd");
 	public static final SimpleDateFormat n_fmt = new SimpleDateFormat("dd/MM/yyyy");
 	
-	public static String formattedDate(Date date) {
+	public static String getFormattedDate(Date date) {
 		return s_fmt.format(date);
 	}
 	
@@ -19,14 +19,14 @@ public class DateUtils {
 	}
 	
 	public static String getCurrentFormattedDate() {
-		return formattedDate(getCurrentDate());
+		return getFormattedDate(getCurrentDate());
 	}
 	
-	public static String normalFormattedDate(Date date) {
+	public static String getNormalFormattedDate(Date date) {
 		return n_fmt.format(date);
 	}
 	
 	public static String getCurrentNormalFormattedDate() {
-		return normalFormattedDate(getCurrentDate());
+		return getNormalFormattedDate(getCurrentDate());
 	}
 }

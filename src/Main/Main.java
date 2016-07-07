@@ -72,6 +72,7 @@ public class Main {
 		randomPosition(students);
 		db = students;
 		
+		// Create a directory for current date, if necessary
 		String datePath = CommonUtils.datePath(DateUtils.getCurrentDate());
 		File file = new File(datePath);
 		if (!file.exists())
@@ -98,6 +99,7 @@ public class Main {
 		vis.setVisible(true);
 		runFrame(vis);
 
+		// Initially focus scanner window
 		scannerDialog.toFront();
 		scannerDialog.getField().requestFocus();
 	}

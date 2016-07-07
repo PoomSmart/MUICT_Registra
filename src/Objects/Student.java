@@ -68,12 +68,11 @@ public class Student implements Cloneable {
 		this.position = position;
 	}
 
-	/***
+	/**
 	 * Get current status of a student in the specific date
 	 * 
 	 * @return
 	 */
-
 	public Status getStatus(String date) {
 		for (Entry<String, Status> entry : statuses.entrySet()) {
 			String idate = entry.getKey();
@@ -83,12 +82,11 @@ public class Student implements Cloneable {
 		return null;
 	}
 
-	/***
+	/**
 	 * Get current status of a student in the current date
 	 * 
 	 * @return
 	 */
-
 	public Status getCurrentStatus() {
 		return getStatus(DateUtils.getCurrentFormattedDate());
 	}
@@ -114,32 +112,29 @@ public class Student implements Cloneable {
 		return getTypeCount(Status.Type.LEAVE);
 	}
 
-	/***
+	/**
 	 * A student is considered normal if he or she is present in that day
 	 * 
 	 * @return
 	 */
-
 	public boolean isNormal() {
 		return getCurrentStatus().getType() == Status.Type.PRESENT;
 	}
 
-	/***
+	/**
 	 * This student has left with reason
 	 * 
 	 * @return
 	 */
-
 	public boolean isLeft() {
 		return getCurrentStatus().getType() == Status.Type.LEAVE;
 	}
 
-	/***
+	/**
 	 * This student is absent
 	 * 
 	 * @return
 	 */
-
 	public boolean isAbsent() {
 		return getCurrentStatus().getType() == Status.Type.ABSENT;
 	}

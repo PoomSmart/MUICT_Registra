@@ -5,7 +5,7 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
-import Main.Main;
+import MainApp.MainApp;
 
 public class WindowUtils {
 
@@ -19,7 +19,7 @@ public class WindowUtils {
 	}
 
 	public static String realTitle(String title) {
-		return title + (Main.test ? " (Test Mode)" : "");
+		return title + (MainApp.test ? " (Test Mode)" : "");
 	}
 	
 	public static void setDontClose(JFrame frame) {

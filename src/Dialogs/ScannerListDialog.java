@@ -6,7 +6,7 @@ import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import Main.Main;
+import MainApp.MainApp;
 import Objects.Student;
 import Utilities.WindowUtils;
 
@@ -81,7 +81,7 @@ public class ScannerListDialog extends JFrame {
 	}
 	
 	private JLabel labelForStudentID(int i, Integer ID) {
-		Student student = Main.db.get(ID);
+		Student student = MainApp.db.get(ID);
 		return new JLabel(labelString(i, ID, student), JLabel.LEFT);
 	}
 

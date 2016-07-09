@@ -21,7 +21,7 @@ import javax.swing.SpringLayout;
 
 import org.apache.commons.io.FileUtils;
 
-import Main.Main;
+import MainApp.MainApp;
 import Objects.Constants;
 import Objects.Student;
 import Utilities.CommonUtils;
@@ -91,7 +91,7 @@ public class LeaveDialog extends JFrame {
 						Integer ID = CommonUtils.getID(sID);
 						if (ID == -1)
 							throw new Exception();
-						if (!Main.db.containsKey(ID)) {
+						if (!MainApp.db.containsKey(ID)) {
 							JOptionPane.showMessageDialog(null, ID + " or more student ID not found");
 							return;
 						}

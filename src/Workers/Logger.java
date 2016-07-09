@@ -70,12 +70,12 @@ public class Logger {
 			}
 			content.append(DateUtils.getNormalFormattedDate(d) + "\n");
 			try {
-				content.append(logContentForDate(d));
+				content.append(logContentForDate(d) + "\n----------\n");
 			} catch (IOException e) {
-				content.append("No content.\n\n");
+				content.append("No content.\n----------\n");
 			}
 		}
-		content.append("\n\n===========================");
+		content.append("\n===========================");
 		dialog.setText(content.toString());
 		dialog.setVisible(true);
 	}

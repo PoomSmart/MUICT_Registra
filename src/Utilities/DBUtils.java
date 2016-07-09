@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 
-import Main.Main;
+import MainApp.MainApp;
 import Objects.Status;
 import Objects.Student;
 import Objects.Status.Type;
@@ -42,12 +42,12 @@ public class DBUtils {
 				if ((m = pLeave.matcher(line)).find()) {
 					Integer ID = CommonUtils.getID(m.group(1));
 					String reason = m.group(2);
-					if (!Main.db.containsKey(ID)) {
+					if (!MainApp.db.containsKey(ID)) {
 						System.out.println("ID not found: " + ID);
 						System.out.println("I don't think we would face this problem");
 						continue;
 					}
-					Student student = Main.db.get(ID);
+					Student student = MainApp.db.get(ID);
 					if (student == null)
 						continue;
 					student = student.clone();
@@ -81,9 +81,9 @@ public class DBUtils {
 				Integer ID = CommonUtils.getID(line);
 				if (ID == -1)
 					continue;
-				if (!Main.db.containsKey(ID))
+				if (!MainApp.db.containsKey(ID))
 					continue;
-				Student student = Main.db.get(ID);
+				Student student = MainApp.db.get(ID);
 				if (student == null)
 					continue;
 				student = student.clone();
@@ -109,7 +109,7 @@ public class DBUtils {
 	public static Map<Integer, Student> getAbsentStudents(Date date) {
 		Map<Integer, Student> absentStudents = new TreeMap<Integer, Student>();
 		Map<Integer, Student> presentStudents = getPresentStudents(date);
-		for (Student student : Main.db.values()) {
+		for (Student student : MainApp.db.values()) {
 			Integer ID = student.getID();
 			if (!presentStudents.containsKey(ID)) {
 				Student absentStudent = student.clone();

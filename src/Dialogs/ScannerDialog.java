@@ -33,7 +33,7 @@ import javax.swing.text.DocumentFilter;
 
 import org.apache.commons.io.FileUtils;
 
-import Main.Main;
+import MainApp.MainApp;
 import Objects.Constants;
 import Objects.Student;
 import Utilities.CommonUtils;
@@ -45,7 +45,7 @@ import Workers.ScannerSaver;
 public class ScannerDialog extends JFrame {
 
 	private static final long serialVersionUID = 2561998L;
-	
+
 	public static ScannerDialog activeScanner = null;
 
 	private Vector<Integer> IDs;
@@ -92,7 +92,7 @@ public class ScannerDialog extends JFrame {
 	private void reloadCurrentPresentStudents() {
 		currentPresentStudents = DBUtils.getCurrentPresentStudents();
 	}
-	
+
 	public static void random(int maxCount) {
 		if (activeScanner != null) {
 			Random r = new Random();
@@ -105,7 +105,8 @@ public class ScannerDialog extends JFrame {
 			while (maxCount-- != 0) {
 				do {
 					rID = 5988001 + r.nextInt(300);
-				} while ((randomIDs.contains(rID) || oldIDs.contains(rID)) && oldIDs.size() != Main.db.size() && !Main.db.containsKey(rID));
+				} while ((randomIDs.contains(rID) || oldIDs.contains(rID)) && oldIDs.size() != MainApp.db.size()
+						&& !MainApp.db.containsKey(rID));
 				randomIDs.add(rID);
 			}
 			try {
@@ -117,8 +118,9 @@ public class ScannerDialog extends JFrame {
 			}
 		}
 	}
-	
-	public static void addingCode(ScannerDialog dialog, Vector<Integer> IDs, boolean append, FileType type, boolean force) throws IOException {
+
+	public static void addingCode(ScannerDialog dialog, Vector<Integer> IDs, boolean append, FileType type,
+			boolean force) throws IOException {
 		dialog.resolveIDDuplicates();
 		ScannerSaver.doneAddingCodes(IDs, append, type, force);
 		dialog.cleanup();
@@ -217,7 +219,7 @@ public class ScannerDialog extends JFrame {
 				} else {
 					Integer ID = -1;
 					int stringLength = text.length();
-					if (!Main.test) {
+					if (!MainApp.test) {
 						if (stringLength == 14) {
 							ID = CommonUtils.getID(text.substring(6, 6 + 7));
 							if (ID == -1) {
@@ -236,7 +238,7 @@ public class ScannerDialog extends JFrame {
 					}
 					if (ID != -1) {
 						System.out.println("-> " + ID);
-						if (!Main.db.containsKey(ID)) {
+						if (!MainApp.db.containsKey(ID)) {
 							System.out.println("ID does not exist in database: " + ID);
 							setStatus("Not Added: " + ID);
 						} else {
@@ -301,7 +303,7 @@ public class ScannerDialog extends JFrame {
 		c.gridy = 3;
 		c.gridwidth = 1;
 		c.ipady = 0;
-		JLabel regularLabel = new JLabel("Present:");
+		JLabel regularLabel = new JLabel("Save Present:");
 		regularLabel.setHorizontalAlignment(JLabel.CENTER);
 		getContentPane().add(regularLabel, c);
 

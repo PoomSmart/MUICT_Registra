@@ -140,7 +140,7 @@ class SeatPanel extends JPanel {
 		for (int x = 0; x < SeatVisualizer.bounds.width; x++) {
 			g.setColor(Color.black);
 			FontMetrics metrics = g.getFontMetrics();
-			String xLabel = alphabet(x);
+			String xLabel = String.valueOf(SeatVisualizer.bounds.width - x);
 			int labelWidth = metrics.stringWidth(xLabel);
 			g.drawString(xLabel, shiftLeft + x * tileWidth + (int) (0.5 * tileWidth) - (int) (0.5 * labelWidth),
 					shiftTop - textGap);
@@ -175,12 +175,12 @@ class SeatPanel extends JPanel {
 			g.drawLine(shiftLeft, shiftTop + y * tileHeight, SeatVisualizer.absoluteSize.width,
 					shiftTop + y * tileHeight);
 			g.setColor(Color.black);
-			String yLabel = String.valueOf(y);
 			FontMetrics metrics = g.getFontMetrics();
+			String yLabel = alphabet(SeatVisualizer.bounds.height - y - 1);
 			int labelWidth = metrics.stringWidth(yLabel);
 			int labelHeight = metrics.getHeight();
 			g.drawString(yLabel, shiftLeft - textGap - (int) (0.5 * labelWidth),
-					shiftTop + labelHeight + y * tileHeight);
+					shiftTop + (int) (0.5 * labelHeight) + y * tileHeight + (int) (0.5 * tileHeight));
 		}
 		g.setColor(Color.gray);
 		g.drawLine(SeatVisualizer.absoluteSize.width, shiftTop, SeatVisualizer.absoluteSize.width,
@@ -199,8 +199,8 @@ public class SeatVisualizer extends JFrame {
 	
 	private static final int shiftLeft = 30;
 	private static final int shiftTop = 30;
-	public static final Dimension bounds = new Dimension(14, 20);
-	public static final Dimension tileSize = new Dimension(40, 25);
+	public static final Dimension bounds = new Dimension(10, 10);
+	public static final Dimension tileSize = new Dimension(40, 40);
 	public static final Dimension absoluteSize = new Dimension(bounds.width * tileSize.width + shiftLeft,
 			bounds.height * tileSize.height + shiftTop);
 
@@ -211,7 +211,7 @@ public class SeatVisualizer extends JFrame {
 		this.setTitle(WindowUtils.realTitle("Seat Visualizer"));
 		this.setSize(absoluteSize.width + shiftLeft, absoluteSize.height + (int) (tileSize.height * 1.5) + shiftTop);
 		getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 0, 1));
-		WindowUtils.setRelativeCenter(this, -this.getWidth() + 45, 0);
+		WindowUtils.setRelativeCenter(this, -this.getWidth() + bounds.width / 2, 0);
 		reloadStudents();
 		panel = new SeatPanel(currentStudents, shiftLeft, shiftTop);
 		panel.setPreferredSize(this.getSize());

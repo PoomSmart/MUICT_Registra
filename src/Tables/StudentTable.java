@@ -31,7 +31,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 
-import Main.Main;
+import MainApp.MainApp;
 import Objects.Constants;
 import Objects.Status;
 import Objects.Student;
@@ -105,7 +105,7 @@ public class StudentTable extends JFrame {
 			internalStudents = DBUtils.getCurrentStudents();
 		else {
 			internalStudents = new TreeMap<Integer, Student>();
-			for (Entry<Integer, Student> entry : Main.db.entrySet())
+			for (Entry<Integer, Student> entry : MainApp.db.entrySet())
 				internalStudents.put(entry.getKey(), entry.getValue().clone());
 			File[] dates = new File(Constants.FILE_ROOT).listFiles();
 			for (File date : dates) {
@@ -122,7 +122,7 @@ public class StudentTable extends JFrame {
 				}
 				// Assigning present and absent students
 				Map<Integer, Student> presentStudents = DBUtils.getPresentStudents(d);
-				for (Integer ID : Main.db.keySet()) {
+				for (Integer ID : MainApp.db.keySet()) {
 					if (presentStudents.containsKey(ID))
 						internalStudents.get(ID).addStatus(d, new Status());
 					else

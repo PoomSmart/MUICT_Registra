@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
 
 import org.apache.commons.io.FileUtils;
 
-import Main.Main;
+import MainApp.MainApp;
 import Objects.Constants;
 import Tables.StudentTable;
 import Utilities.CommonUtils;
@@ -97,11 +97,11 @@ public class ControlCenterDialog extends JFrame {
 		});
 		getContentPane().add(clearLeaveButton);
 		
-		if (Main.test) {
+		if (MainApp.test) {
 			JButton randomPresentButton = new JButton("Random Present");
 			randomPresentButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					ScannerDialog.random(40);
+					ScannerDialog.random(60);
 				}
 			});
 			getContentPane().add(randomPresentButton);

@@ -15,8 +15,10 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import Objects.Cell;
 import Objects.Position;
 import Objects.Student;
+import Utilities.CommonUtils;
 import Utilities.DBUtils;
 import Utilities.WindowUtils;
 
@@ -25,50 +27,12 @@ class SeatPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private Map<Integer, Student> students;
-	private int shiftLeft;
-	private int shiftTop;
 
 	private static final int textGap = 10;
 
-	class Cell<X, Y> {
-		public String x;
-		public Integer y = -1;
-
-		public Cell(String x, Integer y) {
-			this.x = x;
-			this.y = y;
-		}
-
-		public Cell(int wx, int wy) {
-			setName(wx, wy);
-		}
-
-		public boolean isNull() {
-			return x == null || y == -1;
-		}
-
-		public void setName(int x, int y) {
-			int cx = (x - shiftLeft) / SeatVisualizer.tileSize.width;
-			int cy = (y - shiftTop) / SeatVisualizer.tileSize.height;
-			if (cx >= SeatVisualizer.bounds.width || x < shiftLeft || cy >= SeatVisualizer.bounds.height
-					|| y < shiftTop)
-				return;
-			this.x = SeatPanel.alphabet(cx);
-			this.y = cy;
-		}
-
-		public String toString() {
-			if (isNull())
-				return "Null";
-			return String.format("%s-%d", x, y);
-		}
-	}
-
 	private Cell<String, Integer> selectedCell;
 
-	public SeatPanel(Map<Integer, Student> students, int shiftLeft, int shiftTop) {
-		this.shiftLeft = shiftLeft;
-		this.shiftTop = shiftTop;
+	public SeatPanel(Map<Integer, Student> students) {
 		this.students = students;
 		this.addMouseListener(new MouseListener() {
 			@Override
@@ -76,7 +40,8 @@ class SeatPanel extends JPanel {
 				int x = e.getX();
 				int y = e.getY();
 				if (e.getClickCount() == 2) {
-					selectedCell = new Cell<String, Integer>(x, y);
+					selectedCell = new Cell<String, Integer>(null, -1);
+					selectedCell.setName(x, y);
 					updateSelection();
 				}
 			}
@@ -103,18 +68,8 @@ class SeatPanel extends JPanel {
 		this.students = students;
 	}
 
-	private static String alphabet(int x) {
-		return Character.toString((char) (x + 'A'));
-	}
-
 	private Position<Integer, Integer> studentPositionFromSelection() {
-		if (selectedCell == null)
-			return Position.nullPosition;
-		if (selectedCell.isNull())
-			return Position.nullPosition;
-		Position<Integer, Integer> position = new Position<Integer, Integer>(selectedCell.x.charAt(0) - 'A',
-				selectedCell.y);
-		return position;
+		return CommonUtils.positionByCellPosition(selectedCell);
 	}
 
 	private Student studentFromSelection() {
@@ -137,14 +92,18 @@ class SeatPanel extends JPanel {
 		super.paintComponent(g);
 		int tileWidth = SeatVisualizer.tileSize.width;
 		int tileHeight = SeatVisualizer.tileSize.height;
-		for (int x = 0; x < SeatVisualizer.bounds.width; x++) {
+		int shiftLeft = SeatVisualizer.shiftLeft;
+		int shiftTop = SeatVisualizer.shiftTop;
+		int width = SeatVisualizer.bounds.width;
+		int height = SeatVisualizer.bounds.height;
+		for (int x = 0; x < width; x++) {
 			g.setColor(Color.black);
 			FontMetrics metrics = g.getFontMetrics();
-			String xLabel = String.valueOf(SeatVisualizer.bounds.width - x);
+			String xLabel = String.valueOf(width - x);
 			int labelWidth = metrics.stringWidth(xLabel);
 			g.drawString(xLabel, shiftLeft + x * tileWidth + (int) (0.5 * tileWidth) - (int) (0.5 * labelWidth),
 					shiftTop - textGap);
-			for (int y = 0; y < SeatVisualizer.bounds.height; y++) {
+			for (int y = 0; y < height; y++) {
 				g.setColor(Color.white);
 				boolean found = false;
 				for (Student student : students.values()) {
@@ -170,13 +129,13 @@ class SeatPanel extends JPanel {
 			g.drawLine(shiftLeft + x * tileWidth, shiftTop, shiftLeft + x * tileWidth,
 					SeatVisualizer.absoluteSize.height);
 		}
-		for (int y = 0; y < SeatVisualizer.bounds.height; y++) {
+		for (int y = 0; y < height; y++) {
 			g.setColor(Color.gray);
 			g.drawLine(shiftLeft, shiftTop + y * tileHeight, SeatVisualizer.absoluteSize.width,
 					shiftTop + y * tileHeight);
 			g.setColor(Color.black);
 			FontMetrics metrics = g.getFontMetrics();
-			String yLabel = alphabet(SeatVisualizer.bounds.height - y - 1);
+			String yLabel = CommonUtils.alphabet(height - y - 1);
 			int labelWidth = metrics.stringWidth(yLabel);
 			int labelHeight = metrics.getHeight();
 			g.drawString(yLabel, shiftLeft - textGap - (int) (0.5 * labelWidth),
@@ -197,8 +156,8 @@ public class SeatVisualizer extends JFrame {
 
 	public static SeatVisualizer activeVisualizer = null;
 	
-	private static final int shiftLeft = 30;
-	private static final int shiftTop = 30;
+	public static final int shiftLeft = 30;
+	public static final int shiftTop = 30;
 	public static final Dimension bounds = new Dimension(10, 10);
 	public static final Dimension tileSize = new Dimension(40, 40);
 	public static final Dimension absoluteSize = new Dimension(bounds.width * tileSize.width + shiftLeft,
@@ -213,7 +172,7 @@ public class SeatVisualizer extends JFrame {
 		getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 0, 1));
 		WindowUtils.setRelativeCenter(this, -this.getWidth() + bounds.width / 2, 0);
 		reloadStudents();
-		panel = new SeatPanel(currentStudents, shiftLeft, shiftTop);
+		panel = new SeatPanel(currentStudents);
 		panel.setPreferredSize(this.getSize());
 		this.setPreferredSize(this.getSize());
 		this.setMinimumSize(this.getSize());

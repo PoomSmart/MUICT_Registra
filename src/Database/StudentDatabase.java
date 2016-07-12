@@ -13,10 +13,20 @@ import Objects.Student;
 import Utilities.CommonUtils;
 
 public class StudentDatabase {
-	// Pattern: ID,name,gender,nickname
-	private static final Pattern pattern = Pattern.compile("(\\d+),(.+),(M|F),(.+)");
+	// Pattern 1: ID,name,gender,nickname
+	// private static final Pattern pattern = Pattern.compile("(\\d+),(.+),(M|F),(.+)");
+	// Pattern 2: ID,title,name,lastname,nickname
+	private static final Pattern pattern = Pattern.compile("(\\d+),(.+),(.+),(.+),(.+)");
 
 	private Map<Integer, Student> students = new TreeMap<Integer, Student>();
+	
+	private static String getGender(String str) {
+		if (str.equals("MR."))
+			return "M";
+		if (str.equals("MISS"))
+			return "F";
+		return "Unknown";
+	}
 	
 	public StudentDatabase(List<String> lines) {
 		Matcher m;
@@ -31,10 +41,11 @@ public class StudentDatabase {
 					System.out.println("Duplicate ID: " + ID + ", ignoring");
 					continue;
 				}
-				String name = m.group(2);
-				String gender = m.group(3);
-				String nickname = m.group(4);
-				Student student = new Student(ID, name, nickname, gender);
+				String firstname = m.group(3);
+				String lastname = m.group(4);
+				String gender = getGender(m.group(2));
+				String nickname = m.group(5);
+				Student student = new Student(ID, firstname, lastname, nickname, gender);
 				students.put(ID, student);
 			}
 		}

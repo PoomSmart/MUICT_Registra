@@ -85,7 +85,7 @@ public class StudentTable extends JFrame {
 			arr[i][4] = student.getGender();
 			if (mode == 0) {
 				arr[i][5] = student.getCurrentStatus();
-				arr[i][6] = student.getPosition();
+				arr[i][6] = student.getPosition().toCellString();
 			} else {
 				arr[i][5] = student.getPresentCount();
 				arr[i][6] = student.getLeaveCount();
@@ -154,7 +154,7 @@ public class StudentTable extends JFrame {
 		JPanel self = new JPanel();
 		self.setLayout(new BoxLayout(self, BoxLayout.Y_AXIS));
 		this.setTitle(WindowUtils.realTitle(title));
-		this.setSize(700, 900);
+		this.setSize(1100, 700);
 		WindowUtils.setCenter(this);
 
 		class StudentTableModel extends AbstractTableModel {

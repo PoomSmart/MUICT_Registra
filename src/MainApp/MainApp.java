@@ -82,7 +82,7 @@ public class MainApp {
 	}
 
 	public static void main(String[] args) throws InterruptedException, IOException {
-		Map<Integer, Student> students = new StudentDatabase("batch-14.csv").getStudents();
+		Map<Integer, Student> students = new StudentDatabase("batch-14-new.csv").getStudents();
 		randomPosition(students);
 		db = students;
 		

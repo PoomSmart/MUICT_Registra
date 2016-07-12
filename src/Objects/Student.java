@@ -10,26 +10,18 @@ import Utilities.DateUtils;
 
 public class Student implements Cloneable {
 
-	private Integer ID;
-	private String name;
-	private String firstname;
-	private String lastname;
-	private String nickname;
-	private String gender;
+	private final Integer ID;
+	private final String firstname;
+	private final String lastname;
+	private final String nickname;
+	private final String gender;
 	private Map<String, Status> statuses;
 	private Position<Integer, Integer> position;
 
-	public Student(Integer ID, String name, String nickname, String gender) {
+	public Student(Integer ID, String firstname, String lastname, String nickname, String gender) {
 		this.ID = ID;
-		this.name = name;
-		String[] x = name.split("\\s+");
-		if (x.length == 2) {
-			this.firstname = x[0];
-			this.lastname = x[1];
-		} else {
-			this.firstname = name;
-			this.lastname = "";
-		}
+		this.firstname = firstname;
+		this.lastname = lastname;
 		this.nickname = nickname;
 		this.gender = gender;
 		this.position = new Position<Integer, Integer>(-1, -1);
@@ -41,7 +33,7 @@ public class Student implements Cloneable {
 	}
 
 	public String getName() {
-		return name;
+		return firstname + " " + lastname;
 	}
 
 	public String getNickname() {
@@ -67,6 +59,8 @@ public class Student implements Cloneable {
 	public void setPosition(Position<Integer, Integer> position) {
 		this.position = position;
 	}
+	
+	//public 
 
 	/**
 	 * Get current status of a student in the specific date
@@ -165,7 +159,7 @@ public class Student implements Cloneable {
 	public String toString(int mode) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(" ID: " + ID + "\n");
-		sb.append(" Full Name: " + name + "\n");
+		sb.append(" Full Name: " + getName() + "\n");
 		sb.append(" Nickname: " + nickname + "\n");
 		sb.append(" Gender: " + getNormalizedGender() + "\n");
 		if (mode == 0) {
@@ -173,7 +167,7 @@ public class Student implements Cloneable {
 			sb.append(" Current Status: " + status + "\n");
 			if (status.getType() == Status.Type.LEAVE)
 				sb.append(" Reason: " + status.getReason() + "\n");
-			sb.append(" Current Position: " + position + "\n");
+			sb.append(" Current Position: " + position.toCellString() + "\n");
 		}
 		if (mode != 0) {
 			sb.append(String.format(" Present | Leave | Absent: %d, %d, %d\n", getPresentCount(), getLeaveCount(),
@@ -199,7 +193,7 @@ public class Student implements Cloneable {
 	}
 
 	public Student clone() {
-		Student student = new Student(ID, name, nickname, gender);
+		Student student = new Student(ID, firstname, lastname, nickname, gender);
 		student.statuses = new TreeMap<String, Status>();
 		student.position = position.clone();
 		for (Map.Entry<String, Status> entry : statuses.entrySet()) {

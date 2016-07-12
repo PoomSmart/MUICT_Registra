@@ -1,5 +1,7 @@
 package Objects;
 
+import Utilities.CommonUtils;
+
 public class Position<X, Y> implements Cloneable {
 	public Integer x;
 	public Integer y;
@@ -13,6 +15,11 @@ public class Position<X, Y> implements Cloneable {
 	
 	public String toString() {
 		return String.format("{%d, %d}", x, y);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public String toCellString() {
+		return CommonUtils.cellPositionByPosition((Position<Integer, Integer>)this).toString();
 	}
 	
 	public Position<X, Y> clone() {
@@ -29,6 +36,8 @@ public class Position<X, Y> implements Cloneable {
 
 	@Override
 	public boolean equals(Object obj) {
+		if (!(obj instanceof Position))
+			return false;
 		@SuppressWarnings("unchecked")
 		Position<X, Y> position = (Position<X, Y>)obj;
 		return position.x == x && position.y == y;

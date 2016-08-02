@@ -61,6 +61,7 @@ public class ScannerDialog extends JFrame {
 
 	private Map<Integer, Student> currentPresentStudents;
 
+	@SuppressWarnings("unused")
 	private void destroyEverything() {
 		this.setVisible(false);
 		this.dispose();
@@ -222,6 +223,7 @@ public class ScannerDialog extends JFrame {
 					if (!MainApp.test) {
 						if (stringLength == 14) {
 							ID = CommonUtils.getID(text.substring(6, 6 + 7));
+							ID = ID % 100000 + 5900000;
 							if (ID == -1) {
 								cleanupTextField();
 								return;
@@ -261,12 +263,12 @@ public class ScannerDialog extends JFrame {
 			}
 
 		});
-		field.addActionListener(new ActionListener() {
+		/*field.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("Enter pressed");
 				destroyEverything();
 			}
-		});
+		});*/
 		field.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 				desLabel.setText(Constants.SCANNER_DETECTING_MESSAGE);

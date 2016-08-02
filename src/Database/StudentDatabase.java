@@ -16,7 +16,7 @@ public class StudentDatabase {
 	// Pattern 1: ID,name,gender,nickname
 	// private static final Pattern pattern = Pattern.compile("(\\d+),(.+),(M|F),(.+)");
 	// Pattern 2: ID,title,name,lastname,nickname
-	private static final Pattern pattern = Pattern.compile("(\\d+),(.+),(.+),(.+),(.+)");
+	private static final Pattern pattern = Pattern.compile("(\\d+),(.+),(.+),(.+),(.*)");
 
 	private Map<Integer, Student> students = new TreeMap<Integer, Student>();
 	

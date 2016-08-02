@@ -24,7 +24,6 @@ public class DBUtils {
 	// Pattern: ID,type,reason
 	public static final Pattern pLeave = Pattern.compile("(\\d+),leave,(.*)");
 	
-	
 	/**
 	 * Get leave-with reason students from specific date
 	 * 
@@ -41,6 +40,8 @@ public class DBUtils {
 			while ((line = reader.readLine()) != null) {
 				if ((m = pLeave.matcher(line)).find()) {
 					Integer ID = CommonUtils.getID(m.group(1));
+					if (ID == -1)
+						continue;
 					String reason = m.group(2);
 					if (!MainApp.db.containsKey(ID)) {
 						System.out.println("ID not found: " + ID);

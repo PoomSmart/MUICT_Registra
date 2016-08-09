@@ -17,8 +17,9 @@ public class Student implements Cloneable {
 	private final String gender;
 	private Map<String, Status> statuses;
 	private Position<Integer, Integer> position;
+	private String allergies;
 
-	public Student(Integer ID, String firstname, String lastname, String nickname, String gender) {
+	public Student(Integer ID, String firstname, String lastname, String nickname, String gender, String allergies) {
 		this.ID = ID;
 		this.firstname = firstname;
 		this.lastname = lastname;
@@ -26,6 +27,7 @@ public class Student implements Cloneable {
 		this.gender = gender;
 		this.position = new Position<Integer, Integer>(-1, -1);
 		this.statuses = new TreeMap<String, Status>();
+		this.allergies = allergies;
 	}
 
 	public Integer getID() {
@@ -168,6 +170,8 @@ public class Student implements Cloneable {
 			if (status.getType() == Status.Type.LEAVE)
 				sb.append(" Reason: " + status.getReason() + "\n");
 			sb.append(" Current Position: " + position.toCellString() + "\n");
+			if (allergies != null)
+				sb.append(" **Allergies: " + allergies + "\n");
 		}
 		if (mode != 0) {
 			sb.append(String.format(" Present | Leave | Absent: %d, %d, %d\n", getPresentCount(), getLeaveCount(),
@@ -193,7 +197,7 @@ public class Student implements Cloneable {
 	}
 
 	public Student clone() {
-		Student student = new Student(ID, firstname, lastname, nickname, gender);
+		Student student = new Student(ID, firstname, lastname, nickname, gender, allergies);
 		student.statuses = new TreeMap<String, Status>();
 		student.position = position.clone();
 		for (Map.Entry<String, Status> entry : statuses.entrySet()) {
@@ -202,6 +206,14 @@ public class Student implements Cloneable {
 			student.statuses.put(date, status);
 		}
 		return student;
+	}
+
+	public String getAllergies() {
+		return allergies;
+	}
+
+	public void setAllergies(String allergies) {
+		this.allergies = allergies;
 	}
 
 }

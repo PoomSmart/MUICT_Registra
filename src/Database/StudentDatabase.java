@@ -11,6 +11,7 @@ import org.apache.commons.io.FileUtils;
 
 import Objects.Student;
 import Utilities.CommonUtils;
+import Workers.AllergiesAssigner;
 
 public class StudentDatabase {
 	// Pattern 1: ID,name,gender,nickname
@@ -45,10 +46,12 @@ public class StudentDatabase {
 				String lastname = m.group(4);
 				String gender = getGender(m.group(2));
 				String nickname = m.group(5);
-				Student student = new Student(ID, firstname, lastname, nickname, gender);
+				Student student = new Student(ID, firstname, lastname, nickname, gender, null);
 				students.put(ID, student);
 			}
 		}
+		AllergiesAssigner.students = students;
+		AllergiesAssigner.assignAll();
 	}
 
 	public StudentDatabase(String dbPath) throws IOException {

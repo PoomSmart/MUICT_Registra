@@ -1,13 +1,22 @@
 package MainApp;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+import org.apache.commons.io.FileUtils;
 
 import Database.StudentDatabase;
 import Dialogs.ControlCenterDialog;
@@ -25,7 +34,7 @@ import Visualizers.SeatVisualizer;
 public class MainApp {
 
 	public static final boolean test = true;
-	
+
 	public static Map<Integer, Student> db;
 
 	private static void runFrame(JFrame frame) throws InterruptedException {
@@ -69,7 +78,7 @@ public class MainApp {
 			}
 		}
 	}
-	
+
 	public static void createPathIfNecessary(String path) {
 		File output = new File(path);
 		if (!output.exists()) {
@@ -82,17 +91,41 @@ public class MainApp {
 	}
 
 	public static void main(String[] args) throws InterruptedException, IOException {
+		// License agreement
+		if (!CommonUtils.fileExistsAtPath("agreed")) {
+			JPanel panel = new JPanel() {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public Dimension getPreferredSize() {
+					return new Dimension(530, 800);
+				}
+			};
+
+			// We can use JTextArea or JLabel to display messages
+			JTextArea textArea = new JTextArea();
+			textArea.setText(FileUtils.readFileToString(new File("LICENSE"), Charset.defaultCharset()));
+			textArea.setEditable(false);
+			panel.setLayout(new BorderLayout());
+			panel.add(new JScrollPane(textArea));
+			Object buttonLabels[] = { "Agree", "Disagree " };
+			int answer = JOptionPane.showOptionDialog(null, panel, "License Agreement", JOptionPane.YES_NO_OPTION,
+					JOptionPane.INFORMATION_MESSAGE, null, buttonLabels, buttonLabels[0]);
+			if (answer != JOptionPane.YES_OPTION)
+				System.exit(0);
+			FileUtils.write(new File("agreed"), "");
+		}
 		Map<Integer, Student> students = new StudentDatabase("batch-14-new.csv").getStudents();
 		randomPosition(students);
 		db = students;
-		
+
 		// Create our working directory
 		createPathIfNecessary(Constants.FILE_ROOT);
-		
+
 		// Create a directory for current date, if necessary
 		String datePath = CommonUtils.datePath(DateUtils.getCurrentDate());
 		createPathIfNecessary(datePath);
-		
+
 		ScannerDialog scannerDialog = new ScannerDialog();
 		scannerDialog.setVisible(true);
 		runFrame(scannerDialog);
@@ -105,11 +138,11 @@ public class MainApp {
 		LeaveDialog leaveDialog = new LeaveDialog();
 		leaveDialog.setVisible(true);
 		runFrame(leaveDialog);
-		
+
 		ControlCenterDialog ccDialog = new ControlCenterDialog();
 		ccDialog.setVisible(true);
 		runFrame(ccDialog);
-		
+
 		SeatVisualizer vis = new SeatVisualizer();
 		vis.setVisible(true);
 		runFrame(vis);

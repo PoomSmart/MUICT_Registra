@@ -1,5 +1,6 @@
 package Dialogs;
 
+import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -7,6 +8,7 @@ import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
@@ -41,7 +43,9 @@ public class PlainTextDialog extends JFrame {
 		layout.putConstraint(SpringLayout.NORTH, textArea, margin, SpringLayout.NORTH, getContentPane());
 		layout.putConstraint(SpringLayout.SOUTH, textArea, -margin, SpringLayout.SOUTH, getContentPane());
 
-		getContentPane().add(textArea);
+		JScrollPane scroll = new JScrollPane(textArea);
+		scroll.setPreferredSize(new Dimension(width - 5, height));
+		getContentPane().add(scroll);
 
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent windowEvent) {
@@ -61,6 +65,7 @@ public class PlainTextDialog extends JFrame {
 				}
 			}
 		});
+		this.setResizable(false);
 	}
 
 	public PlainTextDialog(String title, int width, int height, int margin, String text, boolean editable) {

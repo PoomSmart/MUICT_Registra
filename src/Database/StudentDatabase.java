@@ -14,10 +14,9 @@ import Utilities.CommonUtils;
 import Workers.AllergiesAssigner;
 
 public class StudentDatabase {
-	// Pattern 1: ID,name,gender,nickname
-	// private static final Pattern pattern = Pattern.compile("(\\d+),(.+),(M|F),(.+)");
-	// Pattern 2: ID,title,name,lastname,nickname
-	private static final Pattern pattern = Pattern.compile("(\\d+),(.+),(.+),(.+),(.*)");
+	
+	// Pattern: #,ID,titleTH,firstnameTH,lastnameTH,title,firstname,lastname,section,(unused),school,schoolLoc,nickname,bann,healthCondition,medAllergies,foodAllergies,foodPref
+	private static final Pattern pattern = Pattern.compile("\\d+,(\\d+),[ -û]+,[ -û]+,[ -û]+,(.+),(.+),(.+),(\\d),.*,[ -û]*,[ -û]*,(.*),(\\d*),([ -û]*),([ -û]*),([ -û]*),([ -û]*)", Pattern.UNICODE_CHARACTER_CLASS);
 
 	private Map<Integer, Student> students = new TreeMap<Integer, Student>();
 	
@@ -32,6 +31,7 @@ public class StudentDatabase {
 	public StudentDatabase(List<String> lines) {
 		Matcher m;
 		for (String line : lines) {
+			line = line.replaceFirst("\\, ", "\\,"); // This is "annoying"
 			if ((m = pattern.matcher(line)).find()) {
 				Integer ID = CommonUtils.getID(m.group(1));
 				if (ID == -1) {
@@ -42,11 +42,16 @@ public class StudentDatabase {
 					System.out.println("Duplicate ID: " + ID + ", ignoring");
 					continue;
 				}
+				String gender = getGender(m.group(2));
 				String firstname = m.group(3);
 				String lastname = m.group(4);
-				String gender = getGender(m.group(2));
-				String nickname = m.group(5);
-				Student student = new Student(ID, firstname, lastname, nickname, gender, null);
+				int section = Integer.parseInt(m.group(5));
+				String nickname = m.group(6);
+				String healthCondition = m.group(8);
+				String medicalAllergies = m.group(9);
+				String foodAllergies = m.group(10);
+				String foodPreference = m.group(11);
+				Student student = new Student(ID, firstname, lastname, nickname, section, gender, healthCondition, medicalAllergies, foodAllergies, foodPreference);
 				students.put(ID, student);
 			}
 		}

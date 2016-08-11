@@ -115,7 +115,7 @@ public class MainApp {
 				System.exit(0);
 			FileUtils.write(new File("agreed"), "");
 		}
-		Map<Integer, Student> students = new StudentDatabase("batch-14-new.csv").getStudents();
+		Map<Integer, Student> students = new StudentDatabase("batch-14-new2.csv").getStudents();
 		randomPosition(students);
 		db = students;
 

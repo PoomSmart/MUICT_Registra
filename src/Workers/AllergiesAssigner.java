@@ -22,14 +22,25 @@ public class AllergiesAssigner {
 	// Ponstan (Fix Menstruation), 1 ID; + Generic type
 	
 	// Reminder: put no stress
+	
+	private enum Type {
+		Medical, Food
+	}
 
 	public static Map<Integer, Student> students;
 
-	public static void assign(Integer ID, String allergies) {
-		students.get(ID).setAllergies(allergies);
+	public static void assign(Integer ID, String allergy, Type type) {
+		switch (type) {
+		case Medical:
+			students.get(ID).addMedicalAllergy(allergy);
+			break;
+		case Food:
+			students.get(ID).addFoodAllergy(allergy);
+			break;
+		}
 	}
 
 	public static void assignAll() {
-		assign(5988001, "General flu");
+		//assign(5988001, "General flu", Type.Medical);
 	}
 }

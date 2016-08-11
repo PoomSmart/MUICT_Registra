@@ -15,19 +15,31 @@ public class Student implements Cloneable {
 	private final String lastname;
 	private final String nickname;
 	private final String gender;
+	private final int section;
+	private boolean medicalExclusive;
 	private Map<String, Status> statuses;
 	private Position<Integer, Integer> position;
-	private String allergies;
+	private String healthCondition;
+	private String medicalAllergies;
+	private String foodAllergies;
+	private String foodPreference;
 
-	public Student(Integer ID, String firstname, String lastname, String nickname, String gender, String allergies) {
+	public Student(Integer ID, String firstname, String lastname, String nickname, int section, String gender, String healthCondition, String medicalAllergies, String foodAllergies, String foodPreference) {
 		this.ID = ID;
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.nickname = nickname;
 		this.gender = gender;
+		this.section = section;
 		this.position = new Position<Integer, Integer>(-1, -1);
 		this.statuses = new TreeMap<String, Status>();
-		this.allergies = allergies;
+		this.medicalExclusive = healthCondition.contains("*");
+		if (this.medicalExclusive)
+			System.out.println("Exclusively take care: " + ID);
+		this.healthCondition = healthCondition.replaceAll("\\*", "");
+		this.medicalAllergies = medicalAllergies;
+		this.foodAllergies = foodAllergies;
+		this.foodPreference = foodPreference;
 	}
 
 	public Integer getID() {
@@ -52,6 +64,10 @@ public class Student implements Cloneable {
 
 	public String getGender() {
 		return gender;
+	}
+	
+	public int getSection() {
+		return section;
 	}
 
 	public Position<Integer, Integer> getPosition() {
@@ -164,14 +180,23 @@ public class Student implements Cloneable {
 		sb.append(" Full Name: " + getName() + "\n");
 		sb.append(" Nickname: " + nickname + "\n");
 		sb.append(" Gender: " + getNormalizedGender() + "\n");
+		sb.append(" Section: " + section + "\n");
 		if (mode == 0) {
 			Status status = getCurrentStatus();
 			sb.append(" Current Status: " + status + "\n");
 			if (status.getType() == Status.Type.LEAVE)
 				sb.append(" Reason: " + status.getReason() + "\n");
 			sb.append(" Current Position: " + position.toCellString() + "\n");
-			if (allergies != null)
-				sb.append(" **Allergies: " + allergies + "\n");
+			if (!healthCondition.isEmpty())
+				sb.append(" HEALTH condition: " + healthCondition + "\n");
+			if (!medicalAllergies.isEmpty())
+				sb.append(" MEDICAL Allergies: " + medicalAllergies + "\n");
+			if (!foodAllergies.isEmpty())
+				sb.append(" FOOD Allergies: " + foodAllergies + "\n");
+			if (!foodPreference.isEmpty())
+				sb.append(" FOOD Preference: " + foodPreference + "\n");
+			if (medicalExclusive)
+				sb.append(" TAKE CARE\n");
 		}
 		if (mode != 0) {
 			sb.append(String.format(" Present | Leave | Absent: %d, %d, %d\n", getPresentCount(), getLeaveCount(),
@@ -182,8 +207,7 @@ public class Student implements Cloneable {
 				Date date = null;
 				try {
 					date = DateUtils.s_fmt.parse(dateKey);
-				} catch (ParseException e) {
-				}
+				} catch (ParseException e) {}
 				String realDateKey = DateUtils.n_fmt.format(date);
 				Status status = entry.getValue();
 				sb.append(String.format("  %s: %s\n", realDateKey, status.getDetailedStatus()));
@@ -197,7 +221,8 @@ public class Student implements Cloneable {
 	}
 
 	public Student clone() {
-		Student student = new Student(ID, firstname, lastname, nickname, gender, allergies);
+		Student student = new Student(ID, firstname, lastname, nickname, section, gender, healthCondition, medicalAllergies, foodAllergies, foodPreference);
+		student.medicalExclusive = medicalExclusive;
 		student.statuses = new TreeMap<String, Status>();
 		student.position = position.clone();
 		for (Map.Entry<String, Status> entry : statuses.entrySet()) {
@@ -207,13 +232,37 @@ public class Student implements Cloneable {
 		}
 		return student;
 	}
-
-	public String getAllergies() {
-		return allergies;
+	
+	public String getHealthCondition() {
+		return healthCondition;
+	}
+	
+	public void addHealthCondition(String condition) {
+		healthCondition += " + " + condition;
 	}
 
-	public void setAllergies(String allergies) {
-		this.allergies = allergies;
+	public String getMedicalAllergies() {
+		return medicalAllergies;
+	}
+	
+	public void addMedicalAllergy(String allergy) {
+		medicalAllergies += " + " + allergy;
+	}
+
+	public String getFoodAllergies() {
+		return foodAllergies;
+	}
+	
+	public void addFoodAllergy(String allergy) {
+		foodAllergies += " + " + allergy;
+	}
+
+	public String getFoodPreference() {
+		return foodPreference;
+	}
+	
+	public void addFoodPreference(String food) {
+		foodPreference += " + " + food;
 	}
 
 }

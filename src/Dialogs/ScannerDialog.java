@@ -61,14 +61,6 @@ public class ScannerDialog extends JFrame {
 
 	private Map<Integer, Student> currentPresentStudents;
 
-	@SuppressWarnings("unused")
-	private void destroyEverything() {
-		this.setVisible(false);
-		this.dispose();
-		list.setVisible(false);
-		list.dispose();
-	}
-
 	private void cleanup() {
 		IDs.removeAllElements();
 		list.removeAll();

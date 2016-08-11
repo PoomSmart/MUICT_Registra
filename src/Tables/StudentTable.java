@@ -54,7 +54,7 @@ public class StudentTable extends JFrame {
 	private JTextArea studentText;
 
 	private JTable table;
-	private int mode;
+	private final int mode;
 	
 	private static final String[] names = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Status", "Position" };
 	private static final String[] names_global = { "ID", "First Name", "Last Name", "Nickname", "Gender", "#Present", "#Leave", "#Absence" };

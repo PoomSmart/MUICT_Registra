@@ -58,6 +58,9 @@ public class ScannerDialog extends JFrame {
 	private JTextField field;
 	private JButton confirmRegularBtn;
 	private JButton appendRegularBtn;
+	
+	private boolean shouldCleanup;
+	private boolean removeLabel;
 
 	private Map<Integer, Student> currentPresentStudents;
 
@@ -185,11 +188,33 @@ public class ScannerDialog extends JFrame {
 				validate();
 			}
 
-			public void validate() {
-				updateButtonsState();
-				String text = field.getText();
-				boolean shouldCleanup = false;
-				boolean removeLabel = false;
+			public boolean performSpecialCode(String code) {
+				switch (code) {
+				case "20822200000011":
+					// Append data
+					appendRegularBtn.doClick();
+					return true;
+				case "20822200000021":
+					// Show student table (current date)
+					ControlCenterDialog.currentDialog.showStudentTable(0);
+					return true;
+				case "20822200000031":
+					// Show student table (all-time)
+					ControlCenterDialog.currentDialog.showStudentTable(1);
+					return true;
+				case "20822200000041":
+					// Clear scanned codes
+					parseText("clean");
+					return true;
+				case "20822200000051":
+					// Delete last scanned code
+					parseText("dellast");
+					return true;
+				}
+				return false;
+			}
+			
+			public void parseText(String text) {
 				Matcher m;
 				if (text.equals("sort")) {
 					list.sort();
@@ -248,6 +273,14 @@ public class ScannerDialog extends JFrame {
 						shouldCleanup = true;
 					}
 				}
+			}
+
+			public void validate() {
+				updateButtonsState();
+				String text = field.getText();
+				shouldCleanup = removeLabel = false;
+				if (!performSpecialCode(text))
+					parseText(text);
 				if (removeLabel)
 					setStatus(" ");
 				if (shouldCleanup)
@@ -255,12 +288,10 @@ public class ScannerDialog extends JFrame {
 			}
 
 		});
-		/*field.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("Enter pressed");
-				destroyEverything();
-			}
-		});*/
+		/*
+		 * field.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
+		 * System.out.println("Enter pressed"); destroyEverything(); } });
+		 */
 		field.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 				desLabel.setText(Constants.SCANNER_DETECTING_MESSAGE);

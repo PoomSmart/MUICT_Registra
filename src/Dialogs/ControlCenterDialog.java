@@ -23,6 +23,25 @@ import Workers.Logger;
 public class ControlCenterDialog extends JFrame {
 
 	private static final long serialVersionUID = 1L;
+	
+	public static ControlCenterDialog currentDialog = null;
+	
+	public JButton showDBButton;
+	public JButton showLogButton;
+	public JButton clearPresentButton;
+	public JButton randomPresentButton;
+	public JButton clearLeaveButton;
+	
+	private static Object[] dbOptions = { "Today", "All" };
+	
+	public void showStudentTable(int result) {
+		result = result == -1 ? JOptionPane.showOptionDialog(null, "Select type:", "Attendance Type",
+				JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, dbOptions, dbOptions[0]) : result;
+		if (result != JOptionPane.CLOSED_OPTION) {
+			StudentTable stuTable = new StudentTable(result);
+			stuTable.setVisible(true);
+		}
+	}
 
 	public ControlCenterDialog() {
 		this.setTitle(WindowUtils.realTitle("Control Center"));
@@ -30,21 +49,15 @@ public class ControlCenterDialog extends JFrame {
 		WindowUtils.setRelativeCenter(this, 0, -200);
 		this.setLayout(new FlowLayout());
 
-		JButton showDBButton = new JButton("Attendance");
-		Object[] dbOptions = { "Today", "All" };
+		showDBButton = new JButton("Attendance");
 		showDBButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int result = JOptionPane.showOptionDialog(null, "Select type:", "Attendance Type",
-						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, dbOptions, dbOptions[0]);
-				if (result != JOptionPane.CLOSED_OPTION) {
-					StudentTable stuTable = new StudentTable(result);
-					stuTable.setVisible(true);
-				}
+				showStudentTable(-1);
 			}
 		});
 		getContentPane().add(showDBButton);
 
-		JButton showLogButton = new JButton("Log");
+		showLogButton = new JButton("Log");
 		Object[] logOptions = { "Current", "All" };
 		showLogButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -61,7 +74,7 @@ public class ControlCenterDialog extends JFrame {
 		});
 		getContentPane().add(showLogButton);
 		
-		JButton clearPresentButton = new JButton("Clear Present");
+		clearPresentButton = new JButton("Clear Present");
 		clearPresentButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int result = JOptionPane.showConfirmDialog(null, Constants.COMMON_CONFIRM, getTitle(), JOptionPane.YES_NO_OPTION);
@@ -80,7 +93,7 @@ public class ControlCenterDialog extends JFrame {
 		});
 		getContentPane().add(clearPresentButton);
 		
-		JButton clearLeaveButton = new JButton("Clear Leave");
+		clearLeaveButton = new JButton("Clear Leave");
 		clearLeaveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int result = JOptionPane.showConfirmDialog(null, Constants.COMMON_CONFIRM, getTitle(), JOptionPane.YES_NO_OPTION);
@@ -98,7 +111,7 @@ public class ControlCenterDialog extends JFrame {
 		getContentPane().add(clearLeaveButton);
 		
 		if (MainApp.test) {
-			JButton randomPresentButton = new JButton("Random Present");
+			randomPresentButton = new JButton("Random Present");
 			randomPresentButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					ScannerDialog.random(60);
@@ -108,5 +121,6 @@ public class ControlCenterDialog extends JFrame {
 		}
 
 		this.setResizable(false);
+		currentDialog = this;
 	}
 }

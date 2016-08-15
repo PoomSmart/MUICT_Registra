@@ -40,6 +40,7 @@ import Utilities.CommonUtils;
 import Utilities.CommonUtils.FileType;
 import Utilities.DBUtils;
 import Utilities.WindowUtils;
+import Workers.Logger;
 import Workers.ScannerSaver;
 
 public class ScannerDialog extends JFrame {
@@ -171,6 +172,8 @@ public class ScannerDialog extends JFrame {
 		document.setDocumentFilter(new DocumentFilter());
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
+				if (Logger.currentDialog != null)
+					Logger.currentDialog.windowClosing();
 				System.out.println("Exit");
 				System.exit(0);
 			}
@@ -215,6 +218,14 @@ public class ScannerDialog extends JFrame {
 			}
 			
 			public void parseText(String text) {
+				// Shortcut section
+				if (text.length() == 3 && !"208222".contains(text)) {
+					Integer ID = CommonUtils.getID("5988" + text);
+					if (ID >= 5988001 && ID <= 5988280) {
+						addID(ID);
+						return;
+					}
+				}
 				Matcher m;
 				if (text.equals("sort")) {
 					list.sort();
@@ -240,7 +251,7 @@ public class ScannerDialog extends JFrame {
 					if (!MainApp.test) {
 						if (stringLength == 14) {
 							ID = CommonUtils.getID(text.substring(6, 6 + 7));
-							ID = ID % 100000 + 5900000;
+							//ID = ID % 100000 + 5900000;
 							if (ID == -1) {
 								cleanupTextField();
 								return;
@@ -255,24 +266,28 @@ public class ScannerDialog extends JFrame {
 							}
 						}
 					}
-					if (ID != -1) {
-						System.out.println("-> " + ID);
-						if (!MainApp.db.containsKey(ID)) {
-							System.out.println("ID does not exist in database: " + ID);
-							setStatus("Not Added: " + ID);
-						} else {
-							if (IDs.contains(ID)) {
-								System.out.println("ID already existed: " + ID);
-								setStatus("Not Added: " + ID);
-							} else {
-								IDs.add(ID);
-								list.addID(ID);
-								setStatus("Added: " + ID);
-							}
-						}
-						shouldCleanup = true;
+					addID(ID);
+				}
+			}
+			
+			public void addID(Integer ID) {
+				if (ID == -1)
+					return;
+				System.out.println("-> " + ID);
+				if (!MainApp.db.containsKey(ID)) {
+					System.out.println("ID does not exist in database: " + ID);
+					setStatus("Not Added: " + ID);
+				} else {
+					if (IDs.contains(ID)) {
+						System.out.println("ID already existed: " + ID);
+						setStatus("Not Added: " + ID);
+					} else {
+						IDs.add(ID);
+						list.addID(ID);
+						setStatus("Added: " + ID);
 					}
 				}
+				shouldCleanup = true;
 			}
 
 			public void validate() {
@@ -281,6 +296,8 @@ public class ScannerDialog extends JFrame {
 				shouldCleanup = removeLabel = false;
 				if (!performSpecialCode(text))
 					parseText(text);
+				else
+					removeLabel = shouldCleanup = true;
 				if (removeLabel)
 					setStatus(" ");
 				if (shouldCleanup)
@@ -288,10 +305,6 @@ public class ScannerDialog extends JFrame {
 			}
 
 		});
-		/*
-		 * field.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent e) {
-		 * System.out.println("Enter pressed"); destroyEverything(); } });
-		 */
 		field.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 				desLabel.setText(Constants.SCANNER_DETECTING_MESSAGE);

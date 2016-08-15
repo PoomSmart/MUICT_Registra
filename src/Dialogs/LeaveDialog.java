@@ -100,10 +100,6 @@ public class LeaveDialog extends JFrame {
 							JOptionPane.showMessageDialog(null, ID + " or more student has already left");
 							return;
 						}
-						if (realStudent.isAbsent()) {
-							JOptionPane.showMessageDialog(null, ID + " or more student is absent");
-							return;
-						}
 						IDs.add(ID);
 					}
 					boolean others = othersSelected();
@@ -132,7 +128,6 @@ public class LeaveDialog extends JFrame {
 						shouldCleanup = true;
 					}
 				} catch (Exception ex) {
-					ex.printStackTrace();
 					JOptionPane.showMessageDialog(null, "Not saving due to malformed input");
 					System.out.println("Malformed input");
 				} finally {

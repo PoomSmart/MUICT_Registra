@@ -19,28 +19,29 @@ import Utilities.DateUtils;
 public class Logger {
 
 	private static final Dimension logSize = new Dimension(500, 500);
+	
+	public static PlainTextDialog currentDialog = null;
 
 	public static String logContentForDate(Date date) throws IOException {
 		return FileUtils.readFileToString(CommonUtils.fileFromType(FileType.LOG, date));
 	}
 
 	public static void showLog(Date date, boolean editable, boolean force, String filePath) {
-		PlainTextDialog dialog = null;
 		String title = "Log for " + DateUtils.getNormalFormattedDate(date);
 		try {
-			dialog = new PlainTextDialog(title, logSize.width, logSize.height, 5, logContentForDate(date),
+			currentDialog = new PlainTextDialog(title, logSize.width, logSize.height, 5, logContentForDate(date),
 					editable, filePath);
 		} catch (FileNotFoundException ex) {
 			if (force)
-				dialog = new PlainTextDialog(title, logSize.width, logSize.height, 5, "", editable, filePath);
+				currentDialog = new PlainTextDialog(title, logSize.width, logSize.height, 5, "", editable, filePath);
 			else
 				JOptionPane.showMessageDialog(null,
 						"No log has been created for " + DateUtils.getNormalFormattedDate(date));
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		} finally {
-			if (dialog != null)
-				dialog.setVisible(true);
+			if (currentDialog != null)
+				currentDialog.setVisible(true);
 		}
 	}
 	
@@ -53,7 +54,7 @@ public class Logger {
 	}
 
 	public static void showLogs() {
-		PlainTextDialog dialog = new PlainTextDialog("All Logs", logSize.width, logSize.height, 5, "", false);
+		currentDialog = new PlainTextDialog("All Logs", logSize.width, logSize.height, 5, "", false);
 		StringBuilder content = new StringBuilder();
 		File[] dates = new File(Constants.FILE_ROOT).listFiles();
 		for (File date : dates) {
@@ -76,7 +77,7 @@ public class Logger {
 			}
 		}
 		content.append("\n===========================");
-		dialog.setText(content.toString());
-		dialog.setVisible(true);
+		currentDialog.setText(content.toString());
+		currentDialog.setVisible(true);
 	}
 }

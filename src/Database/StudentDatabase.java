@@ -16,7 +16,7 @@ import Workers.AllergiesAssigner;
 public class StudentDatabase {
 	
 	// Pattern: #,ID,titleTH,firstnameTH,lastnameTH,title,firstname,lastname,section,(unused),school,schoolLoc,nickname,bann,healthCondition,medAllergies,foodAllergies,foodPref
-	private static final Pattern pattern = Pattern.compile("\\d+,(\\d+),[ -û]+,[ -û]+,[ -û]+,(.+),(.+),(.+),(\\d),.*,[ -û]*,[ -û]*,(.*),(\\d*),([ -û]*),([ -û]*),([ -û]*),([ -û]*)", Pattern.UNICODE_CHARACTER_CLASS);
+	private static final Pattern pattern = Pattern.compile("\\d+,(\\d+),[ -û]*,[ -û]*,[ -û]*,(.*),(.*),(.*),(\\d),.*,[ -û]*,[ -û]*,(.*),(\\d*),([ -û]*),([ -û]*),([ -û]*),([ -û]*)", Pattern.UNICODE_CHARACTER_CLASS);
 
 	private Map<Integer, Student> students = new TreeMap<Integer, Student>();
 	

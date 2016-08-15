@@ -24,6 +24,10 @@ public class DBUtils {
 	// Pattern: ID,type,reason
 	public static final Pattern pLeave = Pattern.compile("(\\d+),leave,(.*)");
 	
+	public static int totalPresent;
+	public static int totalAbsent;
+	public static int totalLeft;
+	
 	/**
 	 * Get leave-with reason students from specific date
 	 * 
@@ -60,6 +64,7 @@ public class DBUtils {
 		} catch (IOException e) {
 			System.out.println("leave.csv for " + DateUtils.getNormalFormattedDate(date) + " not found");
 		}
+		totalLeft = leaveStudents.size();
 		return leaveStudents;
 	}
 	
@@ -94,6 +99,7 @@ public class DBUtils {
 		} catch (IOException e) {
 			System.out.println("present.csv for " + DateUtils.getNormalFormattedDate(date) + " not found");
 		}
+		totalPresent = presentStudents.size();
 		return presentStudents;
 	}
 	
@@ -118,6 +124,7 @@ public class DBUtils {
 				absentStudents.put(ID, absentStudent);
 			}
 		}
+		totalAbsent = absentStudents.size();
 		return absentStudents;
 	}
 	

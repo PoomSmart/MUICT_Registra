@@ -21,14 +21,18 @@ public class PlainTextDialog extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	private JTextArea textArea;
-	private String filePath;
+	private final String filePath;
+	private final String title;
 	private String initialText;
+	private final boolean editable;
 
 	public PlainTextDialog(String title, int width, int height, int margin, String text, boolean editable,
 			String filePath) {
+		this.title = title;
 		this.filePath = filePath;
 		this.setTitle(title);
 		this.setSize(width, height);
+		this.editable = editable;
 		WindowUtils.setCenter(this);
 
 		SpringLayout layout = new SpringLayout();
@@ -49,23 +53,27 @@ public class PlainTextDialog extends JFrame {
 
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent windowEvent) {
-				if (editable && filePath != null) {
-					String newText = textArea.getText();
-					if (!initialText.equals(newText)) {
-						int result = JOptionPane.showConfirmDialog(null, "Apply changes?", title,
-								JOptionPane.YES_NO_OPTION);
-						if (result == JOptionPane.YES_OPTION) {
-							try {
-								FileUtils.write(new File(filePath), newText);
-							} catch (IOException e) {
-								JOptionPane.showMessageDialog(null, "Error saving file to Path: " + filePath);
-							}
-						}
+				
+			}
+		});
+		this.setResizable(true);
+	}
+	
+	public void windowClosing() {
+		if (editable && filePath != null) {
+			String newText = textArea.getText();
+			if (!initialText.equals(newText)) {
+				int result = JOptionPane.showConfirmDialog(null, "Apply changes?", title,
+						JOptionPane.YES_NO_OPTION);
+				if (result == JOptionPane.YES_OPTION) {
+					try {
+						FileUtils.write(new File(filePath), newText);
+					} catch (IOException e) {
+						JOptionPane.showMessageDialog(null, "Error saving file to Path: " + filePath);
 					}
 				}
 			}
-		});
-		this.setResizable(false);
+		}
 	}
 
 	public PlainTextDialog(String title, int width, int height, int margin, String text, boolean editable) {

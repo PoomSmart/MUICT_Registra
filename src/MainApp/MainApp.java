@@ -33,7 +33,7 @@ import Visualizers.SeatVisualizer;
 
 public class MainApp {
 
-	public static final boolean test = true;
+	public static final boolean test = false;
 
 	public static Map<Integer, Student> db;
 

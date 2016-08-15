@@ -52,9 +52,14 @@ public class StudentTable extends JFrame {
 
 	private JTextField filterText;
 	private JTextArea studentText;
+	private JLabel statText;
 
 	private JTable table;
 	private final int mode;
+	
+	private int totalPresent;
+	private int totalAbsent;
+	private int totalLeft;
 	
 	private static final String[] names = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Status", "Position" };
 	private static final String[] names_global = { "ID", "First Name", "Last Name", "Nickname", "Gender", "#Present", "#Leave", "#Absence" };
@@ -99,10 +104,21 @@ public class StudentTable extends JFrame {
 	private String[] columnNamesForMode(int mode) {
 		return mode == 0 ? names : names_global;
 	}
+	
+	private void updateStatText() {
+		if (statText != null)
+			statText.setText(String.format("Total Present: %d, Total Absent: %d, Total Left: %d", totalPresent, totalAbsent, totalLeft));
+	}
 
 	public void updateInternalStudents() {
-		if (mode == 0)
+		totalPresent = totalAbsent = totalLeft = 0;
+		if (mode == 0) {
 			internalStudents = DBUtils.getCurrentStudents();
+			totalPresent = DBUtils.totalPresent;
+			totalAbsent = DBUtils.totalAbsent;
+			totalLeft = DBUtils.totalLeft;
+			updateStatText();
+		}
 		else {
 			internalStudents = new TreeMap<Integer, Student>();
 			for (Entry<Integer, Student> entry : MainApp.db.entrySet())
@@ -242,8 +258,15 @@ public class StudentTable extends JFrame {
 		studentText.setBorder(BorderFactory.createLineBorder(Color.gray));
 		studentText.setEditable(false);
 		form.add(studentText);
+		
+		if (mode == 0) {
+			form.add(new JLabel());
+			statText = new JLabel();
+			form.add(statText);
+			updateStatText();
+		}
 
-		SpringUtilities.makeCompactGrid(form, 2, 2, 6, 6, 6, 6);
+		SpringUtilities.makeCompactGrid(form, mode == 0 ? 3 : 2, 2, 6, 6, 6, 6);
 		self.add(form);
 		this.setContentPane(self);
 		this.pack();
@@ -254,7 +277,7 @@ public class StudentTable extends JFrame {
 		RowFilter<? super AbstractTableModel, Object> rf = null;
 		try {
 			if (mode == 0)
-				rf = RowFilter.regexFilter(filterText.getText(), 0, 1, 2, 3, 6);
+				rf = RowFilter.regexFilter(filterText.getText(), 0, 1, 2, 3, 4, 6);
 			else
 				rf = RowFilter.regexFilter(filterText.getText(), 0, 1, 2, 3);
 		} catch (java.util.regex.PatternSyntaxException e) {

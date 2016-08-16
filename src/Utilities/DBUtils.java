@@ -116,9 +116,10 @@ public class DBUtils {
 	public static Map<Integer, Student> getAbsentStudents(Date date) {
 		Map<Integer, Student> absentStudents = new TreeMap<Integer, Student>();
 		Map<Integer, Student> presentStudents = getPresentStudents(date);
+		Map<Integer, Student> leaveStudents = getLeaveStudents(date);
 		for (Student student : MainApp.db.values()) {
 			Integer ID = student.getID();
-			if (!presentStudents.containsKey(ID)) {
+			if (!presentStudents.containsKey(ID) && !leaveStudents.containsKey(ID)) {
 				Student absentStudent = student.clone();
 				absentStudent.addStatus(date, new Status(Type.ABSENT));
 				absentStudents.put(ID, absentStudent);

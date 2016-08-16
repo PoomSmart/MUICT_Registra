@@ -173,7 +173,7 @@ public class ScannerDialog extends JFrame {
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				if (Logger.currentDialog != null)
-					Logger.currentDialog.windowClosing();
+					Logger.currentDialog._windowClosing();
 				System.out.println("Exit");
 				System.exit(0);
 			}

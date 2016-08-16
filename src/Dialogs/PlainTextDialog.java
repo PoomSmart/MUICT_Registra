@@ -15,6 +15,7 @@ import javax.swing.SpringLayout;
 import org.apache.commons.io.FileUtils;
 
 import Utilities.WindowUtils;
+import Workers.Logger;
 
 public class PlainTextDialog extends JFrame {
 
@@ -25,6 +26,7 @@ public class PlainTextDialog extends JFrame {
 	private final String title;
 	private String initialText;
 	private final boolean editable;
+	public boolean isLog;
 
 	public PlainTextDialog(String title, int width, int height, int margin, String text, boolean editable,
 			String filePath) {
@@ -53,13 +55,15 @@ public class PlainTextDialog extends JFrame {
 
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent windowEvent) {
-				
+				_windowClosing();
 			}
 		});
 		this.setResizable(true);
 	}
 	
-	public void windowClosing() {
+	public void _windowClosing() {
+		if (Logger.currentDialog != null && isLog)
+			Logger.currentDialog = null;
 		if (editable && filePath != null) {
 			String newText = textArea.getText();
 			if (!initialText.equals(newText)) {

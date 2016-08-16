@@ -40,8 +40,10 @@ public class Logger {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		} finally {
-			if (currentDialog != null)
+			if (currentDialog != null) {
 				currentDialog.setVisible(true);
+				currentDialog.isLog = true;
+			}
 		}
 	}
 	
@@ -79,5 +81,6 @@ public class Logger {
 		content.append("\n===========================");
 		currentDialog.setText(content.toString());
 		currentDialog.setVisible(true);
+		currentDialog.isLog = false;
 	}
 }

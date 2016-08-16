@@ -221,7 +221,7 @@ public class ScannerDialog extends JFrame {
 				// Shortcut section
 				if (text.length() == 3 && !"208222".contains(text)) {
 					Integer ID = CommonUtils.getID("5988" + text);
-					if (ID >= 5988001 && ID <= 5988280) {
+					if (ID / 1000 == 5988) {
 						addID(ID);
 						return;
 					}

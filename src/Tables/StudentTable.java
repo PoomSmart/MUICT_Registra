@@ -277,9 +277,9 @@ public class StudentTable extends JFrame {
 		RowFilter<? super AbstractTableModel, Object> rf = null;
 		try {
 			if (mode == 0)
-				rf = RowFilter.regexFilter(filterText.getText(), 0, 1, 2, 3, 4, 6);
+				rf = RowFilter.regexFilter("(?i)" + filterText.getText(), 0, 1, 2, 3, 5, 6);
 			else
-				rf = RowFilter.regexFilter(filterText.getText(), 0, 1, 2, 3);
+				rf = RowFilter.regexFilter("(?i)" + filterText.getText(), 0, 1, 2, 3);
 		} catch (java.util.regex.PatternSyntaxException e) {
 			return;
 		}

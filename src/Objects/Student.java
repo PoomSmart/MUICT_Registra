@@ -288,7 +288,7 @@ public class Student implements Cloneable {
 		case N:
 			return "N";
 		case DS:
-			return "Don't see";
+			return "No attendance";
 		case Null:
 			return "";
 		}

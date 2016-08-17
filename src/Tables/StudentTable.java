@@ -53,6 +53,7 @@ public class StudentTable extends JFrame {
 	private JTextField filterText;
 	private JTextArea studentText;
 	private JLabel statText;
+	private JLabel bannText;
 
 	private JTable table;
 	private final int mode;
@@ -60,9 +61,13 @@ public class StudentTable extends JFrame {
 	private int totalPresent;
 	private int totalAbsent;
 	private int totalLeft;
+	private int totalIslamic;
 	
-	private static final String[] names = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Status", "Position" };
-	private static final String[] names_global = { "ID", "First Name", "Last Name", "Nickname", "Gender", "#Present", "#Leave", "#Absence" };
+	private int bannCount[];
+	private int bannPresentCount[];
+	
+	private static final String[] names = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Status", "Acceptance", "Position", "Bann" };
+	private static final String[] names_global = { "ID", "First Name", "Last Name", "Nickname", "Gender", "#Present", "#Leave", "#Absence", "Bann" };
 
 	private TableRowSorter<? extends AbstractTableModel> sorter;
 
@@ -90,11 +95,14 @@ public class StudentTable extends JFrame {
 			arr[i][4] = student.getGender();
 			if (mode == 0) {
 				arr[i][5] = student.getCurrentStatus();
-				arr[i][6] = student.getPosition().toCellString();
+				arr[i][6] = student.getAcceptanceStatus();
+				arr[i][7] = student.getPosition().toCellString();
+				arr[i][8] = student.getBann();
 			} else {
 				arr[i][5] = student.getPresentCount();
 				arr[i][6] = student.getLeaveCount();
 				arr[i][7] = student.getAbsenceCount();
+				arr[i][8] = student.getBann();
 			}
 			i++;
 		}
@@ -107,17 +115,38 @@ public class StudentTable extends JFrame {
 	
 	private void updateStatText() {
 		if (statText != null)
-			statText.setText(String.format("Total Present: %d, Total Absent: %d, Total Left: %d", totalPresent, totalAbsent, totalLeft));
+			statText.setText(String.format("Total Present: %d (Islamic: %d), Total Absent: %d, Total Left: %d", totalPresent, totalIslamic, totalAbsent, totalLeft));
+	}
+	
+	private void updateBannText() {
+		if (bannText != null) {
+			StringBuilder sb = new StringBuilder();
+			for (int bann = 1; bann <= 10; bann++)
+				sb.append(String.format("[Bann %d: %d/%d]  ", bann, bannPresentCount[bann - 1], bannCount[bann - 1]));
+			bannText.setText(sb.toString());
+			sb = null;
+		}
 	}
 
 	public void updateInternalStudents() {
-		totalPresent = totalAbsent = totalLeft = 0;
 		if (mode == 0) {
+			bannCount = null;
+			bannCount = new int[10];
+			bannPresentCount = null;
+			bannPresentCount = new int[10];
 			internalStudents = DBUtils.getCurrentStudents();
+			for (Entry<Integer, Student> entry : internalStudents.entrySet()) {
+				Student student = entry.getValue();
+				bannCount[student.getBann() - 1]++;
+				if (student.isNormal())
+					bannPresentCount[student.getBann() - 1]++;
+			}
 			totalPresent = DBUtils.totalPresent;
 			totalAbsent = DBUtils.totalAbsent;
 			totalLeft = DBUtils.totalLeft;
+			totalIslamic = DBUtils.totalIslamic;
 			updateStatText();
+			updateBannText();
 		}
 		else {
 			internalStudents = new TreeMap<Integer, Student>();
@@ -264,9 +293,13 @@ public class StudentTable extends JFrame {
 			statText = new JLabel();
 			form.add(statText);
 			updateStatText();
+			form.add(new JLabel());
+			bannText = new JLabel();
+			form.add(bannText);
+			updateBannText();
 		}
 
-		SpringUtilities.makeCompactGrid(form, mode == 0 ? 3 : 2, 2, 6, 6, 6, 6);
+		SpringUtilities.makeCompactGrid(form, mode == 0 ? 4 : 2, 2, 6, 6, 6, 6);
 		self.add(form);
 		this.setContentPane(self);
 		this.pack();
@@ -277,9 +310,9 @@ public class StudentTable extends JFrame {
 		RowFilter<? super AbstractTableModel, Object> rf = null;
 		try {
 			if (mode == 0)
-				rf = RowFilter.regexFilter("(?i)" + filterText.getText(), 0, 1, 2, 3, 5, 6);
+				rf = RowFilter.regexFilter("(?i)" + filterText.getText(), 0, 1, 2, 3, 5, 6, 7, 8);
 			else
-				rf = RowFilter.regexFilter("(?i)" + filterText.getText(), 0, 1, 2, 3);
+				rf = RowFilter.regexFilter("(?i)" + filterText.getText(), 0, 1, 2, 3, 4);
 		} catch (java.util.regex.PatternSyntaxException e) {
 			return;
 		}

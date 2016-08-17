@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -90,7 +92,7 @@ public class LeaveDialog extends JFrame {
 					for (String sID : sIDs) {
 						Integer ID = CommonUtils.getID(sID);
 						if (ID == -1)
-							throw new Exception();
+							continue;
 						if (!MainApp.db.containsKey(ID)) {
 							JOptionPane.showMessageDialog(null, ID + " or more student ID not found");
 							return;
@@ -118,18 +120,20 @@ public class LeaveDialog extends JFrame {
 								CommonUtils.FileType.NOTHERE);
 						// We are supposed to update present.csv since ID there may also exist in leave.csv
 						Map<Integer, Student> leaveStudents = DBUtils.getCurrentLeaveStudents();
-						List<String> presentIDs = FileUtils.readLines(CommonUtils.fileFromType(CommonUtils.FileType.REGULAR));
-						for (Integer ID : leaveStudents.keySet())
-							presentIDs.remove(String.valueOf(ID));
-						Vector<Integer> spresentIDs = new Vector<Integer>();
-						for (String sID : presentIDs)
-							spresentIDs.add(Integer.parseInt(sID));
-						ScannerSaver.doneAddingCodes(spresentIDs, false, CommonUtils.FileType.REGULAR, true);
+						File regularFile = CommonUtils.fileFromType(CommonUtils.FileType.REGULAR);
+						if (CommonUtils.fileExistsAtPath(regularFile.getPath())) {
+							List<String> presentIDs = FileUtils.readLines(regularFile);
+							for (Integer ID : leaveStudents.keySet())
+								presentIDs.remove(String.valueOf(ID));
+							Vector<Integer> spresentIDs = new Vector<Integer>();
+							for (String sID : presentIDs)
+								spresentIDs.add(Integer.parseInt(sID));
+							ScannerSaver.doneAddingCodes(spresentIDs, false, CommonUtils.FileType.REGULAR, true);
+						}
 						shouldCleanup = true;
 					}
-				} catch (Exception ex) {
-					JOptionPane.showMessageDialog(null, "Not saving due to malformed input");
-					System.out.println("Malformed input");
+				} catch (IOException ex) {
+					ex.printStackTrace();
 				} finally {
 					if (shouldCleanup) {
 						inputField.setText("");

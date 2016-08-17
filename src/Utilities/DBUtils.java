@@ -27,6 +27,7 @@ public class DBUtils {
 	public static int totalPresent;
 	public static int totalAbsent;
 	public static int totalLeft;
+	public static int totalIslamic;
 	
 	/**
 	 * Get leave-with reason students from specific date
@@ -94,6 +95,8 @@ public class DBUtils {
 					continue;
 				student = student.clone();
 				student.addStatus(date, new Status());
+				if (student.isIslamic())
+					totalIslamic++;
 				presentStudents.put(ID, student);
 			}
 		} catch (IOException e) {

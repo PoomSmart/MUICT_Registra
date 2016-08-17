@@ -23,9 +23,19 @@ public class Student implements Cloneable {
 	private String medicalAllergies;
 	private String foodAllergies;
 	private String foodPreference;
+	private AcceptanceType acceptanceStatus;
+	private final int bann;
+	private final boolean islamic;
+	
+	public enum AcceptanceType {
+		Y, N, DS, Null
+	}
 
-	public Student(Integer ID, String firstname, String lastname, String nickname, int section, String gender, String healthCondition, String medicalAllergies, String foodAllergies, String foodPreference) {
+	public Student(Integer ID, String firstname, String lastname, String nickname, int section, String gender, String healthCondition, String medicalAllergies, String foodAllergies, String foodPreference, AcceptanceType acceptanceStatus) {
 		this.ID = ID;
+		int tID = ID - 5988000;
+		int tbann = ((tID % 100) / 10);
+		this.bann = tbann == 0 ? 1 : (tID % 10 == 0 ? tbann : tbann + 1);
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.nickname = nickname;
@@ -40,6 +50,8 @@ public class Student implements Cloneable {
 		this.medicalAllergies = medicalAllergies;
 		this.foodAllergies = foodAllergies;
 		this.foodPreference = foodPreference;
+		this.islamic = foodPreference.contains("Islam");
+		this.acceptanceStatus = acceptanceStatus;
 	}
 
 	public Integer getID() {
@@ -78,8 +90,6 @@ public class Student implements Cloneable {
 		this.position = position;
 	}
 	
-	//public 
-
 	/**
 	 * Get current status of a student in the specific date
 	 * 
@@ -221,7 +231,7 @@ public class Student implements Cloneable {
 	}
 
 	public Student clone() {
-		Student student = new Student(ID, firstname, lastname, nickname, section, gender, healthCondition, medicalAllergies, foodAllergies, foodPreference);
+		Student student = new Student(ID, firstname, lastname, nickname, section, gender, healthCondition, medicalAllergies, foodAllergies, foodPreference, acceptanceStatus);
 		student.medicalExclusive = medicalExclusive;
 		student.statuses = new TreeMap<String, Status>();
 		student.position = position.clone();
@@ -263,6 +273,34 @@ public class Student implements Cloneable {
 	
 	public void addFoodPreference(String food) {
 		foodPreference += " + " + food;
+	}
+
+	public int getBann() {
+		return bann;
+	}
+	
+	public String getAcceptanceStatus() {
+		if (acceptanceStatus == null)
+			return "-";
+		switch (acceptanceStatus) {
+		case Y:
+			return "Y";
+		case N:
+			return "N";
+		case DS:
+			return "Don't see";
+		case Null:
+			return "";
+		}
+		return "-";
+	}
+
+	public void setAcceptanceStatus(AcceptanceType acceptanceStatus) {
+		this.acceptanceStatus = acceptanceStatus;
+	}
+
+	public boolean isIslamic() {
+		return islamic;
 	}
 
 }

@@ -27,6 +27,7 @@ public class DBUtils {
 	public static int totalPresent;
 	public static int totalAbsent;
 	public static int totalLeft;
+	public static int totalPresentIslamic;
 	public static int totalIslamic;
 	
 	/**
@@ -58,6 +59,8 @@ public class DBUtils {
 						continue;
 					student = student.clone();
 					student.addStatus(date, new Status(Status.Type.LEAVE, reason));
+					if (student.isIslamic())
+						totalIslamic++;
 					leaveStudents.put(ID, student);
 				}
 			}
@@ -95,8 +98,10 @@ public class DBUtils {
 					continue;
 				student = student.clone();
 				student.addStatus(date, new Status());
-				if (student.isIslamic())
+				if (student.isIslamic()) {
+					totalPresentIslamic++;
 					totalIslamic++;
+				}
 				presentStudents.put(ID, student);
 			}
 		} catch (IOException e) {
@@ -125,6 +130,8 @@ public class DBUtils {
 			if (!presentStudents.containsKey(ID) && !leaveStudents.containsKey(ID)) {
 				Student absentStudent = student.clone();
 				absentStudent.addStatus(date, new Status(Type.ABSENT));
+				if (absentStudent.isIslamic())
+					totalIslamic++;
 				absentStudents.put(ID, absentStudent);
 			}
 		}

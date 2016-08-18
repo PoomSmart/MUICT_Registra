@@ -61,6 +61,7 @@ public class StudentTable extends JFrame {
 	private int totalPresent;
 	private int totalAbsent;
 	private int totalLeft;
+	private int totalPresentIslamic;
 	private int totalIslamic;
 	
 	private int bannCount[];
@@ -115,7 +116,7 @@ public class StudentTable extends JFrame {
 	
 	private void updateStatText() {
 		if (statText != null)
-			statText.setText(String.format("Total Present: %d (Islamic: %d), Total Absent: %d, Total Left: %d", totalPresent, totalIslamic, totalAbsent, totalLeft));
+			statText.setText(String.format("Total Present: %d (Islamic: %d/%d), Total Absent: %d, Total Left: %d", totalPresent, totalPresentIslamic, totalIslamic, totalAbsent, totalLeft));
 	}
 	
 	private void updateBannText() {
@@ -144,6 +145,7 @@ public class StudentTable extends JFrame {
 			totalPresent = DBUtils.totalPresent;
 			totalAbsent = DBUtils.totalAbsent;
 			totalLeft = DBUtils.totalLeft;
+			totalPresentIslamic = DBUtils.totalPresentIslamic;
 			totalIslamic = DBUtils.totalIslamic;
 			updateStatText();
 			updateBannText();
@@ -199,7 +201,7 @@ public class StudentTable extends JFrame {
 		JPanel self = new JPanel();
 		self.setLayout(new BoxLayout(self, BoxLayout.Y_AXIS));
 		this.setTitle(WindowUtils.realTitle(title));
-		this.setSize(1100, 700);
+		this.setSize(1100, 850);
 		WindowUtils.setCenter(this);
 
 		class StudentTableModel extends AbstractTableModel {
@@ -240,7 +242,7 @@ public class StudentTable extends JFrame {
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		sorter = new TableRowSorter<StudentTableModel>(model);
 		table.setRowSorter(sorter);
-		table.setPreferredScrollableViewportSize(new Dimension(this.getWidth(), this.getHeight() - 200));
+		table.setPreferredScrollableViewportSize(new Dimension(this.getWidth(), this.getHeight() - 250));
 
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent event) {
@@ -283,7 +285,7 @@ public class StudentTable extends JFrame {
 		form.add(statusLabel);
 		studentText = new JTextArea();
 		statusLabel.setLabelFor(studentText);
-		studentText.setPreferredSize(new Dimension(studentText.getWidth(), 150));
+		studentText.setPreferredSize(new Dimension(studentText.getWidth(), 200));
 		studentText.setBorder(BorderFactory.createLineBorder(Color.gray));
 		studentText.setEditable(false);
 		form.add(studentText);

@@ -20,7 +20,7 @@ public class AcceptanceAssigner {
 			for (String fID : ncList) {
 				Integer ID = CommonUtils.getID("5988" + fID);
 				if (ID != -1)
-					students.get(ID).setAcceptanceStatus(Student.AcceptanceType.DS);
+					students.get(ID).setAcceptanceStatus(Student.AcceptanceType.DS); 
 			}
 			List<String> yList = FileUtils.readLines(new File("acceptance-y.csv"));
 			for (String fID : yList) {

@@ -193,14 +193,17 @@ public class ScannerDialog extends JFrame {
 
 			public boolean performSpecialCode(String code) {
 				switch (code) {
+				case "append":
 				case "20822200000011":
 					// Append data
 					appendRegularBtn.doClick();
 					return true;
+				case "currenttable":
 				case "20822200000021":
 					// Show student table (current date)
 					ControlCenterDialog.currentDialog.showStudentTable(0);
 					return true;
+				case "table":
 				case "20822200000031":
 					// Show student table (all-time)
 					ControlCenterDialog.currentDialog.showStudentTable(1);

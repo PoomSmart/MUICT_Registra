@@ -24,12 +24,6 @@ public class DBUtils {
 	// Pattern: ID,type,reason
 	public static final Pattern pLeave = Pattern.compile("(\\d+),leave,(.*)");
 	
-	public static int totalPresent;
-	public static int totalAbsent;
-	public static int totalLeft;
-	public static int totalPresentIslamic;
-	public static int totalIslamic;
-	
 	/**
 	 * Get leave-with reason students from specific date
 	 * 
@@ -59,8 +53,6 @@ public class DBUtils {
 						continue;
 					student = student.clone();
 					student.addStatus(date, new Status(Status.Type.LEAVE, reason));
-					if (student.isIslamic())
-						totalIslamic++;
 					leaveStudents.put(ID, student);
 				}
 			}
@@ -68,7 +60,6 @@ public class DBUtils {
 		} catch (IOException e) {
 			System.out.println("leave.csv for " + DateUtils.getNormalFormattedDate(date) + " not found");
 		}
-		totalLeft = leaveStudents.size();
 		return leaveStudents;
 	}
 	
@@ -98,16 +89,11 @@ public class DBUtils {
 					continue;
 				student = student.clone();
 				student.addStatus(date, new Status());
-				if (student.isIslamic()) {
-					totalPresentIslamic++;
-					totalIslamic++;
-				}
 				presentStudents.put(ID, student);
 			}
 		} catch (IOException e) {
 			System.out.println("present.csv for " + DateUtils.getNormalFormattedDate(date) + " not found");
 		}
-		totalPresent = presentStudents.size();
 		return presentStudents;
 	}
 	
@@ -130,12 +116,9 @@ public class DBUtils {
 			if (!presentStudents.containsKey(ID) && !leaveStudents.containsKey(ID)) {
 				Student absentStudent = student.clone();
 				absentStudent.addStatus(date, new Status(Type.ABSENT));
-				if (absentStudent.isIslamic())
-					totalIslamic++;
 				absentStudents.put(ID, absentStudent);
 			}
 		}
-		totalAbsent = absentStudents.size();
 		return absentStudents;
 	}
 	

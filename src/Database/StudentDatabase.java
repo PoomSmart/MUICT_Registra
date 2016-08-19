@@ -11,8 +11,6 @@ import org.apache.commons.io.FileUtils;
 
 import Objects.Student;
 import Utilities.CommonUtils;
-import Workers.AcceptanceAssigner;
-import Workers.AllergiesAssigner;
 
 public class StudentDatabase {
 	
@@ -56,10 +54,6 @@ public class StudentDatabase {
 				students.put(ID, student);
 			}
 		}
-		AllergiesAssigner.students = students;
-		AllergiesAssigner.assignAll();
-		AcceptanceAssigner.students = students;
-		AcceptanceAssigner.assignAll();
 	}
 
 	public StudentDatabase(String dbPath) throws IOException {

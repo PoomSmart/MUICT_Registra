@@ -15,10 +15,11 @@ import Objects.Constants;
 import Utilities.CommonUtils;
 import Utilities.CommonUtils.FileType;
 import Utilities.DateUtils;
+import Utilities.WindowUtils;
 
 public class Logger {
 
-	private static final Dimension logSize = new Dimension(500, 500);
+	private static final Dimension logSize = new Dimension(500, 300);
 	
 	public static PlainTextDialog currentDialog = null;
 
@@ -41,6 +42,7 @@ public class Logger {
 			ex.printStackTrace();
 		} finally {
 			if (currentDialog != null) {
+				WindowUtils.setRelativeCenter(currentDialog, 500, 300);
 				currentDialog.setVisible(true);
 				currentDialog.isLog = true;
 			}
@@ -82,5 +84,6 @@ public class Logger {
 		currentDialog.setText(content.toString());
 		currentDialog.setVisible(true);
 		currentDialog.isLog = false;
+		WindowUtils.setRelativeCenter(currentDialog, 500, 300);
 	}
 }

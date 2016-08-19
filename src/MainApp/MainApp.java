@@ -30,6 +30,9 @@ import Utilities.CommonUtils;
 import Utilities.DateUtils;
 import Utilities.WindowUtils;
 import Visualizers.SeatVisualizer;
+import Workers.AcceptanceAssigner;
+import Workers.AllergiesAssigner;
+import Workers.SpecialAssigner;
 
 public class MainApp {
 
@@ -116,8 +119,10 @@ public class MainApp {
 			FileUtils.write(new File("agreed"), "");
 		}
 		Map<Integer, Student> students = new StudentDatabase("batch-14-new2.csv").getStudents();
-		randomPosition(students);
-		db = students;
+		randomPosition(db = students);
+		AllergiesAssigner.assignAll(db);
+		AcceptanceAssigner.assignAll(db);
+		SpecialAssigner.assignAll(db);
 
 		// Create our working directory
 		createPathIfNecessary(Constants.FILE_ROOT);

@@ -32,7 +32,7 @@ public class ControlCenterDialog extends JFrame {
 	public JButton randomPresentButton;
 	public JButton clearLeaveButton;
 	
-	private static Object[] dbOptions = { "Today", "All" };
+	private static Object[] dbOptions = { "Single", "All" };
 	
 	public void showStudentTable(int result) {
 		result = result == -1 ? JOptionPane.showOptionDialog(null, "Select type:", "Attendance Type",

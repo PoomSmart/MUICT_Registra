@@ -27,20 +27,18 @@ public class AllergiesAssigner {
 		Medical, Food
 	}
 
-	public static Map<Integer, Student> students;
-
-	public static void assign(Integer ID, String allergy, Type type) {
+	public static void assign(Map<Integer, Student> db, Integer ID, String allergy, Type type) {
 		switch (type) {
 		case Medical:
-			students.get(ID).addMedicalAllergy(allergy);
+			db.get(ID).addMedicalAllergy(allergy);
 			break;
 		case Food:
-			students.get(ID).addFoodAllergy(allergy);
+			db.get(ID).addFoodAllergy(allergy);
 			break;
 		}
 	}
 
-	public static void assignAll() {
-		//assign(5988001, "General flu", Type.Medical);
+	public static void assignAll(Map<Integer, Student> db) {
+		//assign(db, 5988001, "General flu", Type.Medical);
 	}
 }

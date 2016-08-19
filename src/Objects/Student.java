@@ -26,12 +26,15 @@ public class Student implements Cloneable {
 	private AcceptanceType acceptanceStatus;
 	private final int bann;
 	private final boolean islamic;
-	
+	private boolean football;
+
 	public enum AcceptanceType {
 		Y, N, DS, Null
 	}
 
-	public Student(Integer ID, String firstname, String lastname, String nickname, int section, String gender, String healthCondition, String medicalAllergies, String foodAllergies, String foodPreference, AcceptanceType acceptanceStatus) {
+	public Student(Integer ID, String firstname, String lastname, String nickname, int section, String gender,
+			String healthCondition, String medicalAllergies, String foodAllergies, String foodPreference,
+			AcceptanceType acceptanceStatus) {
 		this.ID = ID;
 		int tID = ID - 5988000;
 		int tbann = ((tID % 100) / 10);
@@ -52,6 +55,7 @@ public class Student implements Cloneable {
 		this.foodPreference = foodPreference;
 		this.islamic = foodPreference.contains("Islam");
 		this.acceptanceStatus = acceptanceStatus;
+		this.football = false;
 	}
 
 	public Integer getID() {
@@ -77,7 +81,7 @@ public class Student implements Cloneable {
 	public String getGender() {
 		return gender;
 	}
-	
+
 	public int getSection() {
 		return section;
 	}
@@ -89,7 +93,7 @@ public class Student implements Cloneable {
 	public void setPosition(Position<Integer, Integer> position) {
 		this.position = position;
 	}
-	
+
 	/**
 	 * Get current status of a student in the specific date
 	 * 
@@ -134,31 +138,28 @@ public class Student implements Cloneable {
 		return getTypeCount(Status.Type.LEAVE);
 	}
 
-	/**
-	 * A student is considered normal if he or she is present in that day
-	 * 
-	 * @return
-	 */
+	public boolean isNormal(String date) {
+		return getStatus(date).getType() == Status.Type.PRESENT;
+	}
+
 	public boolean isNormal() {
-		return getCurrentStatus().getType() == Status.Type.PRESENT;
+		return isNormal(DateUtils.getCurrentFormattedDate());
 	}
 
-	/**
-	 * This student has left with reason
-	 * 
-	 * @return
-	 */
+	public boolean isLeft(String date) {
+		return getStatus(date).getType() == Status.Type.LEAVE;
+	}
+
 	public boolean isLeft() {
-		return getCurrentStatus().getType() == Status.Type.LEAVE;
+		return isLeft(DateUtils.getCurrentFormattedDate());
 	}
 
-	/**
-	 * This student is absent
-	 * 
-	 * @return
-	 */
+	public boolean isAbsent(String date) {
+		return getStatus(date).getType() == Status.Type.ABSENT;
+	}
+
 	public boolean isAbsent() {
-		return getCurrentStatus().getType() == Status.Type.ABSENT;
+		return isAbsent(DateUtils.getCurrentFormattedDate());
 	}
 
 	public void addStatus(Date date, Status status) {
@@ -184,7 +185,7 @@ public class Student implements Cloneable {
 		return "Unknown";
 	}
 
-	public String toString(int mode) {
+	public String toString(int mode, String sdate) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(" ID: " + ID + "\n");
 		sb.append(" Full Name: " + getName() + "\n");
@@ -192,10 +193,13 @@ public class Student implements Cloneable {
 		sb.append(" Gender: " + getNormalizedGender() + "\n");
 		sb.append(" Section: " + section + "\n");
 		if (mode == 0) {
-			Status status = getCurrentStatus();
-			sb.append(" Current Status: " + status + "\n");
-			if (status.getType() == Status.Type.LEAVE)
-				sb.append(" Reason: " + status.getReason() + "\n");
+			Status status = getStatus(sdate);
+			// Show current status only if today
+			if (status != null) {
+				sb.append(" Current Status: " + status + "\n");
+				if (status.getType() == Status.Type.LEAVE)
+					sb.append(" Reason: " + status.getReason() + "\n");
+			}
 			sb.append(" Current Position: " + position.toCellString() + "\n");
 			if (!healthCondition.isEmpty())
 				sb.append(" HEALTH condition: " + healthCondition + "\n");
@@ -217,7 +221,8 @@ public class Student implements Cloneable {
 				Date date = null;
 				try {
 					date = DateUtils.s_fmt.parse(dateKey);
-				} catch (ParseException e) {}
+				} catch (ParseException e) {
+				}
 				String realDateKey = DateUtils.n_fmt.format(date);
 				Status status = entry.getValue();
 				sb.append(String.format("  %s: %s\n", realDateKey, status.getDetailedStatus()));
@@ -226,15 +231,21 @@ public class Student implements Cloneable {
 		return sb.toString();
 	}
 
+	public String toString(int mode) {
+		return toString(mode, DateUtils.getCurrentFormattedDate());
+	}
+
 	public String toString() {
 		return toString(0);
 	}
 
 	public Student clone() {
-		Student student = new Student(ID, firstname, lastname, nickname, section, gender, healthCondition, medicalAllergies, foodAllergies, foodPreference, acceptanceStatus);
+		Student student = new Student(ID, firstname, lastname, nickname, section, gender, healthCondition,
+				medicalAllergies, foodAllergies, foodPreference, acceptanceStatus);
 		student.medicalExclusive = medicalExclusive;
 		student.statuses = new TreeMap<String, Status>();
 		student.position = position.clone();
+		student.football = football;
 		for (Map.Entry<String, Status> entry : statuses.entrySet()) {
 			String date = entry.getKey();
 			Status status = entry.getValue().clone();
@@ -242,11 +253,11 @@ public class Student implements Cloneable {
 		}
 		return student;
 	}
-	
+
 	public String getHealthCondition() {
 		return healthCondition;
 	}
-	
+
 	public void addHealthCondition(String condition) {
 		healthCondition += " + " + condition;
 	}
@@ -254,7 +265,7 @@ public class Student implements Cloneable {
 	public String getMedicalAllergies() {
 		return medicalAllergies;
 	}
-	
+
 	public void addMedicalAllergy(String allergy) {
 		medicalAllergies += " + " + allergy;
 	}
@@ -262,7 +273,7 @@ public class Student implements Cloneable {
 	public String getFoodAllergies() {
 		return foodAllergies;
 	}
-	
+
 	public void addFoodAllergy(String allergy) {
 		foodAllergies += " + " + allergy;
 	}
@@ -270,7 +281,7 @@ public class Student implements Cloneable {
 	public String getFoodPreference() {
 		return foodPreference;
 	}
-	
+
 	public void addFoodPreference(String food) {
 		foodPreference += " + " + food;
 	}
@@ -278,7 +289,7 @@ public class Student implements Cloneable {
 	public int getBann() {
 		return bann;
 	}
-	
+
 	public String getAcceptanceStatus() {
 		if (acceptanceStatus == null)
 			return "-";
@@ -301,6 +312,14 @@ public class Student implements Cloneable {
 
 	public boolean isIslamic() {
 		return islamic;
+	}
+
+	public boolean isFootball() {
+		return football;
+	}
+
+	public void setFootball(boolean football) {
+		this.football = football;
 	}
 
 }

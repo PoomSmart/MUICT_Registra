@@ -11,25 +11,23 @@ import Objects.Student;
 import Utilities.CommonUtils;
 
 public class AcceptanceAssigner {
-	
-	public static Map<Integer, Student> students;
-	
-	public static void assignAll() {
+		
+	public static void assignAll(Map<Integer, Student> db) {
 		try {
 			List<String> ncList = FileUtils.readLines(new File("acceptance-nc.csv"));
 			for (String fID : ncList) {
 				Integer ID = CommonUtils.getID("5988" + fID);
 				if (ID != -1)
-					students.get(ID).setAcceptanceStatus(Student.AcceptanceType.DS); 
+					db.get(ID).setAcceptanceStatus(Student.AcceptanceType.DS); 
 			}
 			List<String> yList = FileUtils.readLines(new File("acceptance-y.csv"));
 			for (String fID : yList) {
 				Integer ID = CommonUtils.getID("5988" + fID);
 				if (ID != -1)
-					students.get(ID).setAcceptanceStatus(Student.AcceptanceType.Y);
+					db.get(ID).setAcceptanceStatus(Student.AcceptanceType.Y);
 			}
-			for (Integer ID : students.keySet()) {
-				Student student = students.get(ID);
+			for (Integer ID : db.keySet()) {
+				Student student = db.get(ID);
 				if (student.getAcceptanceStatus().equals("-"))
 					student.setAcceptanceStatus(Student.AcceptanceType.Null);
 			}

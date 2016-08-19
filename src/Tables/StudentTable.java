@@ -2,10 +2,11 @@ package Tables;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.io.File;
-import java.text.ParseException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -13,6 +14,7 @@ import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -32,7 +34,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 
 import MainApp.MainApp;
-import Objects.Constants;
 import Objects.Status;
 import Objects.Student;
 import Utilities.DBUtils;
@@ -41,7 +42,7 @@ import Utilities.SpringUtilities;
 import Utilities.WindowUtils;
 
 public class StudentTable extends JFrame {
-	
+
 	// TODO: Disallow table windows duplication
 
 	private static final long serialVersionUID = 1L;
@@ -55,20 +56,25 @@ public class StudentTable extends JFrame {
 	private JLabel statText;
 	private JLabel bannText;
 
+	public static int totalPresent;
+	public static int totalAbsent;
+	public static int totalLeft;
+	public static int totalPresentIslamic;
+	public static int totalIslamic;
+	public static int totalPresentFootball;
+	public static int totalFootball;
+
 	private JTable table;
 	private final int mode;
-	
-	private int totalPresent;
-	private int totalAbsent;
-	private int totalLeft;
-	private int totalPresentIslamic;
-	private int totalIslamic;
-	
+	private String date;
+
 	private int bannCount[];
 	private int bannPresentCount[];
-	
-	private static final String[] names = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Status", "Acceptance", "Position", "Bann" };
-	private static final String[] names_global = { "ID", "First Name", "Last Name", "Nickname", "Gender", "#Present", "#Leave", "#Absence", "Bann" };
+
+	private static final String[] names = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Status",
+			"Acceptance", "Position", "Bann" };
+	private static final String[] names_global = { "ID", "First Name", "Last Name", "Nickname", "Gender", "#Present",
+			"#Leave", "#Absence", "Bann" };
 
 	private TableRowSorter<? extends AbstractTableModel> sorter;
 
@@ -76,13 +82,13 @@ public class StudentTable extends JFrame {
 		if (activeTable != null) {
 			System.out.println("Update StudentTable");
 			activeTable.updateInternalStudents();
-			((AbstractTableModel)activeTable.table.getModel()).fireTableDataChanged();
+			((AbstractTableModel) activeTable.table.getModel()).fireTableDataChanged();
 		} else
 			System.out.println("Null StudentTable");
 	}
 
 	private Object[][] toData(Map<Integer, Student> students, int mode) {
-		Object[][] arr = new Object[students.size()][mode == 0 ? names.length: names_global.length];
+		Object[][] arr = new Object[students.size()][mode == 0 ? names.length : names_global.length];
 		Set<Map.Entry<Integer, Student>> entries = students.entrySet();
 		Iterator<Map.Entry<Integer, Student>> entriesIterator = entries.iterator();
 		int i = 0;
@@ -95,7 +101,7 @@ public class StudentTable extends JFrame {
 			arr[i][3] = student.getNickname();
 			arr[i][4] = student.getGender();
 			if (mode == 0) {
-				arr[i][5] = student.getCurrentStatus();
+				arr[i][5] = student.getStatus(date);
 				arr[i][6] = student.getAcceptanceStatus();
 				arr[i][7] = student.getPosition().toCellString();
 				arr[i][8] = student.getBann();
@@ -113,12 +119,15 @@ public class StudentTable extends JFrame {
 	private String[] columnNamesForMode(int mode) {
 		return mode == 0 ? names : names_global;
 	}
-	
+
 	private void updateStatText() {
 		if (statText != null)
-			statText.setText(String.format("Total Present: %d (Islamic: %d/%d), Total Absent: %d, Total Left: %d", totalPresent, totalPresentIslamic, totalIslamic, totalAbsent, totalLeft));
+			statText.setText(String.format(
+					"Total Present: %d (Islamic: %d/%d), Total Absent: %d, Total Left: %d, Football: (%d/%d), Total Attended: At most %d",
+					totalPresent, totalPresentIslamic, totalIslamic, totalAbsent, totalLeft, totalPresentFootball,
+					totalFootball, totalPresent + totalLeft));
 	}
-	
+
 	private void updateBannText() {
 		if (bannText != null) {
 			StringBuilder sb = new StringBuilder();
@@ -135,38 +144,39 @@ public class StudentTable extends JFrame {
 			bannCount = new int[10];
 			bannPresentCount = null;
 			bannPresentCount = new int[10];
-			internalStudents = DBUtils.getCurrentStudents();
+			totalIslamic = totalPresentIslamic = 0;
+			totalPresent = totalAbsent = totalLeft = 0;
+			totalPresentFootball = totalFootball = 0;
+			internalStudents = null;
+			internalStudents = DBUtils.getStudents(DateUtils.dateFromString(date));
 			for (Entry<Integer, Student> entry : internalStudents.entrySet()) {
 				Student student = entry.getValue();
 				bannCount[student.getBann() - 1]++;
-				if (student.isNormal())
+				if (student.isNormal(date)) {
 					bannPresentCount[student.getBann() - 1]++;
+					totalPresent++;
+				} else if (student.isAbsent(date))
+					totalAbsent++;
+				else if (student.isLeft(date))
+					totalLeft++;
+				if (student.isFootball()) {
+					if (student.isNormal(date))
+						totalPresentFootball++;
+					totalFootball++;
+				}
+				if (student.isIslamic()) {
+					if (student.isNormal(date))
+						totalPresentIslamic++;
+					totalIslamic++;
+				}
 			}
-			totalPresent = DBUtils.totalPresent;
-			totalAbsent = DBUtils.totalAbsent;
-			totalLeft = DBUtils.totalLeft;
-			totalPresentIslamic = DBUtils.totalPresentIslamic;
-			totalIslamic = DBUtils.totalIslamic;
 			updateStatText();
 			updateBannText();
-		}
-		else {
+		} else {
 			internalStudents = new TreeMap<Integer, Student>();
 			for (Entry<Integer, Student> entry : MainApp.db.entrySet())
 				internalStudents.put(entry.getKey(), entry.getValue().clone());
-			File[] dates = new File(Constants.FILE_ROOT).listFiles();
-			for (File date : dates) {
-				if (!date.isDirectory()) {
-					System.out.println("Skip directory: " + date.getName());
-					continue;
-				}
-				Date d;
-				try {
-					d = DateUtils.s_fmt.parse(date.getName());
-				} catch (ParseException e) {
-					System.out.println("Invalid folder: " + date.getName());
-					continue;
-				}
+			for (Date d : DateUtils.availableDates()) {
 				// Assigning present and absent students
 				Map<Integer, Student> presentStudents = DBUtils.getPresentStudents(d);
 				for (Integer ID : MainApp.db.keySet()) {
@@ -189,20 +199,24 @@ public class StudentTable extends JFrame {
 	}
 
 	public StudentTable(int mode) {
+		this(mode, DateUtils.getCurrentFormattedDate());
+	}
+
+	public StudentTable(int mode, String date) {
 		this.mode = mode;
+		this.date = date;
 
 		updateInternalStudents();
-		
+
 		String title = "Attendance";
 		if (mode == 0)
-			title += " for " + DateUtils.getCurrentNormalFormattedDate();
+			title += " for " + DateUtils.getNormalFormattedDate(DateUtils.dateFromString(date));
 		if (mode > 1)
 			return;
 		JPanel self = new JPanel();
 		self.setLayout(new BoxLayout(self, BoxLayout.Y_AXIS));
 		this.setTitle(WindowUtils.realTitle(title));
 		this.setSize(1100, 850);
-		WindowUtils.setCenter(this);
 
 		class StudentTableModel extends AbstractTableModel {
 
@@ -230,7 +244,8 @@ public class StudentTable extends JFrame {
 			}
 
 			public Class<? extends Object> getColumnClass(int c) {
-				return getValueAt(0, c).getClass();
+				Object value = getValueAt(0, c);
+				return value != null ? value.getClass() : Object.class;
 			}
 
 		}
@@ -251,15 +266,30 @@ public class StudentTable extends JFrame {
 					studentText.setText("");
 				else {
 					int modelRow = table.convertRowIndexToModel(viewRow);
-					studentText.setText(internalStudents.get(table.getModel().getValueAt(modelRow, 0)).toString(mode));
+					studentText.setText(
+							internalStudents.get(table.getModel().getValueAt(modelRow, 0)).toString(mode, date));
 				}
 			}
 		});
-		
+
 		JScrollPane scrollPane = new JScrollPane(table);
 		self.add(scrollPane);
-
 		JPanel form = new JPanel(new SpringLayout());
+
+		if (mode == 0) {
+			form.add(new JLabel("Select Date:", SwingConstants.TRAILING));
+			List<String> dates = DateUtils.s_availableDates();
+			JComboBox<String> dateSelector = new JComboBox<String>(dates.toArray(new String[0]));
+			dateSelector.setSelectedIndex(dates.size() - 1);
+			dateSelector.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					setDate((String) dateSelector.getSelectedItem());
+					updateIfPossible();
+				}
+			});
+			form.add(dateSelector);
+		}
+
 		JLabel filterLabel = new JLabel("Filter Text:", SwingConstants.TRAILING);
 		form.add(filterLabel);
 
@@ -288,8 +318,9 @@ public class StudentTable extends JFrame {
 		studentText.setPreferredSize(new Dimension(studentText.getWidth(), 200));
 		studentText.setBorder(BorderFactory.createLineBorder(Color.gray));
 		studentText.setEditable(false);
-		form.add(studentText);
-		
+		JScrollPane scroll = new JScrollPane(studentText);
+		form.add(scroll);
+
 		if (mode == 0) {
 			form.add(new JLabel());
 			statText = new JLabel();
@@ -301,11 +332,13 @@ public class StudentTable extends JFrame {
 			updateBannText();
 		}
 
-		SpringUtilities.makeCompactGrid(form, mode == 0 ? 4 : 2, 2, 6, 6, 6, 6);
+		SpringUtilities.makeCompactGrid(form, mode == 0 ? 5 : 2, 2, 6, 6, 6, 6);
 		self.add(form);
 		this.setContentPane(self);
 		this.pack();
+		WindowUtils.setCenter(this);
 		activeTable = this;
+		filterText.requestFocus();
 	}
 
 	private void newFilter() {
@@ -319,6 +352,14 @@ public class StudentTable extends JFrame {
 			return;
 		}
 		sorter.setRowFilter(rf);
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
 	}
 
 }

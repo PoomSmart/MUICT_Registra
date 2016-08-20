@@ -67,5 +67,7 @@ public class ScannerSaver {
 		Vector<String> reasons = new Vector<String>();
 		reasons.addElement(reason);
 		doneAddingCodes(IDs, reasons, append, type);
+		IDs = null;
+		reasons = null;
 	}
 }

@@ -107,8 +107,7 @@ class SeatPanel extends JPanel {
 				g.setColor(Color.white);
 				boolean found = false;
 				for (Student student : students.values()) {
-					Position<Integer, Integer> position = student.getPosition();
-					if (Position.isSame(position, x, y)) {
+					if (Position.isSame(student.getPosition(), x, y)) {
 						if (student.isNormal())
 							g.setColor(Color.blue);
 						else if (student.isLeft())

@@ -201,9 +201,18 @@ public class StudentTable extends JFrame {
 		}
 		data = toData(internalStudents, mode);
 	}
+	
+	public void updateTitle() {
+		String title = "Attendance";
+		if (mode == 0)
+			title += " for " + DateUtils.getNormalFormattedDate(DateUtils.dateFromString(date));
+		if (mode > 1)
+			return;
+		this.setTitle(WindowUtils.realTitle(title));
+	}
 
 	public StudentTable(int mode) {
-		this(mode, DateUtils.getCurrentFormattedDate());
+		this(mode, DateUtils.getFormattedDate(DateUtils.availableDates().lastElement()));
 	}
 
 	public StudentTable(int mode, String date) {
@@ -211,15 +220,10 @@ public class StudentTable extends JFrame {
 		this.date = date;
 
 		updateInternalStudents();
-
-		String title = "Attendance";
-		if (mode == 0)
-			title += " for " + DateUtils.getNormalFormattedDate(DateUtils.dateFromString(date));
-		if (mode > 1)
-			return;
+		updateTitle();
+		
 		JPanel self = new JPanel();
 		self.setLayout(new BoxLayout(self, BoxLayout.Y_AXIS));
-		this.setTitle(WindowUtils.realTitle(title));
 		this.setSize(1100, 850);
 
 		class StudentTableModel extends AbstractTableModel {
@@ -289,6 +293,7 @@ public class StudentTable extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					setDate((String) dateSelector.getSelectedItem());
 					updateIfPossible();
+					updateTitle();
 				}
 			});
 			form.add(dateSelector);

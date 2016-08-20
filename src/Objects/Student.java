@@ -104,11 +104,6 @@ public class Student implements Cloneable {
 		return cellPosition;
 	}
 
-	/**
-	 * Get current status of a student in the specific date
-	 * 
-	 * @return
-	 */
 	public Status getStatus(String date) {
 		for (Entry<String, Status> entry : statuses.entrySet()) {
 			String idate = entry.getKey();
@@ -118,11 +113,6 @@ public class Student implements Cloneable {
 		return null;
 	}
 
-	/**
-	 * Get current status of a student in the current date
-	 * 
-	 * @return
-	 */
 	public Status getCurrentStatus() {
 		return getStatus(DateUtils.getCurrentFormattedDate());
 	}

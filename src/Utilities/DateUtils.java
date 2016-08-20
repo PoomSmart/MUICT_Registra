@@ -47,8 +47,8 @@ public class DateUtils {
 		return d;
 	}
 
-	public static List<Date> availableDates() {
-		List<Date> list = new Vector<Date>();
+	public static Vector<Date> availableDates() {
+		Vector<Date> list = new Vector<Date>();
 		File[] dates = new File(Constants.FILE_ROOT).listFiles();
 		for (File date : dates) {
 			if (!date.isDirectory()) {

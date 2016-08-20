@@ -49,12 +49,12 @@ public class Logger {
 		}
 	}
 	
-	public static void showLog(Date date, boolean editable) {
-		showLog(date, editable, false, null);
+	public static void showLog(Date date, boolean editable, boolean force) {
+		showLog(date, editable, force, CommonUtils.filePath(CommonUtils.FileType.LOG, date));
 	}
 	
-	public static void showLog(Date date, boolean editable, boolean force) {
-		showLog(date, editable, force, null);
+	public static void showLog(Date date, boolean editable) {
+		showLog(date, editable, false);
 	}
 
 	public static void showLogs() {

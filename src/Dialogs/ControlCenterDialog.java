@@ -65,7 +65,7 @@ public class ControlCenterDialog extends JFrame {
 						JOptionPane.PLAIN_MESSAGE, null, logOptions, logOptions[0]);
 				switch (result) {
 				case 0:
-					Logger.showLog(DateUtils.getCurrentDate(), true, true, CommonUtils.filePath(CommonUtils.FileType.LOG, DateUtils.getCurrentDate()));
+					Logger.showLog(DateUtils.getCurrentDate(), true, true);
 					break;
 				case 1:
 					Logger.showLogs();

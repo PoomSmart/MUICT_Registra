@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -55,6 +56,7 @@ public class StudentTable extends JFrame {
 	private JTextArea studentText;
 	private JLabel statText;
 	private JLabel bannText;
+	private JLabel attendanceText;
 	private JComboBox<String> dateSelector;
 	
 	private Object[][] data;
@@ -66,6 +68,10 @@ public class StudentTable extends JFrame {
 	public static int totalIslamic;
 	public static int totalPresentFootball;
 	public static int totalFootball;
+	
+	public static int totalEverydayAttend;
+	public static int totalSomeAttend;
+	public static int totalOnceAttend;
 
 	private JTable table;
 	private final int mode;
@@ -140,6 +146,11 @@ public class StudentTable extends JFrame {
 			sb = null;
 		}
 	}
+	
+	private void updateAttendanceText() {
+		if (attendanceText != null)
+			attendanceText.setText(String.format("Attend every day: %d, Attend more than one: %d, Attend once: %d, Never attend: %d", totalEverydayAttend, totalSomeAttend, totalOnceAttend, internalStudents.size() - totalEverydayAttend - totalSomeAttend - totalOnceAttend));
+	}
 
 	public void updateInternalStudents() {
 		if (mode == 0) {
@@ -176,10 +187,15 @@ public class StudentTable extends JFrame {
 			updateStatText();
 			updateBannText();
 		} else {
+			totalEverydayAttend = totalSomeAttend = totalOnceAttend = 0;
 			internalStudents = new TreeMap<Integer, Student>();
-			for (Entry<Integer, Student> entry : MainApp.db.entrySet())
-				internalStudents.put(entry.getKey(), entry.getValue().clone());
-			for (Date d : DateUtils.availableDates()) {
+			for (Entry<Integer, Student> entry : MainApp.db.entrySet()) {
+				Integer ID = entry.getKey();
+				Student student = entry.getValue().clone();
+				internalStudents.put(ID, student);
+			}
+			Vector<Date> availableDates = DateUtils.availableDates();
+			for (Date d : availableDates) {
 				// Assigning present and absent students
 				Map<Integer, Student> presentStudents = DBUtils.getPresentStudents(d);
 				for (Integer ID : MainApp.db.keySet()) {
@@ -198,6 +214,18 @@ public class StudentTable extends JFrame {
 						internalStudents.get(ID).addStatus(d, leaveStatus.clone());
 				}
 			}
+			int totalActivityDays = availableDates.size();
+			for (Entry<Integer, Student> entry : internalStudents.entrySet()) {
+				Student student = entry.getValue();
+				int presentCount = student.getPresentCount();
+				if (presentCount == totalActivityDays)
+					totalEverydayAttend++;
+				else if (presentCount > 1)
+					totalSomeAttend++;
+				else if (presentCount == 1)
+					totalOnceAttend++;
+			}
+			updateAttendanceText();
 		}
 		data = toData(internalStudents, mode);
 	}
@@ -339,9 +367,14 @@ public class StudentTable extends JFrame {
 			bannText = new JLabel();
 			form.add(bannText);
 			updateBannText();
+		} else {
+			form.add(new JLabel());
+			attendanceText = new JLabel();
+			form.add(attendanceText);
+			updateAttendanceText();
 		}
 
-		SpringUtilities.makeCompactGrid(form, mode == 0 ? 5 : 2, 2, 6, 6, 6, 6);
+		SpringUtilities.makeCompactGrid(form, mode == 0 ? 5 : 3, 2, 6, 6, 6, 6);
 		self.add(form);
 		this.setContentPane(self);
 		this.pack();

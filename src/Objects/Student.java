@@ -19,6 +19,7 @@ public class Student implements Cloneable {
 	private boolean medicalExclusive;
 	private Map<String, Status> statuses;
 	private Position<Integer, Integer> position;
+	private String cellPosition;
 	private String healthCondition;
 	private String medicalAllergies;
 	private String foodAllergies;
@@ -92,6 +93,15 @@ public class Student implements Cloneable {
 
 	public void setPosition(Position<Integer, Integer> position) {
 		this.position = position;
+		updateCellPosition();
+	}
+
+	private void updateCellPosition() {
+		cellPosition = position.toCellString();
+	}
+
+	public String getCellPosition() {
+		return cellPosition;
 	}
 
 	/**
@@ -200,7 +210,7 @@ public class Student implements Cloneable {
 				if (status.getType() == Status.Type.LEAVE)
 					sb.append(" Reason: " + status.getReason() + "\n");
 			}
-			sb.append(" Current Position: " + position.toCellString() + "\n");
+			sb.append(" Current Position: " + cellPosition + "\n");
 			if (!healthCondition.isEmpty())
 				sb.append(" HEALTH condition: " + healthCondition + "\n");
 			if (!medicalAllergies.isEmpty())
@@ -245,6 +255,7 @@ public class Student implements Cloneable {
 		student.medicalExclusive = medicalExclusive;
 		student.statuses = new TreeMap<String, Status>();
 		student.position = position.clone();
+		student.cellPosition = cellPosition;
 		student.football = football;
 		for (Map.Entry<String, Status> entry : statuses.entrySet()) {
 			String date = entry.getKey();

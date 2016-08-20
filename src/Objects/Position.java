@@ -42,4 +42,8 @@ public class Position<X, Y> implements Cloneable {
 		Position<X, Y> position = (Position<X, Y>)obj;
 		return position.x == x && position.y == y;
 	}
+	
+	public static boolean isSame(Position<Integer, Integer> p, int x, int y) {
+		return p.x == x && p.y == y;
+	}
 }

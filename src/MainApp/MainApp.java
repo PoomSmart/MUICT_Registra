@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.Date;
 import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
@@ -80,6 +81,8 @@ public class MainApp {
 				student.setPosition(position);
 			}
 		}
+		positions = null;
+		r = null;
 	}
 
 	public static void createPathIfNecessary(String path) {
@@ -91,6 +94,7 @@ public class MainApp {
 				e.printStackTrace();
 			}
 		}
+		output = null;
 	}
 
 	public static void main(String[] args) throws InterruptedException, IOException {
@@ -105,7 +109,6 @@ public class MainApp {
 				}
 			};
 
-			// We can use JTextArea or JLabel to display messages
 			JTextArea textArea = new JTextArea();
 			textArea.setText(FileUtils.readFileToString(new File("LICENSE"), Charset.defaultCharset()));
 			textArea.setEditable(false);
@@ -128,8 +131,11 @@ public class MainApp {
 		createPathIfNecessary(Constants.FILE_ROOT);
 
 		// Create a directory for current date, if necessary
-		String datePath = CommonUtils.datePath(DateUtils.getCurrentDate());
-		createPathIfNecessary(datePath);
+		Date currentDate = DateUtils.getCurrentDate();
+		if (DateUtils.isBusinessDay(DateUtils.DateToCalendar(currentDate))) {
+			String datePath = CommonUtils.datePath(currentDate);
+			createPathIfNecessary(datePath);
+		}
 
 		ScannerDialog scannerDialog = new ScannerDialog();
 		scannerDialog.setVisible(true);

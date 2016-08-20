@@ -55,6 +55,9 @@ public class StudentTable extends JFrame {
 	private JTextArea studentText;
 	private JLabel statText;
 	private JLabel bannText;
+	private JComboBox<String> dateSelector;
+	
+	private Object[][] data;
 
 	public static int totalPresent;
 	public static int totalAbsent;
@@ -103,7 +106,7 @@ public class StudentTable extends JFrame {
 			if (mode == 0) {
 				arr[i][5] = student.getStatus(date);
 				arr[i][6] = student.getAcceptanceStatus();
-				arr[i][7] = student.getPosition().toCellString();
+				arr[i][7] = student.getCellPosition();
 				arr[i][8] = student.getBann();
 			} else {
 				arr[i][5] = student.getPresentCount();
@@ -196,6 +199,7 @@ public class StudentTable extends JFrame {
 				}
 			}
 		}
+		data = toData(internalStudents, mode);
 	}
 
 	public StudentTable(int mode) {
@@ -240,7 +244,7 @@ public class StudentTable extends JFrame {
 
 			@Override
 			public Object getValueAt(int row, int col) {
-				return toData(internalStudents, mode)[row][col];
+				return data[row][col];
 			}
 
 			public Class<? extends Object> getColumnClass(int c) {
@@ -279,7 +283,7 @@ public class StudentTable extends JFrame {
 		if (mode == 0) {
 			form.add(new JLabel("Select Date:", SwingConstants.TRAILING));
 			List<String> dates = DateUtils.s_availableDates();
-			JComboBox<String> dateSelector = new JComboBox<String>(dates.toArray(new String[0]));
+			dateSelector = new JComboBox<String>(dates.toArray(new String[0]));
 			dateSelector.setSelectedIndex(dates.size() - 1);
 			dateSelector.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -338,6 +342,8 @@ public class StudentTable extends JFrame {
 		this.pack();
 		WindowUtils.setCenter(this);
 		activeTable = this;
+		if (dateSelector != null)
+			dateSelector.setSelectedIndex(dateSelector.getItemCount() - 1);
 		filterText.requestFocus();
 	}
 

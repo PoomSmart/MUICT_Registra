@@ -56,8 +56,12 @@ public class DateUtils {
 				continue;
 			}
 			Date d = dateFromString(date.getName());
-			if (d != null && isBusinessDay(DateToCalendar(d)))
-				list.add(d);
+			if (d != null) {
+				if (isBusinessDay(DateToCalendar(d)))
+					list.add(d);
+				else
+					System.out.println("Skip holiday: " + date.getName());
+			}
 			else
 				System.out.println("Invalid folder: " + date.getName());
 		}

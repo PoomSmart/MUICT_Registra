@@ -57,6 +57,7 @@ public class DBUtils {
 				}
 			}
 			reader.close();
+			reader = null;
 		} catch (IOException e) {
 			System.out.println("leave.csv for " + DateUtils.getNormalFormattedDate(date) + " not found");
 		}
@@ -119,6 +120,8 @@ public class DBUtils {
 				absentStudents.put(ID, absentStudent);
 			}
 		}
+		presentStudents = null;
+		leaveStudents = null;
 		return absentStudents;
 	}
 	
@@ -142,6 +145,9 @@ public class DBUtils {
 		students.putAll(presentStudents);
 		students.putAll(absentStudents);
 		students.putAll(leaveStudents);
+		presentStudents = null;
+		absentStudents = null;
+		leaveStudents = null;
 		return students;
 	}
 	

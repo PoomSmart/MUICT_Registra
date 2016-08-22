@@ -11,10 +11,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -34,6 +36,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 
+import Dialogs.PlainTextDialog;
 import MainApp.MainApp;
 import Objects.Status;
 import Objects.Student;
@@ -79,9 +82,10 @@ public class StudentTable extends JFrame {
 
 	private int bannCount[];
 	private int bannPresentCount[];
+	private TreeSet<Integer> regularList = new TreeSet<Integer>();
 
 	private static final String[] names = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Status",
-			"Acceptance", "Position", "Bann" };
+			"Acceptance", "Position", "Bann", "Section" };
 	private static final String[] names_global = { "ID", "First Name", "Last Name", "Nickname", "Gender", "#Present",
 			"#Leave", "#Absence", "Bann" };
 
@@ -114,6 +118,7 @@ public class StudentTable extends JFrame {
 				arr[i][6] = student.getAcceptanceStatus();
 				arr[i][7] = student.getCellPosition();
 				arr[i][8] = student.getBann();
+				arr[i][9] = student.getSection();
 			} else {
 				arr[i][5] = student.getPresentCount();
 				arr[i][6] = student.getLeaveCount();
@@ -220,8 +225,13 @@ public class StudentTable extends JFrame {
 				int presentCount = student.getPresentCount();
 				if (presentCount == totalActivityDays)
 					totalEverydayAttend++;
-				else if (presentCount > 1)
+				else if (presentCount > 1) {
 					totalSomeAttend++;
+					if (presentCount >= totalActivityDays - 2) {
+						// regular list
+						regularList.add(student.getID());
+					}
+				}
 				else if (presentCount == 1)
 					totalOnceAttend++;
 			}
@@ -372,9 +382,23 @@ public class StudentTable extends JFrame {
 			attendanceText = new JLabel();
 			form.add(attendanceText);
 			updateAttendanceText();
+			form.add(new JLabel());
+			JButton regularAttendBtn = new JButton("Generate Regular List");
+			regularAttendBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					StringBuilder sb = new StringBuilder();
+					for (Integer ID : regularList)
+						sb.append(ID + "\n");
+					sb.append("Total: " + regularList.size());
+					PlainTextDialog dialog = new PlainTextDialog("Regular List", 300, 600, 5, sb.toString(), false);
+					dialog.setVisible(true);
+					sb = null;
+				}
+			});
+			form.add(regularAttendBtn);
 		}
 
-		SpringUtilities.makeCompactGrid(form, mode == 0 ? 5 : 3, 2, 6, 6, 6, 6);
+		SpringUtilities.makeCompactGrid(form, mode == 0 ? 5 : 4, 2, 6, 6, 6, 6);
 		self.add(form);
 		this.setContentPane(self);
 		this.pack();
@@ -389,7 +413,7 @@ public class StudentTable extends JFrame {
 		RowFilter<? super AbstractTableModel, Object> rf = null;
 		try {
 			if (mode == 0)
-				rf = RowFilter.regexFilter("(?i)" + filterText.getText(), 0, 1, 2, 3, 5, 6, 7, 8);
+				rf = RowFilter.regexFilter("(?i)" + filterText.getText(), 0, 1, 2, 3, 5, 6, 7, 8, 9);
 			else
 				rf = RowFilter.regexFilter("(?i)" + filterText.getText(), 0, 1, 2, 3, 4);
 		} catch (java.util.regex.PatternSyntaxException e) {

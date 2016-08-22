@@ -33,6 +33,7 @@ import Utilities.WindowUtils;
 import Visualizers.SeatVisualizer;
 import Workers.AcceptanceAssigner;
 import Workers.AllergiesAssigner;
+import Workers.SeatAssigner;
 import Workers.SpecialAssigner;
 
 public class MainApp {
@@ -61,6 +62,8 @@ public class MainApp {
 
 	// FIXME: Will be eventually removed
 	private static void randomPosition(Map<Integer, Student> students) {
+		if (SeatAssigner.used)
+			return;
 		Integer width = SeatVisualizer.bounds.width;
 		Integer height = SeatVisualizer.bounds.height;
 		boolean small = false;
@@ -126,6 +129,7 @@ public class MainApp {
 		AllergiesAssigner.assignAll(db);
 		AcceptanceAssigner.assignAll(db);
 		SpecialAssigner.assignAll(db);
+		SeatAssigner.assignAll(db);
 
 		// Create our working directory
 		createPathIfNecessary(Constants.FILE_ROOT);

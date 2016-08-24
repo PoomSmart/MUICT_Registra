@@ -157,7 +157,7 @@ public class SeatVisualizer extends JFrame {
 	
 	public static final int shiftLeft = 30;
 	public static final int shiftTop = 30;
-	public static final Dimension bounds = new Dimension(10, 10);
+	public static final Dimension bounds = new Dimension(8, 8);
 	public static final Dimension tileSize = new Dimension(40, 40);
 	public static final Dimension absoluteSize = new Dimension(bounds.width * tileSize.width + shiftLeft,
 			bounds.height * tileSize.height + shiftTop);
@@ -169,7 +169,7 @@ public class SeatVisualizer extends JFrame {
 		this.setTitle(WindowUtils.realTitle("Seat Visualizer"));
 		this.setSize(absoluteSize.width + shiftLeft, absoluteSize.height + (int) (tileSize.height * 1.5) + shiftTop);
 		getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 0, 1));
-		WindowUtils.setRelativeCenter(this, -this.getWidth() + bounds.width / 2, 0);
+		WindowUtils.setRelativeCenter(this, -this.getWidth() + bounds.width / 2 - 50, 0);
 		reloadStudents();
 		panel = new SeatPanel(currentStudents);
 		panel.setPreferredSize(this.getSize());

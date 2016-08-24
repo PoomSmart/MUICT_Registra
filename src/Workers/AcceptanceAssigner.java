@@ -26,6 +26,12 @@ public class AcceptanceAssigner {
 				if (ID != -1)
 					db.get(ID).setAcceptanceStatus(Student.AcceptanceType.Y);
 			}
+			List<String> nList = FileUtils.readLines(new File("acceptance-n.csv"));
+			for (String fID : nList) {
+				Integer ID = CommonUtils.getID("5988" + fID);
+				if (ID != -1)
+					db.get(ID).setAcceptanceStatus(Student.AcceptanceType.N);
+			}
 			for (Integer ID : db.keySet()) {
 				Student student = db.get(ID);
 				if (student.getAcceptanceStatus().equals("-"))

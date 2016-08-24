@@ -11,12 +11,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -36,7 +34,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 
-import Dialogs.PlainTextDialog;
 import MainApp.MainApp;
 import Objects.Status;
 import Objects.Student;
@@ -60,8 +57,9 @@ public class StudentTable extends JFrame {
 	private JLabel statText;
 	private JLabel bannText;
 	private JLabel attendanceText;
+	private JLabel perSectionText;
 	private JComboBox<String> dateSelector;
-	
+
 	private Object[][] data;
 
 	public static int totalPresent;
@@ -71,7 +69,7 @@ public class StudentTable extends JFrame {
 	public static int totalIslamic;
 	public static int totalPresentFootball;
 	public static int totalFootball;
-	
+
 	public static int totalEverydayAttend;
 	public static int totalSomeAttend;
 	public static int totalOnceAttend;
@@ -82,12 +80,12 @@ public class StudentTable extends JFrame {
 
 	private int bannCount[];
 	private int bannPresentCount[];
-	private TreeSet<Integer> regularList = new TreeSet<Integer>();
+	private int perSectionCount[];
 
 	private static final String[] names = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Status",
 			"Acceptance", "Position", "Bann", "Section" };
 	private static final String[] names_global = { "ID", "First Name", "Last Name", "Nickname", "Gender", "#Present",
-			"#Leave", "#Absence", "Bann" };
+			"#Leave", "#Absence", "Bann", "Section" };
 
 	private TableRowSorter<? extends AbstractTableModel> sorter;
 
@@ -124,6 +122,7 @@ public class StudentTable extends JFrame {
 				arr[i][6] = student.getLeaveCount();
 				arr[i][7] = student.getAbsenceCount();
 				arr[i][8] = student.getBann();
+				arr[i][9] = student.getSection();
 			}
 			i++;
 		}
@@ -151,13 +150,31 @@ public class StudentTable extends JFrame {
 			sb = null;
 		}
 	}
-	
+
 	private void updateAttendanceText() {
 		if (attendanceText != null)
-			attendanceText.setText(String.format("Attend every day: %d, Attend more than one: %d, Attend once: %d, Never attend: %d", totalEverydayAttend, totalSomeAttend, totalOnceAttend, internalStudents.size() - totalEverydayAttend - totalSomeAttend - totalOnceAttend));
+			attendanceText.setText(
+					String.format("Attend every day: %d, Attend more than one: %d, Attend once: %d, Never attend: %d",
+							totalEverydayAttend, totalSomeAttend, totalOnceAttend,
+							internalStudents.size() - totalEverydayAttend - totalSomeAttend - totalOnceAttend));
+	}
+
+	private void updatePerSectionText() {
+		if (perSectionText != null) {
+			StringBuilder sb = new StringBuilder();
+			for (int i = 1; i <= 3; i++) {
+				sb.append(String.format("Section %d attend: %d", i, perSectionCount[i - 1]));
+				if (i != 3)
+					sb.append(", ");
+			}
+			perSectionText.setText(sb.toString());
+			sb = null;
+		}
 	}
 
 	public void updateInternalStudents() {
+		perSectionCount = null;
+		perSectionCount = new int[3];
 		if (mode == 0) {
 			bannCount = null;
 			bannCount = new int[10];
@@ -173,6 +190,7 @@ public class StudentTable extends JFrame {
 				bannCount[student.getBann() - 1]++;
 				if (student.isNormal(date)) {
 					bannPresentCount[student.getBann() - 1]++;
+					perSectionCount[student.getSection() - 1]++;
 					totalPresent++;
 				} else if (student.isAbsent(date))
 					totalAbsent++;
@@ -223,23 +241,24 @@ public class StudentTable extends JFrame {
 			for (Entry<Integer, Student> entry : internalStudents.entrySet()) {
 				Student student = entry.getValue();
 				int presentCount = student.getPresentCount();
-				if (presentCount == totalActivityDays)
-					totalEverydayAttend++;
-				else if (presentCount > 1) {
-					totalSomeAttend++;
-					if (presentCount >= totalActivityDays - 2) {
-						// regular list
-						regularList.add(student.getID());
+				if (presentCount > 0) {
+					if (presentCount == totalActivityDays)
+						totalEverydayAttend++;
+					else if (presentCount >= 1) {
+						if (presentCount > 1)
+							totalSomeAttend++;
+						else
+							totalOnceAttend++;
 					}
+					perSectionCount[student.getSection() - 1]++;
 				}
-				else if (presentCount == 1)
-					totalOnceAttend++;
 			}
 			updateAttendanceText();
 		}
+		updatePerSectionText();
 		data = toData(internalStudents, mode);
 	}
-	
+
 	public void updateTitle() {
 		String title = "Attendance";
 		if (mode == 0)
@@ -259,7 +278,7 @@ public class StudentTable extends JFrame {
 
 		updateInternalStudents();
 		updateTitle();
-		
+
 		JPanel self = new JPanel();
 		self.setLayout(new BoxLayout(self, BoxLayout.Y_AXIS));
 		this.setSize(1100, 850);
@@ -382,23 +401,13 @@ public class StudentTable extends JFrame {
 			attendanceText = new JLabel();
 			form.add(attendanceText);
 			updateAttendanceText();
-			form.add(new JLabel());
-			JButton regularAttendBtn = new JButton("Generate Regular List");
-			regularAttendBtn.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					StringBuilder sb = new StringBuilder();
-					for (Integer ID : regularList)
-						sb.append(ID + "\n");
-					sb.append("Total: " + regularList.size());
-					PlainTextDialog dialog = new PlainTextDialog("Regular List", 300, 600, 5, sb.toString(), false);
-					dialog.setVisible(true);
-					sb = null;
-				}
-			});
-			form.add(regularAttendBtn);
 		}
+		form.add(new JLabel());
+		perSectionText = new JLabel();
+		form.add(perSectionText);
+		updatePerSectionText();
 
-		SpringUtilities.makeCompactGrid(form, mode == 0 ? 5 : 4, 2, 6, 6, 6, 6);
+		SpringUtilities.makeCompactGrid(form, mode == 0 ? 6 : 4, 2, 6, 6, 6, 6);
 		self.add(form);
 		this.setContentPane(self);
 		this.pack();

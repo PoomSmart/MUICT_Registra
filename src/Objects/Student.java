@@ -30,7 +30,7 @@ public class Student implements Cloneable {
 	private boolean football;
 
 	public enum AcceptanceType {
-		Y, N, DS, Null
+		Y, N, DontSee, Unknown
 	}
 
 	public Student(Integer ID, String firstname, String lastname, String nickname, int section, String gender,
@@ -164,9 +164,6 @@ public class Student implements Cloneable {
 
 	public void addStatus(Date date, Status status) {
 		String key = DateUtils.getFormattedDate(date);
-		// We shall overwrite status if same date (same key)
-		if (statuses.containsKey(key))
-			statuses.remove(key);
 		statuses.put(key, status);
 	}
 
@@ -299,9 +296,9 @@ public class Student implements Cloneable {
 			return "Y";
 		case N:
 			return "N";
-		case DS:
+		case DontSee:
 			return "No attendance";
-		case Null:
+		case Unknown:
 			return "";
 		}
 		return "-";
@@ -309,6 +306,10 @@ public class Student implements Cloneable {
 
 	public void setAcceptanceStatus(AcceptanceType acceptanceStatus) {
 		this.acceptanceStatus = acceptanceStatus;
+	}
+	
+	public boolean unableToJoin() {
+		return acceptanceStatus == AcceptanceType.N;
 	}
 
 	public boolean isIslamic() {

@@ -1,6 +1,7 @@
 package Tables;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,6 +33,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
 import MainApp.MainApp;
@@ -333,6 +335,7 @@ public class StudentTable extends JFrame {
 					int modelRow = table.convertRowIndexToModel(viewRow);
 					studentText.setText(
 							internalStudents.get(table.getModel().getValueAt(modelRow, 0)).toString(mode, date));
+					studentText.setCaretPosition(0);
 				}
 			}
 		});
@@ -381,10 +384,12 @@ public class StudentTable extends JFrame {
 		form.add(statusLabel);
 		studentText = new JTextArea();
 		statusLabel.setLabelFor(studentText);
-		studentText.setPreferredSize(new Dimension(studentText.getWidth(), 200));
 		studentText.setBorder(BorderFactory.createLineBorder(Color.gray));
 		studentText.setEditable(false);
 		JScrollPane scroll = new JScrollPane(studentText);
+		scroll.setPreferredSize(new Dimension(studentText.getWidth(), mode == 0 ? 150 : 200));
+		scroll.setWheelScrollingEnabled(true);
+		scroll.setFocusable(false);
 		form.add(scroll);
 
 		if (mode == 0) {
@@ -406,6 +411,28 @@ public class StudentTable extends JFrame {
 		perSectionText = new JLabel();
 		form.add(perSectionText);
 		updatePerSectionText();
+
+		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+					boolean hasFocus, int row, int col) {
+
+				super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+
+				Integer ID = (Integer) table.getModel().getValueAt(row, 0);
+				Student student = internalStudents.get(ID);
+				if (student.unableToJoin()) {
+					setBackground(Color.GRAY);
+					setForeground(Color.WHITE);
+				} else {
+					setBackground(table.getBackground());
+					setForeground(table.getForeground());
+				}
+				return this;
+			}
+		});
 
 		SpringUtilities.makeCompactGrid(form, mode == 0 ? 6 : 4, 2, 6, 6, 6, 6);
 		self.add(form);

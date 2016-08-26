@@ -16,7 +16,7 @@ import Visualizers.SeatVisualizer;
 
 public class SeatAssigner {
 	
-	public static final boolean used = false;
+	public static final boolean used = true;
 	
 	public static void assignAll(Map<Integer, Student> db) {
 		if (!used)
@@ -27,8 +27,13 @@ public class SeatAssigner {
 				String[] tuples = seat.split(",");
 				if (tuples.length == 2) {
 					Integer ID = 5988000 + Integer.parseInt(tuples[0]);
+					Student student = db.get(ID);
+					if (student == null) {
+						System.out.println("ID: " + ID + " not found");
+						continue;
+					}
 					Position<Integer, Integer> position = Position.positionFromCellString(tuples[1]);
-					db.get(ID).setPosition(position);
+					student.setPosition(position);
 				}
 			}
 		} catch (IOException e) {

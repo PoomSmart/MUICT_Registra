@@ -29,6 +29,8 @@ class SeatPanel extends JPanel {
 	private Map<Integer, Student> students;
 
 	private static final int textGap = 10;
+	
+	private int blue, yellow, gray;
 
 	private Cell<String, Integer> selectedCell;
 
@@ -90,6 +92,7 @@ class SeatPanel extends JPanel {
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		blue = yellow = gray = 0;
 		int tileWidth = SeatVisualizer.tileSize.width;
 		int tileHeight = SeatVisualizer.tileSize.height;
 		int shiftLeft = SeatVisualizer.shiftLeft;
@@ -108,12 +111,18 @@ class SeatPanel extends JPanel {
 				boolean found = false;
 				for (Student student : students.values()) {
 					if (Position.isSame(student.getPosition(), x, y)) {
-						if (student.isNormal())
+						if (student.isNormal()) {
 							g.setColor(Color.blue);
-						else if (student.isLeft())
+							blue++;
+						}
+						else if (student.isLeft()) {
 							g.setColor(Color.yellow);
-						else if (student.isAbsent())
+							yellow++;
+						}
+						else if (student.isAbsent()) {
 							g.setColor(Color.getHSBColor(0.0f, 0.0f, 0.9f));
+							gray++;
+						}
 						g.fillRect(shiftLeft + x * tileWidth, shiftTop + y * tileHeight, tileWidth, tileHeight);
 						found = true;
 						break;
@@ -145,6 +154,7 @@ class SeatPanel extends JPanel {
 				SeatVisualizer.absoluteSize.height);
 		g.drawLine(shiftLeft, SeatVisualizer.absoluteSize.height, SeatVisualizer.absoluteSize.width,
 				SeatVisualizer.absoluteSize.height);
+		g.drawString(String.format("Present: %d, Leave: %d, Absent: %d, Completeness: %.2f%%", blue, yellow, gray, (100.0 * blue / (blue + yellow + gray))), shiftLeft, SeatVisualizer.absoluteSize.height + textGap * 2);
 	}
 
 }
@@ -166,7 +176,7 @@ public class SeatVisualizer extends JFrame {
 	private Map<Integer, Student> currentStudents;
 
 	public SeatVisualizer() {
-		this.setTitle(WindowUtils.realTitle("Seat Visualizer"));
+		this.setTitle(WindowUtils.realTitle("Stand Cheer Seats"));
 		this.setSize(absoluteSize.width + shiftLeft, absoluteSize.height + (int) (tileSize.height * 1.5) + shiftTop);
 		getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 0, 1));
 		WindowUtils.setRelativeCenter(this, -this.getWidth() + bounds.width / 2 - 50, 0);

@@ -18,7 +18,7 @@ public class AcceptanceAssigner {
 			for (String fID : ncList) {
 				Integer ID = CommonUtils.getID("5988" + fID);
 				if (ID != -1)
-					db.get(ID).setAcceptanceStatus(Student.AcceptanceType.DS); 
+					db.get(ID).setAcceptanceStatus(Student.AcceptanceType.DontSee); 
 			}
 			List<String> yList = FileUtils.readLines(new File("acceptance-y.csv"));
 			for (String fID : yList) {
@@ -35,7 +35,7 @@ public class AcceptanceAssigner {
 			for (Integer ID : db.keySet()) {
 				Student student = db.get(ID);
 				if (student.getAcceptanceStatus().equals("-"))
-					student.setAcceptanceStatus(Student.AcceptanceType.Null);
+					student.setAcceptanceStatus(Student.AcceptanceType.Unknown);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

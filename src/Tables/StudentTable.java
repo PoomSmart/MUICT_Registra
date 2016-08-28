@@ -448,7 +448,8 @@ public class StudentTable extends JFrame {
 				Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
 				if (isSelected)
 					return c;
-				Integer ID = (Integer) table.getModel().getValueAt(row, 0);
+				int modelRow = table.getRowSorter().convertRowIndexToModel(row);
+				Integer ID = (Integer) table.getModel().getValueAt(modelRow, 0);
 				Student student = internalStudents.get(ID);
 				if (student.unableToJoin()) {
 					c.setBackground(Color.GRAY);

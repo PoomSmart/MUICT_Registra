@@ -310,25 +310,41 @@ public class StudentTable extends JFrame {
 				return data[row][col];
 			}
 
-			public Class<? extends Object> getColumnClass(int c) {
-				Object value = getValueAt(0, c);
-				return value != null ? value.getClass() : Object.class;
-			}
-
 		}
 
 		StudentTableModel model = new StudentTableModel();
 		table = new JTable(model);
 		table.setFillsViewportHeight(true);
 		table.setAutoCreateRowSorter(true);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table.setRowSelectionAllowed(true);
+		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		sorter = new TableRowSorter<StudentTableModel>(model);
 		table.setRowSorter(sorter);
 		table.setPreferredScrollableViewportSize(new Dimension(this.getWidth(), this.getHeight() - 250));
-
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent event) {
-				int viewRow = table.getSelectedRow();
+			public void valueChanged(ListSelectionEvent e) {
+				ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+				int selectedRows = 0;
+				int minIndex = -1;
+				int maxIndex = -1;
+				if (!lsm.isSelectionEmpty()) {
+					minIndex = lsm.getMinSelectionIndex();
+					maxIndex = lsm.getMaxSelectionIndex();
+					for (int i = minIndex; i <= maxIndex; i++) {
+						if (lsm.isSelectedIndex(i))
+							selectedRows++;
+					}
+				}
+				if (selectedRows > 1) {
+					StringBuilder sb = new StringBuilder();
+					sb.append("Selected items: " + selectedRows + "\n");
+					sb.append("Min index: " + minIndex + "\n");
+					sb.append("Max index: " + maxIndex);
+					studentText.setText(sb.toString());
+					sb = null;
+					return;
+				}
+				int viewRow = minIndex;
 				if (viewRow < 0)
 					studentText.setText("");
 				else {
@@ -420,7 +436,8 @@ public class StudentTable extends JFrame {
 					boolean hasFocus, int row, int col) {
 
 				super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-
+				if (isSelected)
+					return this;
 				Integer ID = (Integer) table.getModel().getValueAt(row, 0);
 				Student student = internalStudents.get(ID);
 				if (student.unableToJoin()) {

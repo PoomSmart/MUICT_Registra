@@ -88,6 +88,12 @@ public class StudentTable extends JFrame {
 			"Acceptance", "Position", "Bann", "Section" };
 	private static final String[] names_global = { "ID", "First Name", "Last Name", "Nickname", "Gender", "#Present",
 			"#Leave", "#Absence", "Bann", "Section" };
+	@SuppressWarnings("rawtypes")
+	private static final Class[] columns = new Class[] { Integer.class, String.class, String.class, String.class,
+			String.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class };
+	@SuppressWarnings("rawtypes")
+	private static final Class[] columns_global = new Class[] { Integer.class, String.class, String.class,
+			String.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class };
 
 	private TableRowSorter<? extends AbstractTableModel> sorter;
 
@@ -310,6 +316,10 @@ public class StudentTable extends JFrame {
 				return data[row][col];
 			}
 
+			public Class<?> getColumnClass(int col) {
+				return mode == 0 ? columns[col] : columns_global[col];
+			}
+
 		}
 
 		StudentTableModel model = new StudentTableModel();
@@ -435,21 +445,22 @@ public class StudentTable extends JFrame {
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
 					boolean hasFocus, int row, int col) {
 
-				super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+				Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
 				if (isSelected)
-					return this;
+					return c;
 				Integer ID = (Integer) table.getModel().getValueAt(row, 0);
 				Student student = internalStudents.get(ID);
 				if (student.unableToJoin()) {
-					setBackground(Color.GRAY);
-					setForeground(Color.WHITE);
+					c.setBackground(Color.GRAY);
+					c.setForeground(Color.WHITE);
 				} else {
-					setBackground(table.getBackground());
-					setForeground(table.getForeground());
+					c.setBackground(table.getBackground());
+					c.setForeground(table.getForeground());
 				}
-				return this;
+				return c;
 			}
 		});
+		table.setDefaultRenderer(Integer.class, table.getDefaultRenderer(Object.class));
 
 		SpringUtilities.makeCompactGrid(form, mode == 0 ? 6 : 4, 2, 6, 6, 6, 6);
 		self.add(form);

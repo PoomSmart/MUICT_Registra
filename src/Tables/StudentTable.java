@@ -37,6 +37,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
 import MainApp.MainApp;
+import Objects.Position;
 import Objects.Status;
 import Objects.Student;
 import Utilities.DBUtils;
@@ -90,7 +91,7 @@ public class StudentTable extends JFrame {
 			"#Leave", "#Absence", "Bann", "Section" };
 	@SuppressWarnings("rawtypes")
 	private static final Class[] columns = new Class[] { Integer.class, String.class, String.class, String.class,
-			String.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class };
+			String.class, Status.class, String.class, Position.class, Integer.class, Integer.class };
 	@SuppressWarnings("rawtypes")
 	private static final Class[] columns_global = new Class[] { Integer.class, String.class, String.class,
 			String.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class };
@@ -317,7 +318,8 @@ public class StudentTable extends JFrame {
 			}
 
 			public Class<?> getColumnClass(int col) {
-				return mode == 0 ? columns[col] : columns_global[col];
+				Class<?> clazz = mode == 0 ? columns[col] : columns_global[col];
+				return clazz;
 			}
 
 		}
@@ -448,7 +450,7 @@ public class StudentTable extends JFrame {
 				Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
 				if (isSelected)
 					return c;
-				int modelRow = table.getRowSorter().convertRowIndexToModel(row);
+				int modelRow = sorter.convertRowIndexToModel(row);
 				Integer ID = (Integer) table.getModel().getValueAt(modelRow, 0);
 				Student student = internalStudents.get(ID);
 				if (student.unableToJoin()) {

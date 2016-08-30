@@ -27,7 +27,6 @@ public class Student implements Cloneable {
 	private AcceptanceType acceptanceStatus;
 	private final int bann;
 	private final boolean islamic;
-	private boolean football;
 
 	public enum AcceptanceType {
 		Y, N, DontSee, Unknown
@@ -56,7 +55,6 @@ public class Student implements Cloneable {
 		this.foodPreference = foodPreference;
 		this.islamic = foodPreference.contains("Islam");
 		this.acceptanceStatus = acceptanceStatus;
-		this.football = false;
 	}
 
 	public Integer getID() {
@@ -243,7 +241,6 @@ public class Student implements Cloneable {
 		student.statuses = new TreeMap<String, Status>();
 		student.position = position.clone();
 		student.cellPosition = cellPosition;
-		student.football = football;
 		for (Map.Entry<String, Status> entry : statuses.entrySet()) {
 			String date = entry.getKey();
 			Status status = entry.getValue().clone();
@@ -314,14 +311,6 @@ public class Student implements Cloneable {
 
 	public boolean isIslamic() {
 		return islamic;
-	}
-
-	public boolean isFootball() {
-		return football;
-	}
-
-	public void setFootball(boolean football) {
-		this.football = football;
 	}
 
 }

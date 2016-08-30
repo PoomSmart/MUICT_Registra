@@ -5,7 +5,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +19,7 @@ import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -44,6 +48,7 @@ import Utilities.DBUtils;
 import Utilities.DateUtils;
 import Utilities.SpringUtilities;
 import Utilities.WindowUtils;
+import Visualizers.GraphPanel;
 
 public class StudentTable extends JFrame {
 
@@ -51,7 +56,7 @@ public class StudentTable extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
-	public static StudentTable activeTable = null;
+	public static Vector<StudentTable> activeTables = new Vector<StudentTable>();
 
 	private Map<Integer, Student> internalStudents;
 
@@ -70,8 +75,6 @@ public class StudentTable extends JFrame {
 	public static int totalLeft;
 	public static int totalPresentIslamic;
 	public static int totalIslamic;
-	public static int totalPresentFootball;
-	public static int totalFootball;
 
 	public static int totalEverydayAttend;
 	public static int totalSomeAttend;
@@ -88,23 +91,23 @@ public class StudentTable extends JFrame {
 	private static final String[] names = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Status",
 			"Acceptance", "Position", "Bann", "Section" };
 	private static final String[] names_global = { "ID", "First Name", "Last Name", "Nickname", "Gender", "#Present",
-			"#Leave", "#Absence", "Bann", "Section" };
+			"#Here", "#Leave", "#Absence", "Bann", "Section", "Position" };
 	@SuppressWarnings("rawtypes")
 	private static final Class[] columns = new Class[] { Integer.class, String.class, String.class, String.class,
 			String.class, Status.class, String.class, Position.class, Integer.class, Integer.class };
 	@SuppressWarnings("rawtypes")
-	private static final Class[] columns_global = new Class[] { Integer.class, String.class, String.class,
-			String.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class };
+	private static final Class[] columns_global = new Class[] { Integer.class, String.class, String.class, String.class,
+			String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class,
+			Position.class };
 
 	private TableRowSorter<? extends AbstractTableModel> sorter;
 
 	public static void updateIfPossible() {
-		if (activeTable != null) {
+		for (StudentTable activeTable : activeTables) {
 			System.out.println("Update StudentTable");
 			activeTable.updateInternalStudents();
 			((AbstractTableModel) activeTable.table.getModel()).fireTableDataChanged();
-		} else
-			System.out.println("Null StudentTable");
+		}
 	}
 
 	private Object[][] toData(Map<Integer, Student> students, int mode) {
@@ -127,11 +130,15 @@ public class StudentTable extends JFrame {
 				arr[i][8] = student.getBann();
 				arr[i][9] = student.getSection();
 			} else {
-				arr[i][5] = student.getPresentCount();
-				arr[i][6] = student.getLeaveCount();
-				arr[i][7] = student.getAbsenceCount();
-				arr[i][8] = student.getBann();
-				arr[i][9] = student.getSection();
+				int presentCount = student.getPresentCount();
+				int leaveCount = student.getLeaveCount();
+				arr[i][5] = presentCount;
+				arr[i][6] = presentCount + leaveCount;
+				arr[i][7] = leaveCount;
+				arr[i][8] = student.getAbsenceCount();
+				arr[i][9] = student.getBann();
+				arr[i][10] = student.getSection();
+				arr[i][11] = student.getCellPosition();
 			}
 			i++;
 		}
@@ -145,9 +152,8 @@ public class StudentTable extends JFrame {
 	private void updateStatText() {
 		if (statText != null)
 			statText.setText(String.format(
-					"Total Present: %d (Islamic: %d/%d), Total Absent: %d, Total Left: %d, Football: (%d/%d), Total Attended: At most %d",
-					totalPresent, totalPresentIslamic, totalIslamic, totalAbsent, totalLeft, totalPresentFootball,
-					totalFootball, totalPresent + totalLeft));
+					"Total Present: %d (Islamic: %d/%d), Total Absent: %d, Total Left: %d, Total Attended: At most %d",
+					totalPresent, totalPresentIslamic, totalIslamic, totalAbsent, totalLeft, totalPresent + totalLeft));
 	}
 
 	private void updateBannText() {
@@ -191,7 +197,6 @@ public class StudentTable extends JFrame {
 			bannPresentCount = new int[10];
 			totalIslamic = totalPresentIslamic = 0;
 			totalPresent = totalAbsent = totalLeft = 0;
-			totalPresentFootball = totalFootball = 0;
 			internalStudents = null;
 			internalStudents = DBUtils.getStudents(DateUtils.dateFromString(date));
 			for (Entry<Integer, Student> entry : internalStudents.entrySet()) {
@@ -205,11 +210,6 @@ public class StudentTable extends JFrame {
 					totalAbsent++;
 				else if (student.isLeft(date))
 					totalLeft++;
-				if (student.isFootball()) {
-					if (student.isNormal(date))
-						totalPresentFootball++;
-					totalFootball++;
-				}
 				if (student.isIslamic()) {
 					if (student.isNormal(date))
 						totalPresentIslamic++;
@@ -439,6 +439,23 @@ public class StudentTable extends JFrame {
 		perSectionText = new JLabel();
 		form.add(perSectionText);
 		updatePerSectionText();
+		if (mode != 0) {
+			JButton getGraphBtn = new JButton("Graph");
+			getGraphBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Map<Integer, Integer> data = new HashMap<Integer, Integer>();
+					for (Student student : internalStudents.values()) {
+						int presentCount = student.getPresentCount();
+						int leaveCount = student.getLeaveCount();
+						int key = presentCount + leaveCount;
+						data.put(key, 1 + data.getOrDefault(key, 0));
+					}
+					GraphPanel.constructGraph("Present + Leave", data.values());
+				}
+			});
+			form.add(getGraphBtn);
+			form.add(new JLabel());
+		}
 
 		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 			private static final long serialVersionUID = 1L;
@@ -465,12 +482,17 @@ public class StudentTable extends JFrame {
 		});
 		table.setDefaultRenderer(Integer.class, table.getDefaultRenderer(Object.class));
 
-		SpringUtilities.makeCompactGrid(form, mode == 0 ? 6 : 4, 2, 6, 6, 6, 6);
+		SpringUtilities.makeCompactGrid(form, mode == 0 ? 6 : 5, 2, 6, 6, 6, 6);
 		self.add(form);
 		this.setContentPane(self);
 		this.pack();
 		WindowUtils.setCenter(this);
-		activeTable = this;
+		activeTables.add(this);
+		this.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				activeTables.remove(this);
+			}
+		});
 		if (dateSelector != null)
 			dateSelector.setSelectedIndex(dateSelector.getItemCount() - 1);
 		filterText.requestFocus();

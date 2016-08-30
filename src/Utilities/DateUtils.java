@@ -84,6 +84,8 @@ public class DateUtils {
 	public static boolean isBusinessDay(Calendar cal) {
 		if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
 			return false;
+		if (cal.get(Calendar.DAY_OF_MONTH) == 31 && cal.get(Calendar.MONTH) == Calendar.AUGUST)
+			return false;
 		return true;
 	}
 }

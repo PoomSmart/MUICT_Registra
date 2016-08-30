@@ -1,4 +1,5 @@
 package Dialogs;
+
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,20 +24,22 @@ import Workers.Logger;
 public class ControlCenterDialog extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public static ControlCenterDialog currentDialog = null;
-	
+
 	public JButton showDBButton;
 	public JButton showLogButton;
 	public JButton clearPresentButton;
 	public JButton randomPresentButton;
 	public JButton clearLeaveButton;
-	
+
 	private static Object[] dbOptions = { "Single", "All" };
-	
+
 	public void showStudentTable(int result) {
-		result = result == -1 ? JOptionPane.showOptionDialog(null, "Select type:", "Attendance Type",
-				JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, dbOptions, dbOptions[0]) : result;
+		result = result == -1
+				? JOptionPane.showOptionDialog(null, "Select type:", "Attendance Type",
+						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, dbOptions, dbOptions[0])
+				: result;
 		if (result != JOptionPane.CLOSED_OPTION) {
 			StudentTable stuTable = new StudentTable(result);
 			stuTable.setVisible(true);
@@ -61,8 +64,8 @@ public class ControlCenterDialog extends JFrame {
 		Object[] logOptions = { "Current", "All" };
 		showLogButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int result = JOptionPane.showOptionDialog(null, "Select type:", "Log Type", JOptionPane.YES_NO_CANCEL_OPTION,
-						JOptionPane.PLAIN_MESSAGE, null, logOptions, logOptions[0]);
+				int result = JOptionPane.showOptionDialog(null, "Select type:", "Log Type",
+						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, logOptions, logOptions[0]);
 				switch (result) {
 				case 0:
 					Logger.showLog(DateUtils.getCurrentDate(), true, true);
@@ -73,44 +76,46 @@ public class ControlCenterDialog extends JFrame {
 			}
 		});
 		getContentPane().add(showLogButton);
-		
-		clearPresentButton = new JButton("Clear Present");
-		clearPresentButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int result = JOptionPane.showConfirmDialog(null, Constants.COMMON_CONFIRM, getTitle(), JOptionPane.YES_NO_OPTION);
-				if (result == JOptionPane.YES_OPTION) {
-					System.out.println("Clear current present.csv");
-					try {
-						FileUtils.write(CommonUtils.fileFromType(FileType.REGULAR), "");
-						// empty present.csv = empty leave.csv
-						FileUtils.write(CommonUtils.fileFromType(FileType.NOTHERE), "");
-						SeatVisualizer.updateIfPossible();
-					} catch (IOException ex) {
-						ex.printStackTrace();
-					}
-				}
-			}
-		});
-		getContentPane().add(clearPresentButton);
-		
-		clearLeaveButton = new JButton("Clear Leave");
-		clearLeaveButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int result = JOptionPane.showConfirmDialog(null, Constants.COMMON_CONFIRM, getTitle(), JOptionPane.YES_NO_OPTION);
-				if (result == JOptionPane.YES_OPTION) {
-					System.out.println("Clear current leave.csv");
-					try {
-						FileUtils.write(CommonUtils.fileFromType(FileType.NOTHERE), "");
-						SeatVisualizer.updateIfPossible();
-					} catch (IOException ex) {
-						ex.printStackTrace();
-					}
-				}
-			}
-		});
-		getContentPane().add(clearLeaveButton);
-		
+
 		if (MainApp.test) {
+			clearPresentButton = new JButton("Clear Present");
+			clearPresentButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					int result = JOptionPane.showConfirmDialog(null, Constants.COMMON_CONFIRM, getTitle(),
+							JOptionPane.YES_NO_OPTION);
+					if (result == JOptionPane.YES_OPTION) {
+						System.out.println("Clear current present.csv");
+						try {
+							FileUtils.write(CommonUtils.fileFromType(FileType.REGULAR), "");
+							// empty present.csv = empty leave.csv
+							FileUtils.write(CommonUtils.fileFromType(FileType.NOTHERE), "");
+							SeatVisualizer.updateIfPossible();
+						} catch (IOException ex) {
+							ex.printStackTrace();
+						}
+					}
+				}
+			});
+			getContentPane().add(clearPresentButton);
+
+			clearLeaveButton = new JButton("Clear Leave");
+			clearLeaveButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					int result = JOptionPane.showConfirmDialog(null, Constants.COMMON_CONFIRM, getTitle(),
+							JOptionPane.YES_NO_OPTION);
+					if (result == JOptionPane.YES_OPTION) {
+						System.out.println("Clear current leave.csv");
+						try {
+							FileUtils.write(CommonUtils.fileFromType(FileType.NOTHERE), "");
+							SeatVisualizer.updateIfPossible();
+						} catch (IOException ex) {
+							ex.printStackTrace();
+						}
+					}
+				}
+			});
+			getContentPane().add(clearLeaveButton);
+
 			randomPresentButton = new JButton("Random Present");
 			randomPresentButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {

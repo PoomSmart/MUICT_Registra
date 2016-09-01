@@ -32,7 +32,6 @@ import Utilities.DateUtils;
 import Utilities.WindowUtils;
 import Visualizers.SeatVisualizer;
 import Workers.AcceptanceAssigner;
-import Workers.AllergiesAssigner;
 import Workers.SeatAssigner;
 import Workers.SpecialAssigner;
 
@@ -126,7 +125,6 @@ public class MainApp {
 		}
 		Map<Integer, Student> students = new StudentDatabase("batch-14-new2.csv").getStudents();
 		randomPosition(db = students);
-		AllergiesAssigner.assignAll(db);
 		AcceptanceAssigner.assignAll(db);
 		SpecialAssigner.assignAll(db);
 		SeatAssigner.assignAll(db);

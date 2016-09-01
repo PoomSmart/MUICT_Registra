@@ -59,7 +59,7 @@ public class ScannerDialog extends JFrame {
 	private JTextField field;
 	private JButton confirmRegularBtn;
 	private JButton appendRegularBtn;
-	
+
 	private boolean shouldCleanup;
 	private boolean removeLabel;
 
@@ -219,14 +219,23 @@ public class ScannerDialog extends JFrame {
 				}
 				return false;
 			}
-			
+
 			public void parseText(String text) {
 				// Shortcut section
-				if (text.length() == 3 && !"208222".contains(text)) {
-					Integer ID = CommonUtils.getID("5988" + text);
-					if (ID / 1000 == 5988) {
-						addID(ID);
-						return;
+				if (!"208222".contains(text)) {
+					Integer ID;
+					if (text.length() == 3) {
+						ID = CommonUtils.getID("5988" + text);
+						if (ID / 1000 == 5988) {
+							addID(ID);
+							return;
+						}
+					} else if (text.replaceAll("p", "p5888").matches("p" + CommonUtils.pMUICTID)) {
+						ID = CommonUtils.getID("5888" + text.substring(1, text.length()));
+						if (ID != -1) {
+							addID(ID);
+							return;
+						}
 					}
 				}
 				Matcher m;
@@ -254,7 +263,6 @@ public class ScannerDialog extends JFrame {
 					if (!MainApp.test) {
 						if (stringLength == 14) {
 							ID = CommonUtils.getID(text.substring(6, 6 + 7));
-							//ID = ID % 100000 + 5900000;
 							if (ID == -1) {
 								cleanupTextField();
 								return;
@@ -272,7 +280,7 @@ public class ScannerDialog extends JFrame {
 					addID(ID);
 				}
 			}
-			
+
 			public void addID(Integer ID) {
 				if (ID == -1)
 					return;

@@ -22,8 +22,8 @@ public class ScannerListDialog extends JFrame {
 	public ScannerListDialog() {
 		this.setTitle(WindowUtils.realTitle("Scanned Codes"));
 		this.setLayout(new GridLayout(defaultMaxListCount, 1));
-		this.setSize(550, 600);
-		WindowUtils.setRelativeCenter(this, 500, 0);
+		this.setSize(470, 500);
+		WindowUtils.setRelativeCenter(this, 470, 0);
 		this.IDs = new Vector<Integer>();
 		this.labels = new Vector<JLabel>();
 	}

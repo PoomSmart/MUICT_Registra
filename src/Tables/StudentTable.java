@@ -23,6 +23,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -188,16 +189,12 @@ public class StudentTable extends JFrame {
 	}
 
 	public void updateInternalStudents() {
-		perSectionCount = null;
 		perSectionCount = new int[3];
 		if (mode == 0) {
-			bannCount = null;
 			bannCount = new int[10];
-			bannPresentCount = null;
 			bannPresentCount = new int[10];
 			totalIslamic = totalPresentIslamic = 0;
 			totalPresent = totalAbsent = totalLeft = 0;
-			internalStudents = null;
 			internalStudents = DBUtils.getStudents(DateUtils.dateFromString(date));
 			for (Entry<Integer, Student> entry : internalStudents.entrySet()) {
 				Student student = entry.getValue();
@@ -440,17 +437,24 @@ public class StudentTable extends JFrame {
 		form.add(perSectionText);
 		updatePerSectionText();
 		if (mode != 0) {
-			JButton getGraphBtn = new JButton("Graph");
+			JButton getGraphBtn = new JButton("Worker");
 			getGraphBtn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					Map<Integer, Integer> data = new HashMap<Integer, Integer>();
+					Object[] options = { "Present+Leave" };
+					int result = JOptionPane.showOptionDialog(null, "Choose Type", "Worker", 0, 0, null, options,
+							options[0]);
+					Map<Integer, Integer> data = result == 0 ? new HashMap<Integer, Integer>() : null;
 					for (Student student : internalStudents.values()) {
-						int presentCount = student.getPresentCount();
-						int leaveCount = student.getLeaveCount();
-						int key = presentCount + leaveCount;
-						data.put(key, 1 + data.getOrDefault(key, 0));
+						if (result == 1) {
+							int presentCount = student.getPresentCount();
+							int leaveCount = student.getLeaveCount();
+							int key = presentCount + leaveCount;
+							data.put(key, 1 + data.getOrDefault(key, 0));
+						}
 					}
-					GraphPanel.constructGraph("Present + Leave", data.values());
+					if (result == 0)
+						GraphPanel.constructGraph("Present + Leave", data.values());
+					data = null;
 				}
 			});
 			form.add(getGraphBtn);
@@ -473,6 +477,9 @@ public class StudentTable extends JFrame {
 				if (student.unableToJoin()) {
 					c.setBackground(Color.GRAY);
 					c.setForeground(Color.WHITE);
+				} else if (!student.isFreshman()) {
+					c.setBackground(Color.YELLOW);
+					c.setForeground(Color.DARK_GRAY);
 				} else {
 					c.setBackground(table.getBackground());
 					c.setForeground(table.getForeground());

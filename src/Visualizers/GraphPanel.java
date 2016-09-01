@@ -10,12 +10,15 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 public class GraphPanel extends JPanel {
 
@@ -26,6 +29,7 @@ public class GraphPanel extends JPanel {
 	private int labelPadding = 25;
 	private Color pointColor = new Color(100, 100, 100, 180);
 	private Color gridColor = new Color(200, 200, 200, 200);
+	private Map<Integer, Color> graphColors = new HashMap<Integer, Color>();
 	private static final Stroke GRAPH_STROKE = new BasicStroke(2f);
 	private int pointWidth = 4;
 	private int numberYDivisions = 10;
@@ -36,7 +40,7 @@ public class GraphPanel extends JPanel {
 
 	public static double xMultiplier = 1;
 
-	public GraphPanel(List<List<Integer>> scores) {
+	public GraphPanel(String name, List<List<Integer>> scores) {
 		this.data = scores;
 		for (List<Integer> subscores : scores) {
 			if (currentMaxVersions < subscores.size()) {
@@ -44,6 +48,11 @@ public class GraphPanel extends JPanel {
 				currentMaxVersions = subscores.size();
 			}
 		}
+		JFrame frame = new JFrame(name == null ? "Multiple data" : name);
+		frame.getContentPane().add(this);
+		frame.pack();
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
 	}
 
 	@Override
@@ -122,8 +131,9 @@ public class GraphPanel extends JPanel {
 
 		Stroke oldStroke = g2.getStroke();
 		g2.setStroke(GRAPH_STROKE);
+		int colorIndex = 0;
 		for (List<Point> subgraphPoints : graphPoints) {
-			g2.setColor(new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256)));
+			g2.setColor(graphColors.getOrDefault(colorIndex++, new Color(random.nextInt(230), random.nextInt(230), random.nextInt(230))));
 			for (int i = 0; i < subgraphPoints.size() - 1; i++) {
 				int x1 = subgraphPoints.get(i).x;
 				int y1 = subgraphPoints.get(i).y;
@@ -178,20 +188,26 @@ public class GraphPanel extends JPanel {
 	public List<List<Integer>> getScores() {
 		return data;
 	}
+	
+	public void addGraphColor(Integer index, Color color) {
+		graphColors.put(index, color);
+	}
+	
+	public void clearGraphColors() {
+		graphColors.clear();
+	}
 
-	public static void _constructGraphs(String name, List<List<Integer>> data) {
-		GraphPanel mainPanel = new GraphPanel(data);
-		if (name == null)
-			name = "Multiple data";
-		JFrame frame = new JFrame(name);
-		frame.getContentPane().add(mainPanel);
-		frame.pack();
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
+	public static void constructGraphs(String name, List<List<Integer>> data) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new GraphPanel(name, data);
+			}
+		});
 	}
 
 	public static void constructGraphs(List<List<Integer>> scores) {
-		_constructGraphs(null, scores);
+		constructGraphs(null, scores);
 	}
 
 	public static void constructGraph(String name, Collection<Integer> data) {
@@ -200,6 +216,6 @@ public class GraphPanel extends JPanel {
 		for (Integer d : data)
 			subscores.add(d);
 		scores.add(subscores);
-		_constructGraphs(name, scores);
+		constructGraphs(name, scores);
 	}
 }

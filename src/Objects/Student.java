@@ -27,6 +27,7 @@ public class Student implements Cloneable {
 	private AcceptanceType acceptanceStatus;
 	private final int bann;
 	private final boolean islamic;
+	private final boolean freshman;
 
 	public enum AcceptanceType {
 		Y, N, DontSee, Unknown
@@ -36,7 +37,8 @@ public class Student implements Cloneable {
 			String healthCondition, String medicalAllergies, String foodAllergies, String foodPreference,
 			AcceptanceType acceptanceStatus) {
 		this.ID = ID;
-		int tID = ID - 5988000;
+		this.freshman = ID / 100000 == 59;
+		int tID = ID % 1000;
 		int tbann = ((tID % 100) / 10);
 		this.bann = tbann == 0 ? 1 : (tID % 10 == 0 ? tbann : tbann + 1);
 		this.firstname = firstname;
@@ -113,6 +115,10 @@ public class Student implements Cloneable {
 
 	public Status getCurrentStatus() {
 		return getStatus(DateUtils.getCurrentFormattedDate());
+	}
+	
+	public Map<String, Status> getStatuses() {
+		return statuses;
 	}
 
 	public Integer getTypeCount(Status.Type type) {
@@ -311,6 +317,10 @@ public class Student implements Cloneable {
 
 	public boolean isIslamic() {
 		return islamic;
+	}
+
+	public boolean isFreshman() {
+		return freshman;
 	}
 
 }

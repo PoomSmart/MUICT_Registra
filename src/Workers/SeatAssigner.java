@@ -26,7 +26,7 @@ public class SeatAssigner {
 			for (String seat : seats) {
 				String[] tuples = seat.split(",");
 				if (tuples.length == 2) {
-					Integer ID = 5988000 + Integer.parseInt(tuples[0]);
+					Integer ID = Integer.parseInt(tuples[0]);
 					Student student = db.get(ID);
 					if (student == null) {
 						System.out.println("ID: " + ID + " not found");
@@ -59,7 +59,7 @@ public class SeatAssigner {
 					position = new Position<>(r.nextInt(width), r.nextInt(height));
 				} while (positions.contains(position) && (numRandom++ < 20 || !small));
 				positions.add(position);
-				sb.append(String.format("%03d,%s\n", student.getID() - 5988000, position.toCellString()));
+				sb.append(String.format("%d,%s\n", student.getID(), position.toCellString()));
 			}
 		}
 		positions = null;

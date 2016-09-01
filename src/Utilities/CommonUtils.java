@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import javax.swing.JOptionPane;
-
 import Objects.Cell;
 import Objects.Constants;
 import Objects.Position;
@@ -46,10 +44,6 @@ public class CommonUtils {
 	public static final String pMUICTID = "\\d\\d88\\d\\d\\d";
 
 	public static Integer getID(String sID) {
-		if (!sID.startsWith("5988")) {
-			JOptionPane.showMessageDialog(null, "Where did you get this ID Card? : " + sID);
-			return -1;
-		}
 		if (!sID.matches(pMUICTID))
 			return -1;
 		return Integer.parseInt(sID);

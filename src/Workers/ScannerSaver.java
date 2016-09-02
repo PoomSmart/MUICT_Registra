@@ -32,7 +32,7 @@ public class ScannerSaver {
 		}
 		else {
 			if (reasons == null) {
-				System.out.println("null reason");
+				System.out.println("null reasons");
 				return;
 			}
 			StringBuilder lists = new StringBuilder();
@@ -43,7 +43,10 @@ public class ScannerSaver {
 			}
 			writer.append(lists.toString());
 			writer.close();
+			lists = null;
+			writer = null;
 		}
+		file = null;
 		System.out.println(String.format("(%s mode) %s data to %s", type, (append ? "Append" : "Write"), filePath));
 		SeatVisualizer.updateIfPossible();
 		StudentTable.updateIfPossible();

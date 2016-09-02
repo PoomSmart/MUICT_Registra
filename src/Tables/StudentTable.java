@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -19,11 +18,9 @@ import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -49,7 +46,6 @@ import Utilities.DBUtils;
 import Utilities.DateUtils;
 import Utilities.SpringUtilities;
 import Utilities.WindowUtils;
-import Visualizers.GraphPanel;
 
 public class StudentTable extends JFrame {
 
@@ -287,7 +283,7 @@ public class StudentTable extends JFrame {
 
 		JPanel self = new JPanel();
 		self.setLayout(new BoxLayout(self, BoxLayout.Y_AXIS));
-		this.setSize(1100, 850);
+		this.setSize(1100, 920);
 
 		class StudentTableModel extends AbstractTableModel {
 
@@ -412,7 +408,7 @@ public class StudentTable extends JFrame {
 		studentText.setBorder(BorderFactory.createLineBorder(Color.gray));
 		studentText.setEditable(false);
 		JScrollPane scroll = new JScrollPane(studentText);
-		scroll.setPreferredSize(new Dimension(studentText.getWidth(), mode == 0 ? 150 : 200));
+		scroll.setPreferredSize(new Dimension(studentText.getWidth(), 100));
 		scroll.setWheelScrollingEnabled(true);
 		scroll.setFocusable(false);
 		form.add(scroll);
@@ -436,30 +432,6 @@ public class StudentTable extends JFrame {
 		perSectionText = new JLabel();
 		form.add(perSectionText);
 		updatePerSectionText();
-		if (mode != 0) {
-			JButton getGraphBtn = new JButton("Worker");
-			getGraphBtn.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					Object[] options = { "Present+Leave" };
-					int result = JOptionPane.showOptionDialog(null, "Choose Type", "Worker", 0, 0, null, options,
-							options[0]);
-					Map<Integer, Integer> data = result == 0 ? new HashMap<Integer, Integer>() : null;
-					for (Student student : internalStudents.values()) {
-						if (result == 1) {
-							int presentCount = student.getPresentCount();
-							int leaveCount = student.getLeaveCount();
-							int key = presentCount + leaveCount;
-							data.put(key, 1 + data.getOrDefault(key, 0));
-						}
-					}
-					if (result == 0)
-						GraphPanel.constructGraph("Present + Leave", data.values());
-					data = null;
-				}
-			});
-			form.add(getGraphBtn);
-			form.add(new JLabel());
-		}
 
 		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 			private static final long serialVersionUID = 1L;
@@ -489,7 +461,7 @@ public class StudentTable extends JFrame {
 		});
 		table.setDefaultRenderer(Integer.class, table.getDefaultRenderer(Object.class));
 
-		SpringUtilities.makeCompactGrid(form, mode == 0 ? 6 : 5, 2, 6, 6, 6, 6);
+		SpringUtilities.makeCompactGrid(form, mode == 0 ? 6 : 4, 2, 6, 6, 6, 6);
 		self.add(form);
 		this.setContentPane(self);
 		this.pack();

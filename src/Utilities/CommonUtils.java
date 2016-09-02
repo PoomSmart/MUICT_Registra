@@ -90,7 +90,10 @@ public class CommonUtils {
 	}
 
 	public static <T> Vector<T> resolveDuplicates(Vector<T> list) {
-		return new Vector<T>(new TreeSet<T>(list));
+		TreeSet<T> treeSet = new TreeSet<T>(list);
+		Vector<T> nlist = new Vector<T>(treeSet);
+		treeSet = null;
+		return nlist;
 	}
 
 	public static String alphabet(int x) {

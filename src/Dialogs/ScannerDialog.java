@@ -287,11 +287,11 @@ public class ScannerDialog extends JFrame {
 				System.out.println("-> " + ID);
 				if (!MainApp.db.containsKey(ID)) {
 					System.out.println("ID does not exist in database: " + ID);
-					setStatus("Not Added: " + ID);
+					setStatus("Not Added (1): " + ID);
 				} else {
 					if (IDs.contains(ID)) {
 						System.out.println("ID already existed: " + ID);
-						setStatus("Not Added: " + ID);
+						setStatus("Not Added (2): " + ID);
 					} else {
 						IDs.add(ID);
 						list.addID(ID);

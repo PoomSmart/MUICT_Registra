@@ -86,6 +86,8 @@ public class DateUtils {
 			return false;
 		if (cal.get(Calendar.DAY_OF_MONTH) == 31 && cal.get(Calendar.MONTH) == Calendar.AUGUST)
 			return false;
+		if (cal.get(Calendar.DAY_OF_MONTH) == 2 && cal.get(Calendar.MONTH) == Calendar.SEPTEMBER)
+			return false;
 		return true;
 	}
 }

@@ -129,9 +129,11 @@ public class LeaveDialog extends JFrame {
 							for (String sID : presentIDs)
 								spresentIDs.add(Integer.parseInt(sID));
 							ScannerSaver.doneAddingCodes(spresentIDs, false, CommonUtils.FileType.REGULAR, true);
+							spresentIDs = null;
 						}
 						shouldCleanup = true;
 					}
+					IDs = null;
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				} finally {

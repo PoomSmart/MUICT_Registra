@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -484,7 +485,7 @@ public class StudentTable extends JFrame {
 				rf = RowFilter.regexFilter("(?i)" + filterText.getText(), 0, 1, 2, 3, 5, 6, 7, 8, 9);
 			else
 				rf = RowFilter.regexFilter("(?i)" + filterText.getText(), 0, 1, 2, 3, 4);
-		} catch (java.util.regex.PatternSyntaxException e) {
+		} catch (PatternSyntaxException e) {
 			return;
 		}
 		sorter.setRowFilter(rf);

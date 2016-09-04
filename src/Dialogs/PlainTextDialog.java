@@ -6,14 +6,17 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
 import org.apache.commons.io.FileUtils;
 
+import Utilities.SpringUtilities;
 import Utilities.WindowUtils;
 import Workers.Logger;
 
@@ -37,38 +40,37 @@ public class PlainTextDialog extends JFrame {
 		this.editable = editable;
 		WindowUtils.setCenter(this);
 
-		SpringLayout layout = new SpringLayout();
-		getContentPane().setLayout(layout);
+		JPanel self = new JPanel();
+		self.setLayout(new BoxLayout(self, BoxLayout.Y_AXIS));
+		JPanel form = new JPanel(new SpringLayout());
 
 		textArea = new JTextArea();
 		textArea.setText(initialText = text);
 		textArea.setEditable(editable);
 
-		layout.putConstraint(SpringLayout.WEST, textArea, margin, SpringLayout.WEST, getContentPane());
-		layout.putConstraint(SpringLayout.EAST, textArea, -margin, SpringLayout.EAST, getContentPane());
-		layout.putConstraint(SpringLayout.NORTH, textArea, margin, SpringLayout.NORTH, getContentPane());
-		layout.putConstraint(SpringLayout.SOUTH, textArea, -margin, SpringLayout.SOUTH, getContentPane());
-
 		JScrollPane scroll = new JScrollPane(textArea);
-		scroll.setPreferredSize(new Dimension(width - 5, height));
-		getContentPane().add(scroll);
+		scroll.setPreferredSize(new Dimension(textArea.getWidth(), height));
+		scroll.setWheelScrollingEnabled(true);
+		form.add(scroll);
+		SpringUtilities.makeCompactGrid(form, 1, 1, margin, margin, margin, margin);
 
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent windowEvent) {
 				_windowClosing();
 			}
 		});
+		self.add(form);
+		this.setContentPane(self);
 		this.setResizable(true);
 	}
-	
+
 	public void _windowClosing() {
 		if (Logger.currentDialog != null && isLog)
 			Logger.currentDialog = null;
 		if (editable && filePath != null) {
 			String newText = textArea.getText();
 			if (!initialText.equals(newText)) {
-				int result = JOptionPane.showConfirmDialog(null, "Apply changes?", title,
-						JOptionPane.YES_NO_OPTION);
+				int result = JOptionPane.showConfirmDialog(null, "Apply changes?", title, JOptionPane.YES_NO_OPTION);
 				if (result == JOptionPane.YES_OPTION) {
 					try {
 						FileUtils.write(new File(filePath), newText);

@@ -97,17 +97,18 @@ public class ControlCenterDialog extends JFrame {
 				Map<Integer, Student> students;
 				Vector<Integer> presentPerDay = result == 0 ? new Vector<Integer>() : null;
 				Vector<Integer> presentAndLeavePerDay = result == 0 ? new Vector<Integer>() : null;
-				Vector<Integer> absentPerDay = result == 0 ? new Vector<Integer>() : null;
+				Vector<Integer> leavePerDay = result == 0 ? new Vector<Integer>() : null;
+				//Vector<Integer> absentPerDay = result == 0 ? new Vector<Integer>() : null;
 				Vector<Integer> section1 = result == 1 ? new Vector<Integer>() : null;
 				Vector<Integer> section2 = result == 1 ? new Vector<Integer>() : null;
 				Vector<Integer> section3 = result == 1 ? new Vector<Integer>() : null;
 				List<List<Integer>> graphs = new Vector<List<Integer>>();
-				int presentStudents, leaveStudents, absentStudents;
+				int presentStudents, leaveStudents/*, absentStudents*/;
 				int[] perSection;
 				for (Date date : DateUtils.availableDates()) {
 					String fdate = DateUtils.getFormattedDate(date);
 					students = DBUtils.getStudents(date);
-					presentStudents = leaveStudents = absentStudents = 0;
+					presentStudents = leaveStudents = /*absentStudents =*/ 0;
 					perSection = new int[3];
 					for (Student student : students.values()) {
 						// We probably skip those unable to join at all
@@ -122,15 +123,16 @@ public class ControlCenterDialog extends JFrame {
 						} else {
 							if (student.isLeft(fdate))
 								leaveStudents++;
-							else if (student.isAbsent(fdate))
-								absentStudents++;
+							//else if (student.isAbsent(fdate))
+								//absentStudents++;
 						}
 					}
 					if (presentStudents > 0) {
 						if (result == 0) {
 							presentPerDay.add(presentStudents);
 							presentAndLeavePerDay.add(presentStudents + leaveStudents);
-							absentPerDay.add(absentStudents);
+							leavePerDay.add(leaveStudents);
+							//absentPerDay.add(absentStudents);
 						} else if (result == 1) {
 							section1.add(perSection[0]);
 							section2.add(perSection[1]);
@@ -141,7 +143,8 @@ public class ControlCenterDialog extends JFrame {
 				if (result == 0) {
 					graphs.add(presentPerDay);
 					graphs.add(presentAndLeavePerDay);
-					graphs.add(absentPerDay);
+					graphs.add(leavePerDay);
+					//graphs.add(absentPerDay);
 				} else if (result == 1) {
 					graphs.add(section1);
 					graphs.add(section2);
@@ -161,7 +164,7 @@ public class ControlCenterDialog extends JFrame {
 				}
 				presentPerDay = null;
 				presentAndLeavePerDay = null;
-				absentPerDay = null;
+				//absentPerDay = null;
 				section1 = null;
 				section2 = null;
 				section3 = null;

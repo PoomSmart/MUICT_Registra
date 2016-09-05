@@ -49,7 +49,7 @@ public class Position<X, Y> implements Cloneable {
 
 	public static Position<Integer, Integer> positionFromCellString(String cellString) {
 		Integer alphabet = cellString.charAt(0) - 'A';
-		Integer num = Integer.parseInt(cellString.substring(1, cellString.length())) - 1;
+		Integer num = Integer.parseInt(cellString.substring(1, cellString.length()));
 		return new Position<Integer, Integer>(alphabet, num);
 	}
 }

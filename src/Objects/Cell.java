@@ -23,10 +23,10 @@ public class Cell<X, Y> {
 		int cy = (y - shiftTop) / SeatVisualizer.tileSize.height;
 		int width = SeatVisualizer.bounds.width;
 		int height = SeatVisualizer.bounds.height;
-		if (cx >= width || x < shiftLeft || cy >= height || y < shiftTop)
+		if (cx > width || x < shiftLeft || cy > height || y < shiftTop)
 			return;
-		this.x = CommonUtils.alphabet(cx);
-		this.y = cy;
+		this.x = CommonUtils.alphabet(height - cy - 1);
+		this.y = width - cx;
 	}
 
 	public String toString() {

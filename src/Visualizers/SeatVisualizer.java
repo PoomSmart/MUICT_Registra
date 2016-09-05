@@ -110,7 +110,7 @@ class SeatPanel extends JPanel {
 				g.setColor(Color.white);
 				boolean found = false;
 				for (Student student : students.values()) {
-					if (Position.isSame(student.getPosition(), x, y)) {
+					if (Position.isSame(student.getPosition(), height - y - 1, width - x)) {
 						if (student.isNormal()) {
 							g.setColor(Color.blue);
 							blue++;
@@ -129,7 +129,7 @@ class SeatPanel extends JPanel {
 					}
 				}
 				if (!found) {
-					g.setColor(Color.white);
+					g.setColor(Color.getHSBColor(0.98f, 0.9f, 0.6f));
 					g.fillRect(shiftLeft + x * tileWidth, shiftTop + y * tileHeight, tileWidth, tileHeight);
 				}
 			}
@@ -167,7 +167,7 @@ public class SeatVisualizer extends JFrame {
 	
 	public static final int shiftLeft = 30;
 	public static final int shiftTop = 30;
-	public static final Dimension bounds = new Dimension(8, 8);
+	public static final Dimension bounds = new Dimension(8, 9);
 	public static final Dimension tileSize = new Dimension(40, 40);
 	public static final Dimension absoluteSize = new Dimension(bounds.width * tileSize.width + shiftLeft,
 			bounds.height * tileSize.height + shiftTop);

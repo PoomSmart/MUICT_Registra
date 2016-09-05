@@ -9,7 +9,6 @@ import Objects.Cell;
 import Objects.Constants;
 import Objects.Position;
 import Objects.Status;
-import Visualizers.SeatVisualizer;
 
 public class CommonUtils {
 
@@ -110,8 +109,7 @@ public class CommonUtils {
 	}
 
 	public static Cell<String, Integer> cellPositionByPosition(Position<Integer, Integer> pos) {
-		return new Cell<String, Integer>(alphabet(SeatVisualizer.bounds.height - pos.y - 1),
-				SeatVisualizer.bounds.width - pos.x);
+		return new Cell<String, Integer>(alphabet(pos.x), pos.y);
 	}
 
 }

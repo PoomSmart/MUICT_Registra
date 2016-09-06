@@ -7,13 +7,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.Vector;
 import java.util.regex.PatternSyntaxException;
 
@@ -39,7 +37,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
-import MainApp.MainApp;
 import Objects.Position;
 import Objects.Status;
 import Objects.Student;
@@ -214,33 +211,8 @@ public class StudentTable extends JFrame {
 			updateBannText();
 		} else {
 			totalEverydayAttend = totalSomeAttend = totalOnceAttend = 0;
-			internalStudents = new TreeMap<Integer, Student>();
-			for (Entry<Integer, Student> entry : MainApp.db.entrySet()) {
-				Integer ID = entry.getKey();
-				Student student = entry.getValue().clone();
-				internalStudents.put(ID, student);
-			}
-			Vector<Date> availableDates = DateUtils.availableDates();
-			for (Date d : availableDates) {
-				// Assigning present and absent students
-				Map<Integer, Student> presentStudents = DBUtils.getPresentStudents(d);
-				for (Integer ID : MainApp.db.keySet()) {
-					if (presentStudents.containsKey(ID))
-						internalStudents.get(ID).addStatus(d, new Status());
-					else
-						internalStudents.get(ID).addStatus(d, new Status(Status.Type.ABSENT));
-				}
-				// Assigning leave-with-reason students
-				Map<Integer, Student> leaveStudents = DBUtils.getLeaveStudents(d);
-				for (Entry<Integer, Student> entry : leaveStudents.entrySet()) {
-					Integer ID = entry.getKey();
-					Student student = entry.getValue();
-					Status leaveStatus = student.getStatus(DateUtils.getFormattedDate(d));
-					if (leaveStatus != null)
-						internalStudents.get(ID).addStatus(d, leaveStatus.clone());
-				}
-			}
-			int totalActivityDays = availableDates.size();
+			internalStudents = DBUtils.getStudentsAllTime();
+			int totalActivityDays = DateUtils.availableDates().size();
 			for (Entry<Integer, Student> entry : internalStudents.entrySet()) {
 				Student student = entry.getValue();
 				int presentCount = student.getPresentCount();
@@ -356,7 +328,7 @@ public class StudentTable extends JFrame {
 				else {
 					int modelRow = table.convertRowIndexToModel(viewRow);
 					studentText.setText(
-							internalStudents.get(table.getModel().getValueAt(modelRow, 0)).toString(mode, date));
+							internalStudents.get(table.getModel().getValueAt(modelRow, 0)).toString(mode, date, false));
 					studentText.setCaretPosition(0);
 				}
 			}

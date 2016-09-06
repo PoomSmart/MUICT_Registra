@@ -4,16 +4,16 @@ import Utilities.CommonUtils;
 import Visualizers.SeatVisualizer;
 
 public class Cell<X, Y> {
-	public String x;
-	public Integer y = -1;
+	public String alphabet;
+	public Integer number = -1;
 
-	public Cell(String x, Integer y) {
-		this.x = x;
-		this.y = y;
+	public Cell(String alphabet, Integer number) {
+		this.alphabet = alphabet;
+		this.number = number;
 	}
 
 	public boolean isNull() {
-		return x == null || y == -1;
+		return alphabet == null || number == -1;
 	}
 
 	public void setName(int x, int y) {
@@ -25,13 +25,17 @@ public class Cell<X, Y> {
 		int height = SeatVisualizer.bounds.height;
 		if (cx > width || x < shiftLeft || cy > height || y < shiftTop)
 			return;
-		this.x = CommonUtils.alphabet(height - cy - 1);
-		this.y = width - cx;
+		this.alphabet = CommonUtils.alphabet(height - cy - 1);
+		this.number = width - cx;
 	}
 
 	public String toString() {
 		if (isNull())
 			return "Null";
-		return String.format("%s%d", x, y);
+		return String.format("%s%d", alphabet, number);
+	}
+	
+	public static Cell<String, Integer> cellPositionByPosition(Position<Integer, Integer> pos) {
+		return new Cell<String, Integer>(CommonUtils.alphabet(pos.y), pos.x);
 	}
 }

@@ -1,25 +1,36 @@
 package Visualizers;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 import java.util.Map;
 
+import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import javax.swing.SwingConstants;
 
+import MainApp.MainApp;
 import Objects.Cell;
 import Objects.Position;
 import Objects.Student;
 import Utilities.CommonUtils;
 import Utilities.DBUtils;
+import Utilities.DateUtils;
+import Utilities.SpringUtilities;
 import Utilities.WindowUtils;
 
 class SeatPanel extends JPanel {
@@ -27,15 +38,17 @@ class SeatPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private Map<Integer, Student> students;
+	private String date;
 
 	private static final int textGap = 10;
-	
+
 	private int blue, yellow, gray;
 
 	private Cell<String, Integer> selectedCell;
 
-	public SeatPanel(Map<Integer, Student> students) {
+	public SeatPanel(Map<Integer, Student> students, String date) {
 		this.students = students;
+		this.date = date;
 		this.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -70,8 +83,12 @@ class SeatPanel extends JPanel {
 		this.students = students;
 	}
 
+	public void setDate(String date) {
+		this.date = date;
+	}
+
 	private Position<Integer, Integer> studentPositionFromSelection() {
-		return CommonUtils.positionByCellPosition(selectedCell);
+		return Position.positionByCellPosition(selectedCell);
 	}
 
 	private Student studentFromSelection() {
@@ -86,7 +103,7 @@ class SeatPanel extends JPanel {
 		Student selectedStudent = studentFromSelection();
 		if (selectedStudent == null)
 			return;
-		JOptionPane.showMessageDialog(this, selectedStudent);
+		JOptionPane.showMessageDialog(this, selectedStudent.toString(0, date, false));
 	}
 
 	@Override
@@ -99,62 +116,61 @@ class SeatPanel extends JPanel {
 		int shiftTop = SeatVisualizer.shiftTop;
 		int width = SeatVisualizer.bounds.width;
 		int height = SeatVisualizer.bounds.height;
-		for (int x = 0; x < width; x++) {
-			g.setColor(Color.black);
-			FontMetrics metrics = g.getFontMetrics();
-			String xLabel = String.valueOf(width - x);
-			int labelWidth = metrics.stringWidth(xLabel);
-			g.drawString(xLabel, shiftLeft + x * tileWidth + (int) (0.5 * tileWidth) - (int) (0.5 * labelWidth),
-					shiftTop - textGap);
-			for (int y = 0; y < height; y++) {
+		FontMetrics metrics = g.getFontMetrics();
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
 				g.setColor(Color.white);
-				boolean found = false;
-				for (Student student : students.values()) {
-					if (Position.isSame(student.getPosition(), height - y - 1, width - x)) {
-						if (student.isNormal()) {
-							g.setColor(Color.blue);
-							blue++;
-						}
-						else if (student.isLeft()) {
-							g.setColor(Color.yellow);
-							yellow++;
-						}
-						else if (student.isAbsent()) {
-							g.setColor(Color.getHSBColor(0.0f, 0.0f, 0.9f));
-							gray++;
-						}
-						g.fillRect(shiftLeft + x * tileWidth, shiftTop + y * tileHeight, tileWidth, tileHeight);
-						found = true;
-						break;
+				Position<Integer, Integer> findPos = new Position<Integer, Integer>(height - x - 1, width - y);
+				Student student = MainApp.studentsByPositions.get(findPos);
+				if (student != null) {
+					Integer ID = student.getID();
+					student = students.get(ID);
+					if (student.isNormal(date)) {
+						g.setColor(Color.blue);
+						blue++;
+					} else if (student.isLeft(date)) {
+						g.setColor(Color.yellow);
+						yellow++;
+					} else if (student.isAbsent(date)) {
+						g.setColor(Color.getHSBColor(0.0f, 0.0f, 0.9f));
+						gray++;
 					}
-				}
-				if (!found) {
+					g.fillRect(shiftLeft + x * tileWidth, shiftTop + y * tileHeight, tileWidth, tileHeight);
+				} else {
 					g.setColor(Color.getHSBColor(0.98f, 0.9f, 0.6f));
 					g.fillRect(shiftLeft + x * tileWidth, shiftTop + y * tileHeight, tileWidth, tileHeight);
 				}
+				findPos = null;
 			}
-			g.setColor(Color.gray);
-			g.drawLine(shiftLeft + x * tileWidth, shiftTop, shiftLeft + x * tileWidth,
-					SeatVisualizer.absoluteSize.height);
-		}
-		for (int y = 0; y < height; y++) {
 			g.setColor(Color.gray);
 			g.drawLine(shiftLeft, shiftTop + y * tileHeight, SeatVisualizer.absoluteSize.width,
 					shiftTop + y * tileHeight);
 			g.setColor(Color.black);
-			FontMetrics metrics = g.getFontMetrics();
 			String yLabel = CommonUtils.alphabet(height - y - 1);
 			int labelWidth = metrics.stringWidth(yLabel);
 			int labelHeight = metrics.getHeight();
 			g.drawString(yLabel, shiftLeft - textGap - (int) (0.5 * labelWidth),
 					shiftTop + (int) (0.5 * labelHeight) + y * tileHeight + (int) (0.5 * tileHeight));
 		}
+		for (int x = 0; x < width; x++) {
+			g.setColor(Color.black);
+			String xLabel = String.valueOf(width - x);
+			int labelWidth = metrics.stringWidth(xLabel);
+			g.drawString(xLabel, shiftLeft + x * tileWidth + (int) (0.5 * tileWidth) - (int) (0.5 * labelWidth),
+					shiftTop - textGap);
+			g.setColor(Color.gray);
+			g.drawLine(shiftLeft + x * tileWidth, shiftTop, shiftLeft + x * tileWidth,
+					SeatVisualizer.absoluteSize.height);
+		}
 		g.setColor(Color.gray);
 		g.drawLine(SeatVisualizer.absoluteSize.width, shiftTop, SeatVisualizer.absoluteSize.width,
 				SeatVisualizer.absoluteSize.height);
 		g.drawLine(shiftLeft, SeatVisualizer.absoluteSize.height, SeatVisualizer.absoluteSize.width,
 				SeatVisualizer.absoluteSize.height);
-		g.drawString(String.format("Present: %d, Leave: %d, Absent: %d, Completeness: %.2f%%", blue, yellow, gray, (100.0 * blue / (blue + yellow + gray))), shiftLeft, SeatVisualizer.absoluteSize.height + textGap * 2);
+		g.drawString(
+				String.format("Present: %d, Leave: %d, Absent: %d, Completeness: %.2f%%", blue, yellow, gray,
+						(100.0 * blue / (blue + yellow + gray))),
+				shiftLeft, SeatVisualizer.absoluteSize.height + textGap * 2);
 	}
 
 }
@@ -164,7 +180,7 @@ public class SeatVisualizer extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	public static SeatVisualizer activeVisualizer = null;
-	
+
 	public static final int shiftLeft = 30;
 	public static final int shiftTop = 30;
 	public static final Dimension bounds = new Dimension(8, 9);
@@ -174,19 +190,37 @@ public class SeatVisualizer extends JFrame {
 
 	private SeatPanel panel;
 	private Map<Integer, Student> currentStudents;
+	private JComboBox<String> dateSelector;
+	private String date;
 
 	public SeatVisualizer() {
 		this.setTitle(WindowUtils.realTitle("Stand Cheer Seats"));
-		this.setSize(absoluteSize.width + shiftLeft, absoluteSize.height + (int) (tileSize.height * 1.5) + shiftTop);
-		getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 0, 1));
+		this.setSize(absoluteSize.width + shiftLeft, absoluteSize.height + (int) (tileSize.height * 1.8) + shiftTop);
+		Container self = getContentPane();
+		self.setLayout(new BoxLayout(self, BoxLayout.Y_AXIS));
 		WindowUtils.setRelativeCenter(this, -this.getWidth() + bounds.width / 2 - 50, 0);
+		date = DateUtils.getCurrentFormattedDate();
 		reloadStudents();
-		panel = new SeatPanel(currentStudents);
+		panel = new SeatPanel(currentStudents, date);
 		panel.setPreferredSize(this.getSize());
 		this.setPreferredSize(this.getSize());
 		this.setMinimumSize(this.getSize());
 		this.setMaximumSize(this.getSize());
-		this.add(panel);
+		self.add(panel);
+		List<String> dates = DateUtils.s_availableDates();
+		dateSelector = new JComboBox<String>(dates.toArray(new String[0]));
+		dateSelector.setSelectedIndex(dates.size() - 1);
+		dateSelector.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setDate((String) dateSelector.getSelectedItem());
+				updateIfPossible();
+			}
+		});
+		JPanel form = new JPanel(new SpringLayout());
+		form.add(new JLabel("Select Date:", SwingConstants.TRAILING));
+		form.add(dateSelector);
+		self.add(form);
+		SpringUtilities.makeCompactGrid(form, 1, 2, 4, 4, 4, 4);
 		this.setResizable(false);
 		activeVisualizer = this;
 		this.addWindowListener(new WindowAdapter() {
@@ -197,16 +231,25 @@ public class SeatVisualizer extends JFrame {
 	}
 
 	private void reloadStudents() {
-		currentStudents = DBUtils.getCurrentStudents();
+		currentStudents = DBUtils.getStudentsAllTime();
 	}
 
 	public static void updateIfPossible() {
 		System.out.println("Update SeatVisualizer");
 		if (activeVisualizer != null) {
+			activeVisualizer.panel.setDate(activeVisualizer.date);
 			activeVisualizer.reloadStudents();
 			activeVisualizer.panel.setStudents(activeVisualizer.currentStudents);
 			activeVisualizer.repaint();
 		}
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
 	}
 
 }

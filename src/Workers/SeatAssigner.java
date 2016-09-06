@@ -32,8 +32,9 @@ public class SeatAssigner {
 						System.out.println("ID: " + ID + " not found");
 						continue;
 					}
-					Position<Integer, Integer> position = Position.positionFromCellString(tuples[1]);
+					Position<Integer, Integer> position = Position.positionByCellString(tuples[1]);
 					student.setPosition(position);
+					MainApp.studentsByPositions.put(position, student);
 				}
 			}
 		} catch (IOException e) {
@@ -52,13 +53,14 @@ public class SeatAssigner {
 		Vector<Position<Integer, Integer>> positions = new Vector<Position<Integer, Integer>>();
 		StringBuilder sb = new StringBuilder();
 		for (Student student : students.values()) {
-			if (student.getPosition().equals(Position.nullPosition)) {
+			if (Position.isNull(student.getPosition())) {
 				Position<Integer, Integer> position;
 				int numRandom = 0;
 				do {
 					position = new Position<>(r.nextInt(width), r.nextInt(height));
 				} while (positions.contains(position) && (numRandom++ < 20 || !small));
 				positions.add(position);
+				MainApp.studentsByPositions.put(position, student);
 				sb.append(String.format("%d,%s\n", student.getID(), position.toCellString()));
 			}
 		}

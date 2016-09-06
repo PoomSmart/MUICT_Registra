@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.util.Date;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -40,6 +41,7 @@ public class MainApp {
 	public static final boolean test = false;
 
 	public static Map<Integer, Student> db;
+	public static Map<Position<Integer, Integer>, Student> studentsByPositions;
 
 	private static void runFrame(JFrame frame) throws InterruptedException {
 		WindowUtils.setDontClose(frame);
@@ -73,7 +75,7 @@ public class MainApp {
 		Random r = new Random();
 		Vector<Position<Integer, Integer>> positions = new Vector<Position<Integer, Integer>>();
 		for (Student student : students.values()) {
-			if (student.getPosition().equals(Position.nullPosition)) {
+			if (Position.isNull(student.getPosition())) {
 				Position<Integer, Integer> position;
 				int numRandom = 0;
 				do {
@@ -81,6 +83,7 @@ public class MainApp {
 				} while (positions.contains(position) && (numRandom++ < 20 || !small));
 				positions.add(position);
 				student.setPosition(position);
+				studentsByPositions.put(position, student);
 			}
 		}
 		positions = null;
@@ -124,6 +127,7 @@ public class MainApp {
 			FileUtils.write(new File("agreed"), "");
 		}
 		Map<Integer, Student> students = new StudentDatabase("batch-14-new2.csv").getStudents();
+		studentsByPositions = new TreeMap<Position<Integer, Integer>, Student>();
 		randomPosition(db = students);
 		AcceptanceAssigner.assignAll(db);
 		SpecialAssigner.assignAll(db);

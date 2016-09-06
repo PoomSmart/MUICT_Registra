@@ -116,7 +116,7 @@ public class Student implements Cloneable {
 	public Status getCurrentStatus() {
 		return getStatus(DateUtils.getCurrentFormattedDate());
 	}
-	
+
 	public Map<String, Status> getStatuses() {
 		return statuses;
 	}
@@ -186,14 +186,18 @@ public class Student implements Cloneable {
 		return "Unknown";
 	}
 
-	public String toString(int mode, String sdate) {
+	public String toString(int mode, String sdate, boolean debug) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(" ID: " + ID + "\n");
-		sb.append(" Full Name: " + getName() + "\n");
-		sb.append(" Nickname: " + nickname + "\n");
-		sb.append(" Gender: " + getNormalizedGender() + "\n");
-		sb.append(" Section: " + section + "\n");
-		if (mode == 0) {
+		if (debug)
+			sb.append(String.format("[%d] %s [Section %d] [Position %s]", ID, getName(), section, cellPosition));
+		else {
+			sb.append(" ID: " + ID + "\n");
+			sb.append(" Full Name: " + getName() + "\n");
+			sb.append(" Nickname: " + nickname + "\n");
+			sb.append(" Gender: " + getNormalizedGender() + "\n");
+			sb.append(" Section: " + section + "\n");
+		}
+		if (mode == 0 && !debug) {
 			Status status = getStatus(sdate);
 			// Show current status only if today
 			if (status != null) {
@@ -214,9 +218,12 @@ public class Student implements Cloneable {
 				sb.append(" TAKE CARE\n");
 		}
 		if (mode != 0) {
-			sb.append(String.format(" Present | Leave | Absent: %d, %d, %d\n", getPresentCount(), getLeaveCount(),
-					getAbsenceCount()));
-			sb.append(" Overall Status:\n");
+			if (!debug) {
+				sb.append(String.format(" Present | Leave | Absent: %d, %d, %d\n", getPresentCount(), getLeaveCount(),
+						getAbsenceCount()));
+				sb.append(" Overall Status:\n");
+			} else
+				sb.append(" Statuses: |");
 			for (Entry<String, Status> entry : statuses.entrySet()) {
 				String dateKey = entry.getKey();
 				Date date = null;
@@ -226,18 +233,25 @@ public class Student implements Cloneable {
 				}
 				String realDateKey = DateUtils.n_fmt.format(date);
 				Status status = entry.getValue();
-				sb.append(String.format("  %s: %s\n", realDateKey, status.getDetailedStatus()));
+				if (debug)
+					sb.append(status.getType() + "|");
+				else
+					sb.append(String.format("  %s: %s\n", realDateKey, status.getDetailedStatus()));
 			}
 		}
 		return sb.toString();
 	}
 
+	public String toString(int mode, boolean debug) {
+		return toString(mode, DateUtils.getCurrentFormattedDate(), debug);
+	}
+	
 	public String toString(int mode) {
-		return toString(mode, DateUtils.getCurrentFormattedDate());
+		return toString(mode, false);
 	}
 
 	public String toString() {
-		return toString(0);
+		return toString(0, true);
 	}
 
 	public Student clone() {
@@ -310,7 +324,7 @@ public class Student implements Cloneable {
 	public void setAcceptanceStatus(AcceptanceType acceptanceStatus) {
 		this.acceptanceStatus = acceptanceStatus;
 	}
-	
+
 	public boolean unableToJoin() {
 		return acceptanceStatus == AcceptanceType.N;
 	}

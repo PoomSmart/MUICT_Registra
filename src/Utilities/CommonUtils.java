@@ -5,9 +5,7 @@ import java.util.Date;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import Objects.Cell;
 import Objects.Constants;
-import Objects.Position;
 import Objects.Status;
 
 public class CommonUtils {
@@ -97,19 +95,6 @@ public class CommonUtils {
 
 	public static String alphabet(int x) {
 		return Character.toString((char) (x + 'A'));
-	}
-
-	public static Position<Integer, Integer> positionByCellPosition(Cell<String, Integer> cell) {
-		if (cell == null)
-			return Position.nullPosition;
-		if (cell.isNull())
-			return Position.nullPosition;
-		Position<Integer, Integer> position = new Position<Integer, Integer>(cell.x.charAt(0) - 'A', cell.y);
-		return position;
-	}
-
-	public static Cell<String, Integer> cellPositionByPosition(Position<Integer, Integer> pos) {
-		return new Cell<String, Integer>(alphabet(pos.x), pos.y);
 	}
 
 }

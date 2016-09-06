@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Vector;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -153,5 +155,35 @@ public class DBUtils {
 	
 	public static Map<Integer, Student> getCurrentStudents() {
 		return getStudents(DateUtils.getCurrentDate());
+	}
+	
+	public static Map<Integer, Student> getStudentsAllTime() {
+		Map<Integer, Student> students = new TreeMap<Integer, Student>();
+		for (Entry<Integer, Student> entry : MainApp.db.entrySet()) {
+			Integer ID = entry.getKey();
+			Student student = entry.getValue().clone();
+			students.put(ID, student);
+		}
+		Vector<Date> availableDates = DateUtils.availableDates();
+		for (Date d : availableDates) {
+			// Assigning present and absent students
+			Map<Integer, Student> presentStudents = DBUtils.getPresentStudents(d);
+			for (Integer ID : MainApp.db.keySet()) {
+				if (presentStudents.containsKey(ID))
+					students.get(ID).addStatus(d, new Status());
+				else
+					students.get(ID).addStatus(d, new Status(Status.Type.ABSENT));
+			}
+			// Assigning leave-with-reason students
+			Map<Integer, Student> leaveStudents = DBUtils.getLeaveStudents(d);
+			for (Entry<Integer, Student> entry : leaveStudents.entrySet()) {
+				Integer ID = entry.getKey();
+				Student student = entry.getValue();
+				Status leaveStatus = student.getStatus(DateUtils.getFormattedDate(d));
+				if (leaveStatus != null)
+					students.get(ID).addStatus(d, leaveStatus.clone());
+			}
+		}
+		return students;
 	}
 }

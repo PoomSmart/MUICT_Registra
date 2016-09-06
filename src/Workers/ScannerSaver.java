@@ -48,7 +48,7 @@ public class ScannerSaver {
 		}
 		file = null;
 		System.out.println(String.format("(%s mode) %s data to %s", type, (append ? "Append" : "Write"), filePath));
-		SeatVisualizer.updateIfPossible();
+		SeatVisualizer.updateIfPossible(false);
 		StudentTable.updateIfPossible();
 	}
 	

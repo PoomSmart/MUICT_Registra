@@ -41,6 +41,7 @@ class SeatPanel extends JPanel {
 	private String date;
 
 	private static final int textGap = 10;
+	private static final int infoGap = 3;
 
 	private int blue, yellow, gray;
 
@@ -123,6 +124,7 @@ class SeatPanel extends JPanel {
 				Position<Integer, Integer> findPos = new Position<Integer, Integer>(height - x - 1, width - y);
 				Student student = MainApp.studentsByPositions.get(findPos);
 				if (student != null) {
+					Color infoColor = Color.WHITE;
 					Integer ID = student.getID();
 					student = students.get(ID);
 					if (student.isNormal(date)) {
@@ -130,12 +132,26 @@ class SeatPanel extends JPanel {
 						blue++;
 					} else if (student.isLeft(date)) {
 						g.setColor(Color.yellow);
+						infoColor = Color.BLACK;
 						yellow++;
 					} else if (student.isAbsent(date)) {
 						g.setColor(Color.getHSBColor(0.0f, 0.0f, 0.9f));
+						infoColor = Color.BLACK;
 						gray++;
 					}
 					g.fillRect(shiftLeft + x * tileWidth, shiftTop + y * tileHeight, tileWidth, tileHeight);
+					String nickname = student.getNickname();
+					int labelWidth = metrics.stringWidth(nickname);
+					int labelHeight = metrics.getHeight();
+					int startY = tileHeight - infoGap - labelHeight * 2;
+					g.setColor(infoColor);
+					g.drawString(nickname, shiftLeft + x * tileWidth + (tileWidth - labelWidth) / 2,
+							shiftTop + y * tileHeight + startY);
+					startY += infoGap + labelHeight;
+					String sID = ID.toString().substring(4, ID.toString().length());
+					labelWidth = metrics.stringWidth(sID);
+					g.drawString(sID, shiftLeft + x * tileWidth + (tileWidth - labelWidth) / 2,
+							shiftTop + y * tileHeight + startY);
 				} else {
 					g.setColor(Color.getHSBColor(0.98f, 0.9f, 0.6f));
 					g.fillRect(shiftLeft + x * tileWidth, shiftTop + y * tileHeight, tileWidth, tileHeight);
@@ -184,7 +200,7 @@ public class SeatVisualizer extends JFrame {
 	public static final int shiftLeft = 30;
 	public static final int shiftTop = 30;
 	public static final Dimension bounds = new Dimension(8, 9);
-	public static final Dimension tileSize = new Dimension(40, 40);
+	public static final Dimension tileSize = new Dimension(55, 55);
 	public static final Dimension absoluteSize = new Dimension(bounds.width * tileSize.width + shiftLeft,
 			bounds.height * tileSize.height + shiftTop);
 
@@ -198,7 +214,7 @@ public class SeatVisualizer extends JFrame {
 		this.setSize(absoluteSize.width + shiftLeft, absoluteSize.height + (int) (tileSize.height * 1.8) + shiftTop);
 		Container self = getContentPane();
 		self.setLayout(new BoxLayout(self, BoxLayout.Y_AXIS));
-		WindowUtils.setRelativeCenter(this, -this.getWidth() + bounds.width / 2 - 50, 0);
+		WindowUtils.setRelativeCenter(this, -this.getWidth() + bounds.width / 2 - 30, 0);
 		date = DateUtils.getCurrentFormattedDate();
 		reloadStudents();
 		panel = new SeatPanel(currentStudents, date);
@@ -213,7 +229,7 @@ public class SeatVisualizer extends JFrame {
 		dateSelector.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setDate((String) dateSelector.getSelectedItem());
-				updateIfPossible();
+				updateIfPossible(true);
 			}
 		});
 		JPanel form = new JPanel(new SpringLayout());
@@ -234,10 +250,10 @@ public class SeatVisualizer extends JFrame {
 		currentStudents = DBUtils.getStudentsAllTime();
 	}
 
-	public static void updateIfPossible() {
+	public static void updateIfPossible(boolean manual) {
 		System.out.println("Update SeatVisualizer");
 		if (activeVisualizer != null) {
-			activeVisualizer.panel.setDate(activeVisualizer.date);
+			activeVisualizer.panel.setDate(manual ? activeVisualizer.date : DateUtils.getCurrentFormattedDate());
 			activeVisualizer.reloadStudents();
 			activeVisualizer.panel.setStudents(activeVisualizer.currentStudents);
 			activeVisualizer.repaint();

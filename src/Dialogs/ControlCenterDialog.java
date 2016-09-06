@@ -186,7 +186,7 @@ public class ControlCenterDialog extends JFrame {
 							FileUtils.write(CommonUtils.fileFromType(FileType.REGULAR), "");
 							// empty present.csv = empty leave.csv
 							FileUtils.write(CommonUtils.fileFromType(FileType.NOTHERE), "");
-							SeatVisualizer.updateIfPossible();
+							SeatVisualizer.updateIfPossible(false);
 						} catch (IOException ex) {
 							ex.printStackTrace();
 						}
@@ -204,7 +204,7 @@ public class ControlCenterDialog extends JFrame {
 						System.out.println("Clear current leave.csv");
 						try {
 							FileUtils.write(CommonUtils.fileFromType(FileType.NOTHERE), "");
-							SeatVisualizer.updateIfPossible();
+							SeatVisualizer.updateIfPossible(false);
 						} catch (IOException ex) {
 							ex.printStackTrace();
 						}

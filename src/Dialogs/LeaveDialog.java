@@ -92,6 +92,8 @@ public class LeaveDialog extends JFrame {
 					for (String sID : sIDs) {
 						Integer ID = CommonUtils.getID(sID);
 						if (ID == -1)
+							ID = CommonUtils.getID("5988" + sID);
+						if (ID == -1)
 							continue;
 						if (!MainApp.db.containsKey(ID)) {
 							JOptionPane.showMessageDialog(null, ID + " or more student ID not found");
@@ -107,7 +109,7 @@ public class LeaveDialog extends JFrame {
 					boolean others = othersSelected();
 					String reason = !others ? getReason() : reasonField.getText();
 					String reasonCheck = reason.trim().replaceAll("[\n\t\r]", "");
-					if (reasonCheck.length() == 0 && others) {
+					if (reasonCheck.isEmpty() && others) {
 						JOptionPane.showMessageDialog(null, "Couldn't save leave form without reason");
 						System.out.println("Null reason field");
 						return;
@@ -142,6 +144,7 @@ public class LeaveDialog extends JFrame {
 						reasonField.setText("");
 					}
 				}
+				ScannerDialog.activeScanner.reloadCurrentPresentStudents();
 			}
 		});
 		

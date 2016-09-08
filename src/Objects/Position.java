@@ -51,9 +51,9 @@ public class Position<X, Y> implements Cloneable, Comparable<Object> {
 	
 	public static Position<Integer, Integer> positionByCellPosition(Cell<String, Integer> cell) {
 		if (cell == null)
-			return new Position<Integer, Integer>();
+			return null;
 		if (cell.isNull())
-			return new Position<Integer, Integer>();
+			return null;
 		return positionByCellString(cell.toString());
 	}
 	

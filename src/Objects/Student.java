@@ -143,7 +143,10 @@ public class Student implements Cloneable {
 	}
 
 	public boolean isNormal(String date) {
-		return getStatus(date).getType() == Status.Type.PRESENT;
+		Status status = getStatus(date);
+		if (status == null)
+			return true;
+		return status.getType() == Status.Type.PRESENT;
 	}
 
 	public boolean isNormal() {

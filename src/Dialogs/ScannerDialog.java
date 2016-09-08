@@ -13,6 +13,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -86,7 +87,7 @@ public class ScannerDialog extends JFrame {
 			IDs.remove(ID);
 	}
 
-	private void reloadCurrentPresentStudents() {
+	public void reloadCurrentPresentStudents() {
 		currentPresentStudents = DBUtils.getCurrentPresentStudents();
 	}
 
@@ -109,7 +110,7 @@ public class ScannerDialog extends JFrame {
 			try {
 				// Clean up leave.csv before adding randomized list
 				FileUtils.write(CommonUtils.fileFromType(FileType.NOTHERE), "");
-				addingCode(activeScanner, new Vector<Integer>(randomIDs), false, FileType.REGULAR, true);
+				addingCode(activeScanner, new Vector<Integer>(randomIDs), false, FileType.REGULAR, true, true);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -117,24 +118,83 @@ public class ScannerDialog extends JFrame {
 	}
 
 	public static void addingCode(ScannerDialog dialog, Vector<Integer> IDs, boolean append, FileType type,
-			boolean force) throws IOException {
+			boolean force, boolean reload) throws IOException {
 		dialog.resolveIDDuplicates();
 		ScannerSaver.doneAddingCodes(IDs, append, type, force);
-		dialog.cleanup();
-		dialog.reloadCurrentPresentStudents();
+		if (reload) {
+			dialog.cleanup();
+			dialog.reloadCurrentPresentStudents();
+		}
+	}
+
+	private void updateDialog() {
+		if (removeLabel)
+			setStatus(" ");
+		if (shouldCleanup)
+			cleanupTextField();
+	}
+
+	private void fixUpLeaveStudents() {
+		// We would update leave.csv if we also found any ID there, like they leave and then come back in reality
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				List<String> presentIDs = null;
+				List<String> leaveStudents = null;
+				try {
+					presentIDs = FileUtils.readLines(CommonUtils.fileFromType(CommonUtils.FileType.REGULAR));
+					leaveStudents = FileUtils.readLines(CommonUtils.fileFromType(CommonUtils.FileType.NOTHERE));
+				} catch (IOException e) {
+					presentIDs = new Vector<String>();
+					leaveStudents = new Vector<String>();
+				}
+				Vector<Integer> leaveIDs = new Vector<Integer>();
+				Vector<String> reasons = new Vector<String>();
+				for (String tuple : leaveStudents) {
+					String[] line = tuple.split(",");
+					String spresentID = line[0];
+					Integer presentID = Integer.parseInt(spresentID);
+					if (!presentIDs.contains(spresentID)) {
+						leaveIDs.add(presentID);
+						reasons.add(line[2]);
+					} else {
+						int reasonIdx = leaveStudents.indexOf(tuple);
+						if (reasonIdx < reasons.size())
+							reasons.remove(reasonIdx);
+						leaveIDs.remove(presentID);
+					}
+				}
+				System.out.println("PresentIDs: " + presentIDs);
+				System.out.println("LeaveIDs: " + leaveIDs);
+				System.out.println("Reasons: " + reasons);
+				try {
+					ScannerSaver.doneAddingCodes(leaveIDs, reasons, false, CommonUtils.FileType.NOTHERE, true);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				presentIDs = null;
+				leaveIDs = null;
+				reasons = null;
+			}
+		});
+		cleanup();
+		reloadCurrentPresentStudents();
 	}
 
 	private void actionPerformWriteForType(String title, String confirmString, String fileExistedString,
 			CommonUtils.FileType type) {
 		try {
 			int result = JOptionPane.showConfirmDialog(null, confirmString, title, JOptionPane.YES_NO_OPTION);
-			if (result == JOptionPane.YES_OPTION)
-				addingCode(this, IDs, false, type, false);
+			if (result == JOptionPane.YES_OPTION) {
+				addingCode(this, IDs, false, type, false, false);
+				fixUpLeaveStudents();
+			}
 		} catch (FileAlreadyExistsException ex) {
 			int result = JOptionPane.showConfirmDialog(null, fileExistedString, title, JOptionPane.YES_NO_OPTION);
 			if (result == JOptionPane.YES_OPTION) {
 				try {
-					addingCode(this, IDs, false, type, true);
+					addingCode(this, IDs, false, type, true, false);
+					fixUpLeaveStudents();
 				} catch (IOException ex2) {
 					ex2.printStackTrace();
 				}
@@ -147,8 +207,10 @@ public class ScannerDialog extends JFrame {
 	private void actionPerformAppendForType(String title, String confirmString, CommonUtils.FileType type) {
 		try {
 			int result = JOptionPane.showConfirmDialog(null, confirmString, title, JOptionPane.YES_NO_OPTION);
-			if (result == JOptionPane.YES_OPTION)
-				addingCode(this, IDs, true, type, false);
+			if (result == JOptionPane.YES_OPTION) {
+				addingCode(this, IDs, true, type, false, false);
+				fixUpLeaveStudents();
+			}
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
@@ -196,7 +258,10 @@ public class ScannerDialog extends JFrame {
 				case "append":
 				case "20822200000011":
 					// Append data
-					appendRegularBtn.doClick();
+					if (appendRegularBtn.isEnabled())
+						appendRegularBtn.doClick();
+					else
+						confirmRegularBtn.doClick();
 					return true;
 				case "currenttable":
 				case "20822200000021":
@@ -309,10 +374,7 @@ public class ScannerDialog extends JFrame {
 					parseText(text);
 				else
 					removeLabel = shouldCleanup = true;
-				if (removeLabel)
-					setStatus(" ");
-				if (shouldCleanup)
-					cleanupTextField();
+				updateDialog();
 			}
 
 		});
@@ -387,7 +449,7 @@ public class ScannerDialog extends JFrame {
 
 		WindowUtils.setRelativeCenter(this, 0, -50);
 		this.setResizable(false);
-		this.IDs = new Vector<Integer>();
+		IDs = new Vector<Integer>();
 
 		reloadCurrentPresentStudents();
 		activeScanner = this;

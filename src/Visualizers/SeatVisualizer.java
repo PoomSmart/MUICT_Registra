@@ -53,13 +53,6 @@ class SeatPanel extends JPanel {
 		this.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				int x = e.getX();
-				int y = e.getY();
-				if (e.getClickCount() == 2) {
-					selectedCell = new Cell<String, Integer>(null, -1);
-					selectedCell.setName(x, y);
-					updateSelection();
-				}
 			}
 
 			@Override
@@ -76,6 +69,13 @@ class SeatPanel extends JPanel {
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
+				int x = e.getX();
+				int y = e.getY();
+				if (e.getClickCount() == 1) {
+					selectedCell = new Cell<String, Integer>(null, -1);
+					selectedCell.setName(x, y);
+					updateSelection();
+				}
 			}
 		});
 	}
@@ -241,7 +241,6 @@ public class SeatVisualizer extends JFrame {
 		activeVisualizer = this;
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				activeVisualizer = null;
 			}
 		});
 	}

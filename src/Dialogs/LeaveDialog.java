@@ -65,7 +65,7 @@ public class LeaveDialog extends JFrame {
 		JPanel panel = new JPanel();
 		panel.setLayout(new SpringLayout());
 		
-		JLabel IDLabel = new JLabel("ID: ", JLabel.TRAILING);
+		JLabel IDLabel = new JLabel("ID (s): ", JLabel.TRAILING);
 		panel.add(IDLabel);
 		inputField = new JTextField();
 		inputField.setHorizontalAlignment(JTextField.LEFT);

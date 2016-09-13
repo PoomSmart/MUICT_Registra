@@ -147,7 +147,7 @@ public class StudentTable extends JFrame {
 	private void updateStatText() {
 		if (statText != null)
 			statText.setText(String.format(
-					"Total Present: %d (Islamic: %d/%d), Total Absent: %d, Total Left: %d, Total Attended: At most %d",
+					"Total Present: %d (Islamic: %d/%d), Total Absent: %d, Total Left: %d, Total Ever Here: %d",
 					totalPresent, totalPresentIslamic, totalIslamic, totalAbsent, totalLeft, totalPresent + totalLeft));
 	}
 
@@ -173,7 +173,7 @@ public class StudentTable extends JFrame {
 		if (perSectionText != null) {
 			StringBuilder sb = new StringBuilder();
 			for (int i = 1; i <= 3; i++) {
-				sb.append(String.format("Section %d attend: %d", i, perSectionCount[i - 1]));
+				sb.append(String.format("Section %d here: %d", i, perSectionCount[i - 1]));
 				if (i != 3)
 					sb.append(", ");
 			}
@@ -420,7 +420,7 @@ public class StudentTable extends JFrame {
 				Integer ID = (Integer) table.getModel().getValueAt(modelRow, 0);
 				Student student = internalStudents.get(ID);
 				if (student.unableToJoin()) {
-					c.setBackground(Color.GRAY);
+					c.setBackground(student.isCheerleader() ? Color.BLUE : Color.GRAY);
 					c.setForeground(Color.WHITE);
 				} else if (!student.isFreshman()) {
 					c.setBackground(Color.YELLOW);

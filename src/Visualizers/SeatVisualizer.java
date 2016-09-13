@@ -123,18 +123,25 @@ class SeatPanel extends JPanel {
 				g.setColor(Color.white);
 				Position<Integer, Integer> findPos = new Position<Integer, Integer>(height - x - 1, width - y);
 				Student student = MainApp.studentsByPositions.get(findPos);
+				Student student2 = null;
+				Integer ID = -1;
 				if (student != null) {
+					ID = student.getID();
+					student2 = students.get(ID);
+				}
+				if (student2 != null) {
 					Color infoColor = Color.WHITE;
-					Integer ID = student.getID();
-					student = students.get(ID);
-					if (student.isNormal(date)) {
-						g.setColor(Color.blue);
+					if (student2.isNormal(date)) {
+						int presentCount = student2.getPresentCount();
+						int absenceCount = student2.getAbsenceCount();
+						float degrade = (float)presentCount / (presentCount + absenceCount);
+						g.setColor(Color.getHSBColor((240.0f - (1 - degrade) * 46.0f) / 360.0f, 1.0f, 0.9f));
 						blue++;
-					} else if (student.isLeft(date)) {
+					} else if (student2.isLeft(date)) {
 						g.setColor(Color.yellow);
 						infoColor = Color.BLACK;
 						yellow++;
-					} else if (student.isAbsent(date)) {
+					} else if (student2.isAbsent(date)) {
 						g.setColor(Color.getHSBColor(0.0f, 0.0f, 0.9f));
 						infoColor = Color.BLACK;
 						gray++;
@@ -153,8 +160,15 @@ class SeatPanel extends JPanel {
 					g.drawString(sID, shiftLeft + x * tileWidth + (tileWidth - labelWidth) / 2,
 							shiftTop + y * tileHeight + startY);
 				} else {
-					g.setColor(Color.getHSBColor(0.98f, 0.9f, 0.6f));
+					g.setColor(Color.getHSBColor(0.4f, 0.8f, 0.62f));
 					g.fillRect(shiftLeft + x * tileWidth, shiftTop + y * tileHeight, tileWidth, tileHeight);
+					String senior = "Senior";
+					int labelWidth = metrics.stringWidth(senior);
+					int labelHeight = metrics.getHeight();
+					int startY = tileHeight - labelHeight;
+					g.setColor(Color.WHITE);
+					g.drawString(senior, shiftLeft + x * tileWidth + (tileWidth - labelWidth) / 2,
+							shiftTop + y * tileHeight + startY);
 				}
 				findPos = null;
 			}

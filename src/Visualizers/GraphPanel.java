@@ -9,6 +9,9 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -20,11 +23,16 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 public class GraphPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private int width = 900;
-	private int height = 400;
+	private int width = (int) (1000 * 1.5);
+	private int height = (int) (450 * 1.5);
 	private int padding = 25;
 	private int labelPadding = 25;
 	private Color pointColor = new Color(100, 100, 100, 180);
@@ -82,6 +90,7 @@ public class GraphPanel extends JPanel {
 		g2.fillRect(padding + labelPadding, padding, getWidth() - (2 * padding) - labelPadding,
 				getHeight() - 2 * padding - labelPadding);
 		g2.setColor(Color.BLACK);
+		FontMetrics metrics = g2.getFontMetrics();
 
 		// create hatch marks and grid lines for y axis.
 		for (int i = 0; i < numberYDivisions + 1; i++) {
@@ -96,7 +105,6 @@ public class GraphPanel extends JPanel {
 				g2.setColor(Color.BLACK);
 				String yLabel = ((int) ((getMinScore()
 						+ (getMaxScore() - getMinScore()) * ((i * 1.0) / numberYDivisions)) * 100)) / 100 + "";
-				FontMetrics metrics = g2.getFontMetrics();
 				int labelWidth = metrics.stringWidth(yLabel);
 				g2.drawString(yLabel, x0 - labelWidth - 5, y0 + (metrics.getHeight() / 2) - 3);
 			}
@@ -115,8 +123,7 @@ public class GraphPanel extends JPanel {
 					g2.setColor(gridColor);
 					g2.drawLine(x0, getHeight() - padding - labelPadding - 1 - pointWidth, x1, padding);
 					g2.setColor(Color.BLACK);
-					String xLabel = (int) (i * xMultiplier) + "";
-					FontMetrics metrics = g2.getFontMetrics();
+					String xLabel = (int) ((i + 1) * xMultiplier) + "";
 					int labelWidth = metrics.stringWidth(xLabel);
 					g2.drawString(xLabel, x0 - labelWidth / 2, y0 + metrics.getHeight() + 3);
 				}
@@ -133,7 +140,8 @@ public class GraphPanel extends JPanel {
 		g2.setStroke(GRAPH_STROKE);
 		int colorIndex = 0;
 		for (List<Point> subgraphPoints : graphPoints) {
-			g2.setColor(graphColors.getOrDefault(colorIndex++, new Color(random.nextInt(230), random.nextInt(230), random.nextInt(230))));
+			g2.setColor(graphColors.getOrDefault(colorIndex++,
+					new Color(random.nextInt(230), random.nextInt(230), random.nextInt(230))));
 			for (int i = 0; i < subgraphPoints.size() - 1; i++) {
 				int x1 = subgraphPoints.get(i).x;
 				int y1 = subgraphPoints.get(i).y;
@@ -144,15 +152,28 @@ public class GraphPanel extends JPanel {
 		}
 
 		g2.setStroke(oldStroke);
-		g2.setColor(pointColor);
+		colorIndex = 0;
 		for (List<Point> subgraphPoints : graphPoints) {
+			Color numColor = graphColors.getOrDefault(colorIndex, Color.BLACK);
+			g2.setColor(numColor);
 			for (int i = 0; i < subgraphPoints.size(); i++) {
-				int x = subgraphPoints.get(i).x - pointWidth / 2;
-				int y = subgraphPoints.get(i).y - pointWidth / 2;
-				int ovalW = pointWidth;
-				int ovalH = pointWidth;
-				g2.fillOval(x, y, ovalW, ovalH);
+				int gx = subgraphPoints.get(i).x;
+				int gy = subgraphPoints.get(i).y;
+				int x = gx - pointWidth / 2;
+				int y = gy - pointWidth / 2;
+				g2.setColor(pointColor);
+				g2.fillOval(x, y, pointWidth, pointWidth);
+				String num = data.get(colorIndex).get(i) + "";
+				int labelWidth = metrics.stringWidth(num);
+				g2.drawOval(gx - 9, gy - 9, 18, 18);
+				Color whiteA = new Color(1.0f, 1.0f, 1.0f, 0.8f);
+				g2.setColor(whiteA);
+				whiteA = null;
+				g2.fillOval(gx - 9, gy - 9, 18, 18);
+				g2.setColor(numColor);
+				g2.drawString(num, x - labelWidth / 2 + 3, y + 5);
 			}
+			colorIndex++;
 		}
 	}
 
@@ -162,12 +183,7 @@ public class GraphPanel extends JPanel {
 	}
 
 	private Integer getMinScore() {
-		Integer minScore = Integer.MAX_VALUE;
-		for (List<Integer> subscores : data) {
-			for (Integer score : subscores)
-				minScore = Math.min(minScore, score);
-		}
-		return minScore;
+		return 0;
 	}
 
 	private Integer getMaxScore() {
@@ -188,11 +204,11 @@ public class GraphPanel extends JPanel {
 	public List<List<Integer>> getScores() {
 		return data;
 	}
-	
+
 	public void addGraphColor(Integer index, Color color) {
 		graphColors.put(index, color);
 	}
-	
+
 	public void clearGraphColors() {
 		graphColors.clear();
 	}
@@ -217,5 +233,41 @@ public class GraphPanel extends JPanel {
 			subscores.add(d);
 		scores.add(subscores);
 		constructGraphs(name, scores);
+	}
+
+	public void writeToFile(String filename, List<String> colNames) {
+		try {
+			FileOutputStream fileOut = new FileOutputStream(filename + ".xlsx");
+			XSSFWorkbook workbook = new XSSFWorkbook();
+			XSSFSheet worksheet = workbook.createSheet("Worksheet");
+			XSSFRow row = worksheet.createRow(0);
+			XSSFCell cellDay = row.createCell(0);
+			cellDay.setCellValue("Day");
+			XSSFCell cellValue;
+			for (int col = 0; col < data.size(); col++) {
+				cellValue = row.createCell(1 + col);
+				cellValue.setCellValue(colNames.get(col));
+			}
+			for (int i = 0; i < data.get(0).size(); i++) {
+				row = worksheet.createRow(i + 1);
+				cellDay = row.createCell(0);
+				cellDay.setCellValue(i + 1);
+				for (int col = 0; col < data.size(); col++) {
+					cellValue = row.createCell(col + 1);
+					cellValue.setCellValue(data.get(col).get(i));
+				}
+			}
+			
+			workbook.write(fileOut);
+			fileOut.flush();
+			fileOut.close();
+			workbook.close();
+			workbook = null;
+			fileOut = null;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

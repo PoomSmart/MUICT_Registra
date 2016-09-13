@@ -80,10 +80,23 @@ public class DateUtils {
 		cal.setTime(date);
 		return cal;
 	}
+	
+	public static Calendar finalDay() {
+		Calendar cal = Calendar.getInstance();
+		cal.set(cal.get(Calendar.YEAR), Calendar.SEPTEMBER, 10);
+		return cal;
+	}
 
 	public static boolean isBusinessDay(Calendar cal) {
+		// Exception: final day
+		if (cal.get(Calendar.DAY_OF_MONTH) == 10 && cal.get(Calendar.MONTH) == Calendar.SEPTEMBER)
+			return true;
+		if (cal.compareTo(finalDay()) > 0)
+			return false;
+		// Exception: holidays
 		if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
 			return false;
+		// Exception: special days
 		if (cal.get(Calendar.DAY_OF_MONTH) == 31 && cal.get(Calendar.MONTH) == Calendar.AUGUST)
 			return false;
 		if (cal.get(Calendar.DAY_OF_MONTH) == 2 && cal.get(Calendar.MONTH) == Calendar.SEPTEMBER)

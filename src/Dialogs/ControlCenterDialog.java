@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -89,10 +90,10 @@ public class ControlCenterDialog extends JFrame {
 		showGraphButton = new JButton("Visualize");
 		showGraphButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Object[] options = { "All", "Per Section" };
+				Object[] options = { "All", "Per Section", "Gender" };
 				int result = JOptionPane.showOptionDialog(null, "Select type:", "Graph Type",
 						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
-				if (result > 1)
+				if (result > 2)
 					return;
 				Map<Integer, Student> students;
 				Vector<Integer> presentPerDay = result == 0 ? new Vector<Integer>() : null;
@@ -102,13 +103,17 @@ public class ControlCenterDialog extends JFrame {
 				Vector<Integer> section1 = result == 1 ? new Vector<Integer>() : null;
 				Vector<Integer> section2 = result == 1 ? new Vector<Integer>() : null;
 				Vector<Integer> section3 = result == 1 ? new Vector<Integer>() : null;
+				Vector<Integer> manPerDay = result == 2 ? new Vector<Integer>() : null;
+				Vector<Integer> womanPerDay = result == 2 ? new Vector<Integer>() : null;
 				List<List<Integer>> graphs = new Vector<List<Integer>>();
 				int presentStudents, leaveStudents/*, absentStudents*/;
+				int manCount, womanCount;
 				int[] perSection;
 				for (Date date : DateUtils.availableDates()) {
 					String fdate = DateUtils.getFormattedDate(date);
 					students = DBUtils.getStudents(date);
-					presentStudents = leaveStudents = /*absentStudents =*/ 0;
+					presentStudents = leaveStudents /*= absentStudents*/ = 0;
+					manCount = womanCount = 0;
 					perSection = new int[3];
 					for (Student student : students.values()) {
 						// We probably skip those unable to join at all
@@ -119,12 +124,17 @@ public class ControlCenterDialog extends JFrame {
 							if (result == 1) {
 								int section = student.getSection();
 								perSection[section - 1]++;
+							} else if (result == 2) {
+								if (student.isMan())
+									manCount++;
+								else if (student.isWoman())
+									womanCount++;
 							}
 						} else {
 							if (student.isLeft(fdate))
 								leaveStudents++;
-							//else if (student.isAbsent(fdate))
-								//absentStudents++;
+							/*else if (student.isAbsent(fdate))
+								absentStudents++;*/
 						}
 					}
 					if (presentStudents > 0) {
@@ -137,6 +147,9 @@ public class ControlCenterDialog extends JFrame {
 							section1.add(perSection[0]);
 							section2.add(perSection[1]);
 							section3.add(perSection[2]);
+						} else if (result == 2) {
+							manPerDay.add(manCount);
+							womanPerDay.add(womanCount);
 						}
 					}
 				}
@@ -149,18 +162,28 @@ public class ControlCenterDialog extends JFrame {
 					graphs.add(section1);
 					graphs.add(section2);
 					graphs.add(section3);
+				} else if (result == 2) {
+					graphs.add(manPerDay);
+					graphs.add(womanPerDay);
 				}
 				GraphPanel grapher;
 				if (result == 0) {
 					grapher = new GraphPanel("Attendance", graphs);
 					grapher.addGraphColor(0, Color.BLUE);
-					grapher.addGraphColor(1, Color.YELLOW);
+					grapher.addGraphColor(1, Color.ORANGE);
 					grapher.addGraphColor(2, Color.RED);
+					grapher.writeToFile("attendance-all", Arrays.asList("Present", "Present + Leave", "Leave"));
 				} else if (result == 1) {
-					grapher = new GraphPanel("Attendance per Section", graphs);
+					grapher = new GraphPanel("Attendance by Section", graphs);
 					grapher.addGraphColor(0, Color.BLUE);
 					grapher.addGraphColor(1, Color.GREEN);
 					grapher.addGraphColor(2, Color.MAGENTA);
+					grapher.writeToFile("attendance-section", Arrays.asList("Section 1", "Section 2", "Section 3"));
+				} else if (result == 2) {
+					grapher = new GraphPanel("Attendance by Gender", graphs);
+					grapher.addGraphColor(0, Color.BLUE);
+					grapher.addGraphColor(1, Color.PINK);
+					grapher.writeToFile("attendance-gender", Arrays.asList("Man", "Woman"));
 				}
 				presentPerDay = null;
 				presentAndLeavePerDay = null;
@@ -168,6 +191,8 @@ public class ControlCenterDialog extends JFrame {
 				section1 = null;
 				section2 = null;
 				section3 = null;
+				manPerDay = null;
+				womanPerDay = null;
 				students = null;
 				perSection = null;
 			}
@@ -221,6 +246,25 @@ public class ControlCenterDialog extends JFrame {
 			});
 			getContentPane().add(randomPresentButton);
 		}
+		
+		JButton aboutButton = new JButton("About");
+		aboutButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				StringBuilder sb = new StringBuilder();
+				sb.append("Founder: Thatchapon Unprasert (Batch #13)\n\n");
+				sb.append("MUICT_Registra is a convenient Java program for Stand Cheer registration.\n");
+				sb.append("We can check total students in real-time. We can know how often each attend the activity.\n");
+				sb.append("We can assign status to any student just by clicking. We can log things that happen each day.\n");
+				sb.append("We can generate table showing various information about students and sort them by any filter.\n");
+				sb.append("We definitely can analyze the activity in terms of statistics.\n\n");
+				sb.append("Founder's message\n");
+				sb.append("Love what you do. Go with your strong determination and never ever give up.\n");
+				sb.append("You sure eventually accomplish them all.");
+				JOptionPane.showMessageDialog(null, sb.toString(), "MUICT_Registra", JOptionPane.INFORMATION_MESSAGE);
+				sb = null;
+			}
+		});
+		getContentPane().add(aboutButton);
 
 		this.setResizable(false);
 		currentDialog = this;

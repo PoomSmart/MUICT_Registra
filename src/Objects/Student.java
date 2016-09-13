@@ -16,7 +16,11 @@ public class Student implements Cloneable {
 	private final String nickname;
 	private final String gender;
 	private final int section;
+	private final int bann;
+	private final boolean islamic;
+	private final boolean freshman;
 	private boolean medicalExclusive;
+	private boolean cheerleader;
 	private Map<String, Status> statuses;
 	private Position<Integer, Integer> position;
 	private String cellPosition;
@@ -25,9 +29,6 @@ public class Student implements Cloneable {
 	private String foodAllergies;
 	private String foodPreference;
 	private AcceptanceType acceptanceStatus;
-	private final int bann;
-	private final boolean islamic;
-	private final boolean freshman;
 
 	public enum AcceptanceType {
 		Y, N, DontSee, Unknown
@@ -81,6 +82,14 @@ public class Student implements Cloneable {
 
 	public String getGender() {
 		return gender;
+	}
+	
+	public boolean isMan() {
+		return gender.equals("M");
+	}
+	
+	public boolean isWoman() {
+		return gender.equals("F");
 	}
 
 	public int getSection() {
@@ -194,6 +203,8 @@ public class Student implements Cloneable {
 		if (debug)
 			sb.append(String.format("[%d] %s [Section %d] [Position %s]", ID, getName(), section, cellPosition));
 		else {
+			if (cheerleader)
+				sb.append(" [Cheerleader]\n");
 			sb.append(" ID: " + ID + "\n");
 			sb.append(" Full Name: " + getName() + "\n");
 			sb.append(" Nickname: " + nickname + "\n");
@@ -264,6 +275,7 @@ public class Student implements Cloneable {
 		student.statuses = new TreeMap<String, Status>();
 		student.position = position.clone();
 		student.cellPosition = cellPosition;
+		student.cheerleader = cheerleader;
 		for (Map.Entry<String, Status> entry : statuses.entrySet()) {
 			String date = entry.getKey();
 			Status status = entry.getValue().clone();
@@ -329,7 +341,7 @@ public class Student implements Cloneable {
 	}
 
 	public boolean unableToJoin() {
-		return acceptanceStatus == AcceptanceType.N;
+		return acceptanceStatus == AcceptanceType.N || isCheerleader();
 	}
 
 	public boolean isIslamic() {
@@ -338,6 +350,14 @@ public class Student implements Cloneable {
 
 	public boolean isFreshman() {
 		return freshman;
+	}
+
+	public boolean isCheerleader() {
+		return cheerleader;
+	}
+
+	public void setCheerleader(boolean cheerleader) {
+		this.cheerleader = cheerleader;
 	}
 
 }

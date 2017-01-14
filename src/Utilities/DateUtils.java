@@ -11,18 +11,23 @@ import java.util.Vector;
 import Objects.Constants;
 
 public class DateUtils {
+	
+	private static Calendar calendar = Calendar.getInstance();
+	private static Calendar firstDay = null;
+	private static Calendar finalDay = null;
 
 	public static final SimpleDateFormat s_fmt = new SimpleDateFormat("yyyyMMdd");
 	public static final SimpleDateFormat n_fmt = new SimpleDateFormat("dd/MM/yyyy");
+	
+	public static int studentYearInt = -1;
+	private static final boolean overrideYear = true;
 
 	public static String getFormattedDate(Date date) {
 		return s_fmt.format(date);
 	}
 
 	public static Date getCurrentDate() {
-		Calendar calendar = Calendar.getInstance();
-		Date currentDate = calendar.getTime();
-		return currentDate;
+		return calendar.getTime();
 	}
 
 	public static String getCurrentFormattedDate() {
@@ -81,17 +86,44 @@ public class DateUtils {
 		return cal;
 	}
 	
-	public static Calendar finalDay() {
+	public static Calendar firstDay() {
+		if (firstDay != null)
+			return firstDay;
 		Calendar cal = Calendar.getInstance();
-		cal.set(cal.get(Calendar.YEAR), Calendar.SEPTEMBER, 10);
-		return cal;
+		cal.set(getYear(), Calendar.AUGUST, 15);
+		return firstDay = cal; 
+	}
+	
+	public static Calendar finalDay() {
+		if (finalDay != null)
+			return finalDay;
+		Calendar cal = Calendar.getInstance();
+		cal.set(getYear(), Calendar.SEPTEMBER, 10);
+		return finalDay = cal;
+	}
+	
+	public static int getYear() {
+		if (overrideYear)
+			return 2016;
+		return calendar.get(Calendar.YEAR);
+	}
+	
+	public static int studentYearInt() {
+		if (studentYearInt != -1)
+			return studentYearInt;
+		return studentYearInt = (getYear() + 543) % 100;
+	}
+	
+	public static String studentYear() {
+		return studentYearInt() + "";
+	}
+	
+	public static void prepare() {
+		calendar.set(Calendar.YEAR, getYear());
 	}
 
 	public static boolean isBusinessDay(Calendar cal) {
-		// Exception: final day
-		if (cal.get(Calendar.DAY_OF_MONTH) == 10 && cal.get(Calendar.MONTH) == Calendar.SEPTEMBER)
-			return true;
-		if (cal.compareTo(finalDay()) > 0)
+		if (cal.compareTo(finalDay()) > 0 || cal.compareTo(firstDay()) < 0)
 			return false;
 		// Exception: holidays
 		if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)

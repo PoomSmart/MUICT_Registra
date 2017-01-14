@@ -38,7 +38,7 @@ public class Student implements Cloneable {
 			String healthCondition, String medicalAllergies, String foodAllergies, String foodPreference,
 			AcceptanceType acceptanceStatus) {
 		this.ID = ID;
-		this.freshman = ID / 100000 == 59;
+		this.freshman = ID / 100000 == DateUtils.studentYearInt();
 		int tID = ID % 1000;
 		int tbann = ((tID % 100) / 10);
 		this.bann = tbann == 0 ? 1 : (tID % 10 == 0 ? tbann : tbann + 1);
@@ -358,6 +358,10 @@ public class Student implements Cloneable {
 
 	public void setCheerleader(boolean cheerleader) {
 		this.cheerleader = cheerleader;
+	}
+	
+	public static int createID(int num) {
+		return num + (DateUtils.studentYearInt() * 100000) + 88000;
 	}
 
 }

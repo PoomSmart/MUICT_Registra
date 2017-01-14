@@ -12,6 +12,7 @@ import org.apache.commons.io.FileUtils;
 import MainApp.MainApp;
 import Objects.Position;
 import Objects.Student;
+import Utilities.DateUtils;
 import Visualizers.SeatVisualizer;
 
 public class SeatAssigner {
@@ -27,6 +28,8 @@ public class SeatAssigner {
 				String[] tuples = seat.split(",");
 				if (tuples.length == 2) {
 					Integer ID = Integer.parseInt(tuples[0]);
+					if (ID < 1000)
+						ID = 88000 + ID + DateUtils.studentYearInt() * 10000;
 					Student student = db.get(ID);
 					if (student == null) {
 						System.out.println("ID: " + ID + " not found");

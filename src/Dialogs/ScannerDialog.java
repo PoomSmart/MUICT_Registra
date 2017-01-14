@@ -40,6 +40,7 @@ import Objects.Student;
 import Utilities.CommonUtils;
 import Utilities.CommonUtils.FileType;
 import Utilities.DBUtils;
+import Utilities.DateUtils;
 import Utilities.WindowUtils;
 import Workers.Logger;
 import Workers.ScannerSaver;
@@ -102,7 +103,7 @@ public class ScannerDialog extends JFrame {
 			Integer rID;
 			while (maxCount-- != 0) {
 				do {
-					rID = 5988001 + r.nextInt(300);
+					rID = 88001 + r.nextInt(300) + DateUtils.studentYearInt() * 100000;
 				} while ((randomIDs.contains(rID) || oldIDs.contains(rID)) && oldIDs.size() != MainApp.db.size()
 						&& !MainApp.db.containsKey(rID));
 				randomIDs.add(rID);
@@ -290,8 +291,8 @@ public class ScannerDialog extends JFrame {
 				if (!"208222".contains(text)) {
 					Integer ID;
 					if (text.length() == 3) {
-						ID = CommonUtils.getID("5988" + text);
-						if (ID / 1000 == 5988) {
+						ID = CommonUtils.getID(DateUtils.studentYear() + "88" + text);
+						if (ID / 1000 == (DateUtils.studentYearInt() * 100 + 88)) {
 							addID(ID);
 							return;
 						}
@@ -352,7 +353,7 @@ public class ScannerDialog extends JFrame {
 				System.out.println("-> " + ID);
 				if (!MainApp.db.containsKey(ID)) {
 					if (ID == 5888220)
-						setStatus("Add yourself?: " + ID);
+						setStatus("Add yourself?: " + ID); // the founder
 					else {
 						System.out.println("ID does not exist in database: " + ID);
 						setStatus("Not Added (1): " + ID);

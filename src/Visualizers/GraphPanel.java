@@ -20,6 +20,7 @@ import java.util.Random;
 import java.util.Vector;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -42,6 +43,7 @@ public class GraphPanel extends JPanel {
 	private int pointWidth = 4;
 	private int numberYDivisions = 10;
 	private List<List<Integer>> data;
+	private int maxScore = Integer.MIN_VALUE;
 	private int currentMaxIndex = 0;
 	private int currentMaxVersions = 0;
 	private static Random random = new Random();
@@ -50,11 +52,15 @@ public class GraphPanel extends JPanel {
 
 	public GraphPanel(String name, List<List<Integer>> scores) {
 		this.data = scores;
+		int idx = 0;
 		for (List<Integer> subscores : scores) {
 			if (currentMaxVersions < subscores.size()) {
-				currentMaxIndex = scores.indexOf(subscores);
+				currentMaxIndex = idx;
 				currentMaxVersions = subscores.size();
 			}
+			idx++;
+			for (Integer score : subscores)
+				maxScore = Math.max(maxScore, score);
 		}
 		JFrame frame = new JFrame(name == null ? "Multiple data" : name);
 		frame.getContentPane().add(this);
@@ -153,6 +159,7 @@ public class GraphPanel extends JPanel {
 
 		g2.setStroke(oldStroke);
 		colorIndex = 0;
+		int labelHeight = metrics.getHeight();
 		for (List<Point> subgraphPoints : graphPoints) {
 			Color numColor = graphColors.getOrDefault(colorIndex, Color.BLACK);
 			g2.setColor(numColor);
@@ -165,13 +172,14 @@ public class GraphPanel extends JPanel {
 				g2.fillOval(x, y, pointWidth, pointWidth);
 				String num = data.get(colorIndex).get(i) + "";
 				int labelWidth = metrics.stringWidth(num);
-				g2.drawOval(gx - 9, gy - 9, 18, 18);
-				Color whiteA = new Color(1.0f, 1.0f, 1.0f, 0.8f);
+				int ovalSize = 22;
+				g2.drawOval(gx - ovalSize / 2, gy - ovalSize / 2, ovalSize, ovalSize);
+				Color whiteA = new Color(1.0f, 1.0f, 1.0f, 0.75f);
 				g2.setColor(whiteA);
 				whiteA = null;
-				g2.fillOval(gx - 9, gy - 9, 18, 18);
+				g2.fillOval(gx - ovalSize / 2, gy - ovalSize / 2, ovalSize, ovalSize);
 				g2.setColor(numColor);
-				g2.drawString(num, x - labelWidth / 2 + 3, y + 5);
+				g2.drawString(num, x - (labelWidth - pointWidth) / 2, y + labelHeight / 2);
 			}
 			colorIndex++;
 		}
@@ -187,11 +195,6 @@ public class GraphPanel extends JPanel {
 	}
 
 	private Integer getMaxScore() {
-		Integer maxScore = Integer.MIN_VALUE;
-		for (List<Integer> subscores : data) {
-			for (Integer score : subscores)
-				maxScore = Math.max(maxScore, score);
-		}
 		return maxScore;
 	}
 
@@ -236,6 +239,10 @@ public class GraphPanel extends JPanel {
 	}
 
 	public void writeToFile(String filename, List<String> colNames) {
+		int result = JOptionPane.showConfirmDialog(null, "Save to excel file?", "Graph Saver",
+				JOptionPane.YES_NO_OPTION);
+		if (result != JOptionPane.YES_OPTION)
+			return;
 		try {
 			FileOutputStream fileOut = new FileOutputStream(filename + ".xlsx");
 			XSSFWorkbook workbook = new XSSFWorkbook();
@@ -257,7 +264,6 @@ public class GraphPanel extends JPanel {
 					cellValue.setCellValue(data.get(col).get(i));
 				}
 			}
-			
 			workbook.write(fileOut);
 			fileOut.flush();
 			fileOut.close();

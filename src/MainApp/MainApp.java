@@ -33,6 +33,7 @@ import Utilities.DateUtils;
 import Utilities.WindowUtils;
 import Visualizers.SeatVisualizer;
 import Workers.AcceptanceAssigner;
+import Workers.ErrorReporter;
 import Workers.SeatAssigner;
 import Workers.SpecialAssigner;
 
@@ -104,69 +105,74 @@ public class MainApp {
 
 	public static void main(String[] args) throws InterruptedException, IOException {
 		// License agreement
-		if (!CommonUtils.fileExistsAtPath("agreed")) {
-			JPanel panel = new JPanel() {
-				private static final long serialVersionUID = 1L;
+		try {
+			if (!CommonUtils.fileExistsAtPath("agreed")) {
+				JPanel panel = new JPanel() {
+					private static final long serialVersionUID = 1L;
 
-				@Override
-				public Dimension getPreferredSize() {
-					return new Dimension(530, 800);
-				}
-			};
+					@Override
+					public Dimension getPreferredSize() {
+						return new Dimension(530, 800);
+					}
+				};
 
-			JTextArea textArea = new JTextArea();
-			textArea.setText(FileUtils.readFileToString(new File("LICENSE"), Charset.defaultCharset()));
-			textArea.setEditable(false);
-			panel.setLayout(new BorderLayout());
-			panel.add(new JScrollPane(textArea));
-			Object buttonLabels[] = { "Agree", "Disagree " };
-			int answer = JOptionPane.showOptionDialog(null, panel, "License Agreement", JOptionPane.YES_NO_OPTION,
-					JOptionPane.INFORMATION_MESSAGE, null, buttonLabels, buttonLabels[0]);
-			if (answer != JOptionPane.YES_OPTION)
-				System.exit(0);
-			FileUtils.write(new File("agreed"), "");
+				JTextArea textArea = new JTextArea();
+				textArea.setText(FileUtils.readFileToString(new File("LICENSE"), Charset.defaultCharset()));
+				textArea.setEditable(false);
+				panel.setLayout(new BorderLayout());
+				panel.add(new JScrollPane(textArea));
+				Object buttonLabels[] = { "Agree", "Disagree " };
+				int answer = JOptionPane.showOptionDialog(null, panel, "License Agreement", JOptionPane.YES_NO_OPTION,
+						JOptionPane.INFORMATION_MESSAGE, null, buttonLabels, buttonLabels[0]);
+				if (answer != JOptionPane.YES_OPTION)
+					System.exit(0);
+				FileUtils.write(new File("agreed"), "");
+			}
+			DateUtils.prepare();
+			Map<Integer, Student> students = new StudentDatabase("batch-14-new2.csv").getStudents();
+			studentsByPositions = new TreeMap<Position<Integer, Integer>, Student>();
+			randomPosition(db = students);
+			AcceptanceAssigner.assignAll(db);
+			SpecialAssigner.assignAll(db);
+			SeatAssigner.assignAll(db);
+
+			// Create our working directory
+			createPathIfNecessary(Constants.FILE_ROOT);
+
+			// Create a directory for current date, if necessary
+			Date currentDate = DateUtils.getCurrentDate();
+			if (DateUtils.isBusinessDay(DateUtils.DateToCalendar(currentDate))) {
+				String datePath = CommonUtils.datePath(currentDate);
+				createPathIfNecessary(datePath);
+			}
+
+			ScannerDialog scannerDialog = new ScannerDialog();
+			scannerDialog.setVisible(true);
+			runFrame(scannerDialog);
+
+			ScannerListDialog scannerListDialog = new ScannerListDialog();
+			scannerListDialog.setVisible(true);
+			scannerDialog.setList(scannerListDialog);
+			runFrame(scannerListDialog);
+
+			LeaveDialog leaveDialog = new LeaveDialog();
+			leaveDialog.setVisible(true);
+			runFrame(leaveDialog);
+
+			ControlCenterDialog ccDialog = new ControlCenterDialog();
+			ccDialog.setVisible(true);
+			runFrame(ccDialog);
+
+			SeatVisualizer vis = new SeatVisualizer();
+			vis.setVisible(true);
+			runFrame(vis);
+
+			// Initially focus scanner window
+			scannerDialog.toFront();
+			scannerDialog.getField().requestFocus();
+		} catch (Exception e) {
+			ErrorReporter.report(e);
 		}
-		Map<Integer, Student> students = new StudentDatabase("batch-14-new2.csv").getStudents();
-		studentsByPositions = new TreeMap<Position<Integer, Integer>, Student>();
-		randomPosition(db = students);
-		AcceptanceAssigner.assignAll(db);
-		SpecialAssigner.assignAll(db);
-		SeatAssigner.assignAll(db);
-
-		// Create our working directory
-		createPathIfNecessary(Constants.FILE_ROOT);
-
-		// Create a directory for current date, if necessary
-		Date currentDate = DateUtils.getCurrentDate();
-		if (DateUtils.isBusinessDay(DateUtils.DateToCalendar(currentDate))) {
-			String datePath = CommonUtils.datePath(currentDate);
-			createPathIfNecessary(datePath);
-		}
-
-		ScannerDialog scannerDialog = new ScannerDialog();
-		scannerDialog.setVisible(true);
-		runFrame(scannerDialog);
-
-		ScannerListDialog scannerListDialog = new ScannerListDialog();
-		scannerListDialog.setVisible(true);
-		scannerDialog.setList(scannerListDialog);
-		runFrame(scannerListDialog);
-
-		LeaveDialog leaveDialog = new LeaveDialog();
-		leaveDialog.setVisible(true);
-		runFrame(leaveDialog);
-
-		ControlCenterDialog ccDialog = new ControlCenterDialog();
-		ccDialog.setVisible(true);
-		runFrame(ccDialog);
-
-		SeatVisualizer vis = new SeatVisualizer();
-		vis.setVisible(true);
-		runFrame(vis);
-
-		// Initially focus scanner window
-		scannerDialog.toFront();
-		scannerDialog.getField().requestFocus();
 	}
 
 }

@@ -258,8 +258,8 @@ public class ControlCenterDialog extends JFrame {
 				sb.append("We can generate table showing various information about students and sort them by any filter.\n");
 				sb.append("We definitely can analyze the activity in terms of statistics.\n\n");
 				sb.append("Founder's message\n");
-				sb.append("Love what you do. Go with your strong determination and never ever give up.\n");
-				sb.append("You sure eventually accomplish them all.");
+				sb.append("Redistribution and publication are strictly not allowed.\n");
+				sb.append("And the founder does not really like Stand Cheer.");
 				JOptionPane.showMessageDialog(null, sb.toString(), "MUICT_Registra", JOptionPane.INFORMATION_MESSAGE);
 				sb = null;
 			}

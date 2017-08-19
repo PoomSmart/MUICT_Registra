@@ -8,6 +8,7 @@ public class ErrorReporter {
 	}
 
 	public static void report(Exception e) {
+		e.printStackTrace();
 		report(e.getStackTrace());
 	}
 }

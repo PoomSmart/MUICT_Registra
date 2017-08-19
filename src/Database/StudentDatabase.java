@@ -15,7 +15,8 @@ import Utilities.CommonUtils;
 public class StudentDatabase {
 	
 	// Pattern: #,ID,titleTH,firstnameTH,lastnameTH,title,firstname,lastname,section,(unused),school,schoolLoc,nickname,bann,healthCondition,medAllergies,foodAllergies,foodPref
-	private static final Pattern pattern = Pattern.compile("\\d+,(\\d+),[ -�]*,[ -�]*,[ -�]*,(.*),(.*),(.*),(\\d),.*,[ -�]*,[ -�]*,(.*),(\\d*),([ -�]*),([ -�]*),([ -�]*),([ -�]*)", Pattern.UNICODE_CHARACTER_CLASS);
+	private static final String textSet = "[^\\,]*"; // turns out this simplistically works
+	private static final Pattern pattern = Pattern.compile(String.format("\\d+,(\\d+),%s,%s,%s,(.*),(.*),(.*),(\\d),.*,%s,%s,(.*),(\\d*),(%s),(%s),(%s),(%s)", textSet, textSet, textSet, textSet, textSet, textSet, textSet, textSet, textSet), Pattern.UNICODE_CHARACTER_CLASS);
 
 	private Map<Integer, Student> students = new TreeMap<Integer, Student>();
 	
@@ -51,6 +52,7 @@ public class StudentDatabase {
 				String foodPreference = m.group(11);
 				Student student = new Student(ID, firstname, lastname, nickname, section, gender, healthCondition, medicalAllergies, foodAllergies, foodPreference, null);
 				students.put(ID, student);
+				System.out.println("Added: " + ID);
 			}
 		}
 	}

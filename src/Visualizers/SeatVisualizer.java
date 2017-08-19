@@ -27,11 +27,8 @@ import MainApp.MainApp;
 import Objects.Cell;
 import Objects.Position;
 import Objects.Student;
-import Utilities.CommonUtils;
-import Utilities.DBUtils;
-import Utilities.DateUtils;
-import Utilities.SpringUtilities;
-import Utilities.WindowUtils;
+import Utilities.*;
+
 
 class SeatPanel extends JPanel {
 
@@ -121,7 +118,7 @@ class SeatPanel extends JPanel {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				g.setColor(Color.white);
-				Position<Integer, Integer> findPos = new Position<Integer, Integer>(height - x - 1, width - y);
+				Position<Integer, Integer> findPos = new Position<Integer, Integer>(height - x, width - y - 1);
 				Student student = MainApp.studentsByPositions.get(findPos);
 				Student student2 = null;
 				Integer ID = -1;
@@ -160,6 +157,7 @@ class SeatPanel extends JPanel {
 					g.drawString(sID, shiftLeft + x * tileWidth + (tileWidth - labelWidth) / 2,
 							shiftTop + y * tileHeight + startY);
 				} else {
+					// Senior
 					g.setColor(Color.getHSBColor(0.4f, 0.8f, 0.62f));
 					g.fillRect(shiftLeft + x * tileWidth, shiftTop + y * tileHeight, tileWidth, tileHeight);
 					String senior = "Senior";
@@ -213,8 +211,8 @@ public class SeatVisualizer extends JFrame {
 
 	public static final int shiftLeft = 30;
 	public static final int shiftTop = 30;
-	public static final Dimension bounds = new Dimension(8, 9);
-	public static final Dimension tileSize = new Dimension(55, 55);
+	public static final Dimension bounds = new Dimension(9, 9); // width and height of seat visualizer
+	public static final Dimension tileSize = new Dimension(55, 55); // width and height of each seat in seat visualizer
 	public static final Dimension absoluteSize = new Dimension(bounds.width * tileSize.width + shiftLeft,
 			bounds.height * tileSize.height + shiftTop);
 

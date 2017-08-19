@@ -57,7 +57,7 @@ public class LeaveDialog extends JFrame {
 
 	public LeaveDialog() {
 		this.setTitle(WindowUtils.realTitle("Leave Form"));
-		this.setSize(400, 210);
+		this.setSize(400, 220);
 		WindowUtils.setRelativeCenter(this, 0, 180);
 
 		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
@@ -66,6 +66,7 @@ public class LeaveDialog extends JFrame {
 		panel.setLayout(new SpringLayout());
 		
 		JLabel IDLabel = new JLabel("ID (s): ", JLabel.TRAILING);
+		
 		panel.add(IDLabel);
 		inputField = new JTextField();
 		inputField.setHorizontalAlignment(JTextField.LEFT);
@@ -90,19 +91,29 @@ public class LeaveDialog extends JFrame {
 					String[] sIDs = oIDs.split(",");
 					Vector<Integer> IDs = new Vector<Integer>();
 					for (String sID : sIDs) {
-						Integer ID = CommonUtils.getID(sID);
-						if (ID == -1)
-							ID = CommonUtils.getID("5988" + sID);
-						if (ID == -1)
+						Integer ID = CommonUtils.getID("6088" + sID);
+						/*System.out.println(Arrays.toString(sIDs));
+						System.out.println(ID);*/
+						/*if (ID != -1){
+							System.out.println("in if " + ID);
+						}
+							
+						else if (ID == -1){
+							System.out.println("not found");
 							continue;
+						}
+					
+						if (ID == -1)
+							continue;*/
 						if (!MainApp.db.containsKey(ID)) {
-							JOptionPane.showMessageDialog(null, ID + " or more student ID not found");
-							return;
+							JOptionPane.showMessageDialog(null, "student ID not found");
+							continue;
+							//return;
 						}
 						Student realStudent = currentStudentMap.get(ID);
 						if (realStudent.isLeft()) {
 							JOptionPane.showMessageDialog(null, ID + " or more student has already left");
-							return;
+							continue;
 						}
 						IDs.add(ID);
 					}
@@ -115,27 +126,32 @@ public class LeaveDialog extends JFrame {
 						return;
 					}
 					reason = reason.replaceAll("\n", "\\\\n");
-					int result = JOptionPane.showConfirmDialog(null, Constants.COMMON_CONFIRM, "Leave Form",
-							JOptionPane.YES_NO_OPTION);
-					if (result == JOptionPane.YES_OPTION) {
-						ScannerSaver.doneAddingCodes(IDs, CommonUtils.sameReason(reason, IDs.size()), true,
-								CommonUtils.FileType.NOTHERE);
-						// We are supposed to update present.csv since ID there may also exist in leave.csv
-						Map<Integer, Student> leaveStudents = DBUtils.getCurrentLeaveStudents();
-						File regularFile = CommonUtils.fileFromType(CommonUtils.FileType.REGULAR);
-						if (CommonUtils.fileExistsAtPath(regularFile.getPath())) {
-							List<String> presentIDs = FileUtils.readLines(regularFile);
-							for (Integer ID : leaveStudents.keySet())
-								presentIDs.remove(String.valueOf(ID));
-							Vector<Integer> spresentIDs = new Vector<Integer>();
-							for (String sID : presentIDs)
-								spresentIDs.add(Integer.parseInt(sID));
-							ScannerSaver.doneAddingCodes(spresentIDs, false, CommonUtils.FileType.REGULAR, true);
-							spresentIDs = null;
+					
+					if(!IDs.isEmpty())
+					{
+						int result = JOptionPane.showConfirmDialog(null, Constants.COMMON_CONFIRM, "Leave Form",
+								JOptionPane.YES_NO_OPTION);
+						if (result == JOptionPane.YES_OPTION) {
+							ScannerSaver.doneAddingCodes(IDs, CommonUtils.sameReason(reason, IDs.size()), true,
+									CommonUtils.FileType.NOTHERE);
+							// We are supposed to update present.csv since ID there may also exist in leave.csv
+							Map<Integer, Student> leaveStudents = DBUtils.getCurrentLeaveStudents();
+							File regularFile = CommonUtils.fileFromType(CommonUtils.FileType.REGULAR);
+							if (CommonUtils.fileExistsAtPath(regularFile.getPath())) {
+								List<String> presentIDs = FileUtils.readLines(regularFile);
+								for (Integer ID : leaveStudents.keySet())
+									presentIDs.remove(String.valueOf(ID));
+								Vector<Integer> spresentIDs = new Vector<Integer>();
+								for (String sID : presentIDs)
+									spresentIDs.add(Integer.parseInt(sID));
+								ScannerSaver.doneAddingCodes(spresentIDs, false, CommonUtils.FileType.REGULAR, true);
+								spresentIDs = null;
+							}
+							shouldCleanup = true;
 						}
-						shouldCleanup = true;
+						IDs = null;
 					}
-					IDs = null;
+					
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				} finally {

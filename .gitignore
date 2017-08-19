@@ -65,3 +65,5 @@ $RECYCLE.BIN/
 
 Attendance/*
 *.csv
+*.txt
+*.xlsx

@@ -106,7 +106,7 @@ public class MainApp {
 	public static void main(String[] args) throws InterruptedException, IOException {
 		// License agreement
 		try {
-			if (!CommonUtils.fileExistsAtPath("agreed")) {
+			if (!CommonUtils.fileExistsAtPath("agreed") && CommonUtils.fileExistsAtPath("LICENSE")) {
 				JPanel panel = new JPanel() {
 					private static final long serialVersionUID = 1L;
 
@@ -129,9 +129,12 @@ public class MainApp {
 				FileUtils.write(new File("agreed"), "");
 			}
 			DateUtils.prepare();
-			Map<Integer, Student> students = new StudentDatabase("batch-14-new2.csv").getStudents();
+			
+			// change file name here
+			Map<Integer, Student> students = new StudentDatabase("2017_standcheer_Freshmen_1.csv").getStudents();
 			studentsByPositions = new TreeMap<Position<Integer, Integer>, Student>();
 			randomPosition(db = students);
+			System.out.println(db.size());
 			AcceptanceAssigner.assignAll(db);
 			SpecialAssigner.assignAll(db);
 			SeatAssigner.assignAll(db);

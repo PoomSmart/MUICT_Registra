@@ -25,7 +25,7 @@ public class SeatAssigner {
 		try {
 			List<String> seats = FileUtils.readLines(new File("seats.csv"));
 			for (String seat : seats) {
-				String[] tuples = seat.split(",");
+				String[] tuples = seat.replaceAll("[^\\w\\s\\,]", "").trim().split(","); // FIXME: unwanted special characters from csv files
 				if (tuples.length == 2) {
 					Integer ID = Integer.parseInt(tuples[0]);
 					if (ID < 1000)

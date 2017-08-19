@@ -90,7 +90,7 @@ public class DateUtils {
 		if (firstDay != null)
 			return firstDay;
 		Calendar cal = Calendar.getInstance();
-		cal.set(getYear(), Calendar.AUGUST, 15);
+		cal.set(getYear(), Calendar.AUGUST, 19);
 		return firstDay = cal; 
 	}
 	
@@ -98,13 +98,13 @@ public class DateUtils {
 		if (finalDay != null)
 			return finalDay;
 		Calendar cal = Calendar.getInstance();
-		cal.set(getYear(), Calendar.SEPTEMBER, 10);
+		cal.set(getYear(), Calendar.SEPTEMBER, 10); // TODO: update this
 		return finalDay = cal;
 	}
 	
 	public static int getYear() {
 		if (overrideYear)
-			return 2016;
+			return 2017;
 		return calendar.get(Calendar.YEAR);
 	}
 	
@@ -129,10 +129,10 @@ public class DateUtils {
 		if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
 			return false;
 		// Exception: special days
-		if (cal.get(Calendar.DAY_OF_MONTH) == 31 && cal.get(Calendar.MONTH) == Calendar.AUGUST)
+		/*if (cal.get(Calendar.DAY_OF_MONTH) == 31 && cal.get(Calendar.MONTH) == Calendar.AUGUST)
 			return false;
 		if (cal.get(Calendar.DAY_OF_MONTH) == 2 && cal.get(Calendar.MONTH) == Calendar.SEPTEMBER)
-			return false;
+			return false;*/
 		return true;
 	}
 }

@@ -39,9 +39,7 @@ public class Student implements Cloneable {
 			AcceptanceType acceptanceStatus) {
 		this.ID = ID;
 		this.freshman = ID / 100000 == DateUtils.studentYearInt();
-		int tID = ID % 1000;
-		int tbann = ((tID % 100) / 10);
-		this.bann = tbann == 0 ? 1 : (tID % 10 == 0 ? tbann : tbann + 1);
+		this.bann = (ID % 100 == 0) ? 10 : (((ID % 100) - 1) / 10) + 1;
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.nickname = nickname;

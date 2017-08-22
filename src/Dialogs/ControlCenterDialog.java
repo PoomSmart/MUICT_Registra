@@ -263,8 +263,6 @@ public class ControlCenterDialog extends JFrame {
 							List<String> ComeToday = FileUtils.readLines(new File(path));
 							List<Integer> leave = LeaveDialog.IDs;
 							StringBuilder notsee = new StringBuilder();
-						
-							//System.out.println(ComeToday);
 							
 							for(String s: yList)
 							{

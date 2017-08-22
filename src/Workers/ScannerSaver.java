@@ -15,6 +15,8 @@ import Utilities.CommonUtils.FileType;
 import Visualizers.SeatVisualizer;
 
 public class ScannerSaver {
+	
+	public static Vector<Integer> ComeToday = new Vector<Integer>();
 
 	public static void doneAddingCodes(Vector<Integer> IDs, Vector<String> reasons, boolean append, FileType type,
 			boolean force) throws IOException {
@@ -29,7 +31,9 @@ public class ScannerSaver {
 		if (type == CommonUtils.FileType.REGULAR) {
 			System.out.println(String.format("Write code data to %s (type: %s, append: %s, force: %s)", filePath, type,
 					append, force));
+			ComeToday.addAll(CommonUtils.resolveDuplicates(IDs)); // add id of students who come today
 			FileUtils.writeLines(file, CommonUtils.resolveDuplicates(IDs), append);
+			//System.out.println("writing data to file: " + IDs);	
 		} else if (type == CommonUtils.FileType.NOTHERE) {
 			if (reasons == null) {
 				System.out.println("null reasons");

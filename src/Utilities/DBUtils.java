@@ -40,6 +40,7 @@ public class DBUtils {
 			String line;
 			Matcher m;
 			while ((line = reader.readLine()) != null) {
+				System.out.println("Db utils: " + line);
 				if ((m = pLeave.matcher(line)).find()) {
 					Integer ID = CommonUtils.getID(m.group(1));
 					if (ID == -1)

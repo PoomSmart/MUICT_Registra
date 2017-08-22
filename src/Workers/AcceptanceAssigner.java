@@ -15,7 +15,7 @@ public class AcceptanceAssigner {
 		
 	public static void assignAll(Map<Integer, Student> db) {
 		try {
-			List<String> ncList = FileUtils.readLines(new File("acceptance-nc.csv"));
+			/*List<String> ncList = FileUtils.readLines(new File("acceptance-nc.csv"));
 			for (String fID : ncList) {
 				Integer ID = CommonUtils.getID(DateUtils.studentYear() + "88" + fID);
 				if (ID != -1) {
@@ -23,7 +23,7 @@ public class AcceptanceAssigner {
 					if (student != null)
 						student.setAcceptanceStatus(Student.AcceptanceType.DontSee);
 				}
-			}
+			}*/
 			List<String> yList = FileUtils.readLines(new File("acceptance-y.csv"));
 			for (String fID : yList) {
 				Integer ID = CommonUtils.getID(DateUtils.studentYear() + "88" + fID);

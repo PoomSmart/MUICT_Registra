@@ -43,6 +43,8 @@ public class LeaveDialog extends JFrame {
 	private int defaultIndex = 2;
 	private String[] commonReasons = { "Sick", "ACM-ICPC", "Urgent Business", "Limited Allowances", "Others" };
 	
+	public static Vector<Integer> IDs = new Vector<Integer>();
+	
 	private boolean othersSelected() {
 		return reasonSelector.getSelectedIndex() == commonReasons.length - 1;
 	}
@@ -89,7 +91,7 @@ public class LeaveDialog extends JFrame {
 					Map<Integer, Student> currentStudentMap = DBUtils.getCurrentStudents();
 					String oIDs = inputField.getText();
 					String[] sIDs = oIDs.split(",");
-					Vector<Integer> IDs = new Vector<Integer>();
+					
 					for (String sID : sIDs) {
 						Integer ID = CommonUtils.getID("6088" + sID);
 						/*System.out.println(Arrays.toString(sIDs));
@@ -149,7 +151,8 @@ public class LeaveDialog extends JFrame {
 							}
 							shouldCleanup = true;
 						}
-						IDs = null;
+						//IDs = null;
+						
 					}
 					
 				} catch (IOException ex) {

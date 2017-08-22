@@ -52,7 +52,6 @@ public class StudentDatabase {
 				String foodPreference = m.group(11);
 				Student student = new Student(ID, firstname, lastname, nickname, section, gender, healthCondition, medicalAllergies, foodAllergies, foodPreference, null);
 				students.put(ID, student);
-				System.out.println("Added: " + ID);
 			}
 		}
 	}

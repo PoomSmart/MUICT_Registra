@@ -106,7 +106,7 @@ public class MainApp {
 	public static void main(String[] args) throws InterruptedException, IOException {
 		// License agreement
 		try {
-			if (!CommonUtils.fileExistsAtPath("agreed") && CommonUtils.fileExistsAtPath("LICENSE")) {
+			/*if (!CommonUtils.fileExistsAtPath("agreed") && CommonUtils.fileExistsAtPath("LICENSE")) {
 				JPanel panel = new JPanel() {
 					private static final long serialVersionUID = 1L;
 
@@ -127,14 +127,13 @@ public class MainApp {
 				if (answer != JOptionPane.YES_OPTION)
 					System.exit(0);
 				FileUtils.write(new File("agreed"), "");
-			}
+			}*/
 			DateUtils.prepare();
 			
 			// change file name here
 			Map<Integer, Student> students = new StudentDatabase("2017_standcheer_Freshmen_1.csv").getStudents();
 			studentsByPositions = new TreeMap<Position<Integer, Integer>, Student>();
 			randomPosition(db = students);
-			System.out.println(db.size());
 			AcceptanceAssigner.assignAll(db);
 			SpecialAssigner.assignAll(db);
 			SeatAssigner.assignAll(db);
@@ -166,9 +165,9 @@ public class MainApp {
 			ccDialog.setVisible(true);
 			runFrame(ccDialog);
 
-			SeatVisualizer vis = new SeatVisualizer();
+			/*SeatVisualizer vis = new SeatVisualizer();
 			vis.setVisible(true);
-			runFrame(vis);
+			runFrame(vis);*/
 
 			// Initially focus scanner window
 			scannerDialog.toFront();

@@ -20,7 +20,7 @@ public class DateUtils {
 	public static final SimpleDateFormat n_fmt = new SimpleDateFormat("dd/MM/yyyy");
 	
 	public static int studentYearInt = -1;
-	private static final boolean overrideYear = true;
+	private static final boolean overrideYear = false;
 
 	public static String getFormattedDate(Date date) {
 		return s_fmt.format(date);
@@ -90,7 +90,7 @@ public class DateUtils {
 		if (firstDay != null)
 			return firstDay;
 		Calendar cal = Calendar.getInstance();
-		cal.set(getYear(), Calendar.AUGUST, 19);
+		cal.set(getYear(), Calendar.AUGUST, 21);
 		return firstDay = cal; 
 	}
 	
@@ -98,7 +98,7 @@ public class DateUtils {
 		if (finalDay != null)
 			return finalDay;
 		Calendar cal = Calendar.getInstance();
-		cal.set(getYear(), Calendar.SEPTEMBER, 10); // TODO: update this
+		cal.set(getYear(), Calendar.SEPTEMBER, 19); // TODO: update this
 		return finalDay = cal;
 	}
 	
@@ -122,12 +122,16 @@ public class DateUtils {
 		calendar.set(Calendar.YEAR, getYear());
 	}
 
-	public static boolean isBusinessDay(Calendar cal) {
-		if (cal.compareTo(finalDay()) > 0 || cal.compareTo(firstDay()) < 0)
+	public static boolean isBusinessDay(Calendar cal) { // updated later
+		Calendar firstDay_ = firstDay();
+		Calendar finalDay_ = finalDay();
+		int diffDay = cal.get(Calendar.DAY_OF_MONTH) - firstDay_.get(Calendar.DAY_OF_MONTH);
+		int diffMonth = cal.get(Calendar.MONTH) - finalDay_.get(Calendar.MONTH);
+		if ((diffDay > 0 && diffMonth > 0) || (diffDay < 0 && diffMonth < 0))
 			return false;
 		// Exception: holidays
-		if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
-			return false;
+		/*if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+			return false;*/
 		// Exception: special days
 		/*if (cal.get(Calendar.DAY_OF_MONTH) == 31 && cal.get(Calendar.MONTH) == Calendar.AUGUST)
 			return false;

@@ -4,7 +4,9 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +31,7 @@ import Utilities.WindowUtils;
 import Visualizers.GraphPanel;
 import Visualizers.SeatVisualizer;
 import Workers.Logger;
+import Workers.ScannerSaver;
 
 public class ControlCenterDialog extends JFrame {
 
@@ -58,7 +61,7 @@ public class ControlCenterDialog extends JFrame {
 
 	public ControlCenterDialog() {
 		this.setTitle(WindowUtils.realTitle("Control Center"));
-		this.setSize(450, MainApp.test ? 110 : 75);
+		this.setSize(600, MainApp.test ? 110 : 75);
 		WindowUtils.setRelativeCenter(this, 0, -200);
 		this.setLayout(new FlowLayout());
 
@@ -247,6 +250,43 @@ public class ControlCenterDialog extends JFrame {
 			getContentPane().add(randomPresentButton);
 		}
 		
+		JButton dontcome = new JButton("Who don't come today??");
+		dontcome.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent arg0) {
+						// TODO Auto-generated method stub
+						try 
+						{
+							String path = CommonUtils.filePath(CommonUtils.FileType.REGULAR);
+							String destination = "Attendance/"+ DateUtils.getCurrentFormattedDate() +"/not_come.txt";
+							List<String> yList = FileUtils.readLines(new File("acceptance-y.csv"));
+							List<String> ComeToday = FileUtils.readLines(new File(path));
+							List<Integer> leave = LeaveDialog.IDs;
+							StringBuilder notsee = new StringBuilder();
+						
+							//System.out.println(ComeToday);
+							
+							for(String s: yList)
+							{
+								int id = 6088000 + Integer.parseInt(s);
+								if(!ComeToday.contains(Integer.toString(id)) && !leave.contains(id))
+								{
+									notsee.append(s+"   ");
+								}	
+							}
+							FileUtils.write(new File(destination), notsee.toString());
+							JOptionPane.showMessageDialog(null, notsee.toString(), "Who don't come today",0);
+						} 
+						catch (IOException e) 
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+					}
+				});
+		
+		getContentPane().add(dontcome);
 		JButton aboutButton = new JButton("About");
 		aboutButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

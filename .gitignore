@@ -67,3 +67,4 @@ Attendance/*
 *.csv
 *.txt
 *.xlsx
+/bin/

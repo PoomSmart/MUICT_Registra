@@ -61,6 +61,7 @@ public class StudentTable extends JFrame {
 	private JLabel bannText;
 	private JLabel attendanceText;
 	private JLabel perSectionText;
+	private JLabel MenWomenText;
 	private JComboBox<String> dateSelector;
 
 	private Object[][] data;
@@ -70,6 +71,8 @@ public class StudentTable extends JFrame {
 	public static int totalLeft;
 	public static int totalPresentIslamic;
 	public static int totalIslamic;
+	public static int totalMen;
+	public static int totalWomen;
 
 	public static int totalEverydayAttend;
 	public static int totalSomeAttend;
@@ -149,8 +152,15 @@ public class StudentTable extends JFrame {
 			statText.setText(String.format(
 					"Total Present: %d (Islamic: %d/%d), Total Absent: %d, Total Left: %d, Total Ever Here: %d",
 					totalPresent, totalPresentIslamic, totalIslamic, totalAbsent, totalLeft, totalPresent + totalLeft));
-	}
+	} 
 
+	private void updateMenWomenText()
+	{
+		if(MenWomenText != null)
+			MenWomenText.setText("Total men for today: " + totalMen +
+								 ", Total women for today: " + totalWomen);
+	}
+	
 	private void updateBannText() {
 		if (bannText != null) {
 			StringBuilder sb = new StringBuilder();
@@ -189,6 +199,7 @@ public class StudentTable extends JFrame {
 			bannPresentCount = new int[10];
 			totalIslamic = totalPresentIslamic = 0;
 			totalPresent = totalAbsent = totalLeft = 0;
+			totalMen = totalWomen = 0;
 			internalStudents = DBUtils.getStudents(DateUtils.dateFromString(date));
 			for (Entry<Integer, Student> entry : internalStudents.entrySet()) {
 				Student student = entry.getValue();
@@ -206,9 +217,15 @@ public class StudentTable extends JFrame {
 						totalPresentIslamic++;
 					totalIslamic++;
 				}
+				if(student.isMan() && student.isNormal())
+					totalMen+=1;
+				else if(student.isWoman() && student.isNormal())
+					totalWomen+=1;
+				
 			}
 			updateStatText();
 			updateBannText();
+			updateMenWomenText();
 		} else {
 			totalEverydayAttend = totalSomeAttend = totalOnceAttend = 0;
 			internalStudents = DBUtils.getStudentsAllTime();
@@ -250,7 +267,6 @@ public class StudentTable extends JFrame {
 	public StudentTable(int mode, String date) {
 		this.mode = mode;
 		this.date = date;
-
 		updateInternalStudents();
 		updateTitle();
 
@@ -395,6 +411,11 @@ public class StudentTable extends JFrame {
 			bannText = new JLabel();
 			form.add(bannText);
 			updateBannText();
+			form.add(new JLabel());
+			MenWomenText = new JLabel();
+			form.add(MenWomenText);
+			updateMenWomenText();
+			
 		} else {
 			form.add(new JLabel());
 			attendanceText = new JLabel();

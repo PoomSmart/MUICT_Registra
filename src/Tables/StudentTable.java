@@ -61,7 +61,10 @@ public class StudentTable extends JFrame {
 	private JLabel bannText;
 	private JLabel attendanceText;
 	private JLabel perSectionText;
-	private JLabel MenWomenText;
+	private JLabel perSectionLeaveText;
+	private JLabel totalPerSectionText;
+	private JLabel PresentMenWomenText;
+	private JLabel LeaveMenWomenText;
 	private JComboBox<String> dateSelector;
 
 	private Object[][] data;
@@ -71,8 +74,12 @@ public class StudentTable extends JFrame {
 	public static int totalLeft;
 	public static int totalPresentIslamic;
 	public static int totalIslamic;
+	
 	public static int totalMen;
 	public static int totalWomen;
+
+	public static int MenLeft;
+	public static int WomenLeft;
 
 	public static int totalEverydayAttend;
 	public static int totalSomeAttend;
@@ -85,6 +92,7 @@ public class StudentTable extends JFrame {
 	private int bannCount[];
 	private int bannPresentCount[];
 	private int perSectionCount[];
+	private int perSectionLeave[];
 
 	private static final String[] names = { "ID", "First Name", "Last Name", "Nickname", "Gender", "Status",
 			"Acceptance", "Position", "Bann", "Section" };
@@ -102,7 +110,7 @@ public class StudentTable extends JFrame {
 
 	public static void updateIfPossible() {
 		for (StudentTable activeTable : activeTables) {
-			System.out.println("Update StudentTable");
+			//System.out.println("Update StudentTable");
 			activeTable.updateInternalStudents();
 			((AbstractTableModel) activeTable.table.getModel()).fireTableDataChanged();
 		}
@@ -154,11 +162,26 @@ public class StudentTable extends JFrame {
 					totalPresent, totalPresentIslamic, totalIslamic, totalAbsent, totalLeft, totalPresent + totalLeft));
 	} 
 
-	private void updateMenWomenText()
+	private void updatePresentMenWomenText()
 	{
-		if(MenWomenText != null)
-			MenWomenText.setText("Total men for today: " + totalMen +
-								 ", Total women for today: " + totalWomen);
+		if (PresentMenWomenText != null)
+			PresentMenWomenText.setText("Total men: " + totalMen + ", Total women: " + totalWomen);
+	}
+	
+	private void updateLeaveMenWomenText()
+	{
+		if(LeaveMenWomenText != null)
+			LeaveMenWomenText.setText("Total leave men: " + MenLeft + ", Total leave women: " + WomenLeft);
+	}
+	
+	private void updateTotalPerSectionText()
+	{
+		if(totalPerSectionText != null)
+		{
+			totalPerSectionText.setText("Total sec1: " + (perSectionCount[0] + perSectionLeave[0]) +
+										", Total sec2: " + (perSectionCount[1] + perSectionLeave[1]) +
+										", Total sec3: " + (perSectionCount[2] + perSectionLeave[2]));
+		}
 	}
 	
 	private void updateBannText() {
@@ -191,14 +214,30 @@ public class StudentTable extends JFrame {
 			sb = null;
 		}
 	}
+	
+	private void updatePerSectionLeaveText()
+	{
+		if(perSectionLeaveText != null)
+		{
+			StringBuilder sb = new StringBuilder();
+			for (int i = 1; i <= 3; i++) {
+				sb.append(String.format("Section %d leave: %d", i, perSectionLeave[i - 1]));
+				if (i != 3)
+					sb.append(", ");
+			}
+			perSectionLeaveText.setText(sb.toString());
+			sb = null;
+		}
+	}
 
 	public void updateInternalStudents() {
 		perSectionCount = new int[3];
+		perSectionLeave = new int[3];
 		if (mode == 0) {
 			bannCount = new int[10];
 			bannPresentCount = new int[10];
 			totalIslamic = totalPresentIslamic = 0;
-			totalPresent = totalAbsent = totalLeft = 0;
+			totalPresent = totalAbsent = totalLeft = MenLeft = WomenLeft = 0;
 			totalMen = totalWomen = 0;
 			internalStudents = DBUtils.getStudents(DateUtils.dateFromString(date));
 			for (Entry<Integer, Student> entry : internalStudents.entrySet()) {
@@ -208,24 +247,34 @@ public class StudentTable extends JFrame {
 					bannPresentCount[student.getBann() - 1]++;
 					perSectionCount[student.getSection() - 1]++;
 					totalPresent++;
+					if(student.isMan())
+						totalMen++;
+					else if(student.isWoman())
+						totalWomen++;
 				} else if (student.isAbsent(date))
 					totalAbsent++;
 				else if (student.isLeft(date))
+				{
+					perSectionLeave[student.getSection()-1]++;
+					if(student.isMan())
+						MenLeft++;
+					else if(student.isWoman())
+						WomenLeft++;
 					totalLeft++;
+				}
+					
 				if (student.isIslamic()) {
 					if (student.isNormal(date))
 						totalPresentIslamic++;
 					totalIslamic++;
 				}
-				if(student.isMan() && student.isNormal())
-					totalMen+=1;
-				else if(student.isWoman() && student.isNormal())
-					totalWomen+=1;
-				
 			}
 			updateStatText();
 			updateBannText();
-			updateMenWomenText();
+			updatePresentMenWomenText();
+			updateLeaveMenWomenText();
+			updatePerSectionLeaveText();
+			updateTotalPerSectionText();
 		} else {
 			totalEverydayAttend = totalSomeAttend = totalOnceAttend = 0;
 			internalStudents = DBUtils.getStudentsAllTime();
@@ -272,7 +321,7 @@ public class StudentTable extends JFrame {
 
 		JPanel self = new JPanel();
 		self.setLayout(new BoxLayout(self, BoxLayout.Y_AXIS));
-		this.setSize(1100, 920);
+		this.setSize(1100, 980);
 
 		class StudentTableModel extends AbstractTableModel {
 
@@ -314,7 +363,7 @@ public class StudentTable extends JFrame {
 		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		sorter = new TableRowSorter<StudentTableModel>(model);
 		table.setRowSorter(sorter);
-		table.setPreferredScrollableViewportSize(new Dimension(this.getWidth(), this.getHeight() - 250));
+		table.setPreferredScrollableViewportSize(new Dimension(this.getWidth(), 600));
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				ListSelectionModel lsm = (ListSelectionModel) e.getSource();
@@ -404,28 +453,35 @@ public class StudentTable extends JFrame {
 
 		if (mode == 0) {
 			form.add(new JLabel());
-			statText = new JLabel();
-			form.add(statText);
+			form.add(statText = new JLabel());
 			updateStatText();
 			form.add(new JLabel());
-			bannText = new JLabel();
-			form.add(bannText);
+			form.add(bannText = new JLabel());
 			updateBannText();
 			form.add(new JLabel());
-			MenWomenText = new JLabel();
-			form.add(MenWomenText);
-			updateMenWomenText();
-			
+			form.add(PresentMenWomenText = new JLabel());
+			updatePresentMenWomenText();
+			form.add(new JLabel());
+			form.add(LeaveMenWomenText = new JLabel());
+			updateLeaveMenWomenText();
+			form.add(new JLabel());
+			form.add(perSectionText = new JLabel());
+			updatePerSectionText();
+			form.add(new JLabel());
+			form.add(perSectionLeaveText = new JLabel());
+			updatePerSectionLeaveText();
+			form.add(new JLabel());
+			form.add(totalPerSectionText = new JLabel());
+			updateTotalPerSectionText();
+					
 		} else {
 			form.add(new JLabel());
-			attendanceText = new JLabel();
-			form.add(attendanceText);
+			form.add(attendanceText = new JLabel());
 			updateAttendanceText();
+			form.add(new JLabel());
+			form.add(perSectionText = new JLabel());
+			updatePerSectionText();
 		}
-		form.add(new JLabel());
-		perSectionText = new JLabel();
-		form.add(perSectionText);
-		updatePerSectionText();
 
 		table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 			private static final long serialVersionUID = 1L;
@@ -455,7 +511,7 @@ public class StudentTable extends JFrame {
 		});
 		table.setDefaultRenderer(Integer.class, table.getDefaultRenderer(Object.class));
 
-		SpringUtilities.makeCompactGrid(form, mode == 0 ? 6 : 4, 2, 6, 6, 6, 6);
+		SpringUtilities.makeCompactGrid(form, mode == 0 ? 10 : 4, 2, 6, 6, 6, 6); //set size of window (change 10 to others)
 		self.add(form);
 		this.setContentPane(self);
 		this.pack();

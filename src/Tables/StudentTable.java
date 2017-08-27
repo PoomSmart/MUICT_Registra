@@ -88,7 +88,8 @@ public class StudentTable extends JFrame {
 	private JTable table;
 	private final int mode;
 	private String date;
-
+	
+	
 	private int bannCount[];
 	private int bannPresentCount[];
 	private int perSectionCount[];
@@ -107,13 +108,18 @@ public class StudentTable extends JFrame {
 			Position.class };
 
 	private TableRowSorter<? extends AbstractTableModel> sorter;
-
+	
 	public static void updateIfPossible() {
 		for (StudentTable activeTable : activeTables) {
 			//System.out.println("Update StudentTable");
 			activeTable.updateInternalStudents();
 			((AbstractTableModel) activeTable.table.getModel()).fireTableDataChanged();
 		}
+	}
+	
+	public static void updateSummary()
+	{
+		
 	}
 
 	private Object[][] toData(Map<Integer, Student> students, int mode) {
@@ -206,7 +212,7 @@ public class StudentTable extends JFrame {
 		if (perSectionText != null) {
 			StringBuilder sb = new StringBuilder();
 			for (int i = 1; i <= 3; i++) {
-				sb.append(String.format("Section %d here: %d", i, perSectionCount[i - 1]));
+				sb.append(String.format("Section %d present: %d", i, perSectionCount[i - 1]));
 				if (i != 3)
 					sb.append(", ");
 			}
@@ -445,6 +451,7 @@ public class StudentTable extends JFrame {
 		statusLabel.setLabelFor(studentText);
 		studentText.setBorder(BorderFactory.createLineBorder(Color.gray));
 		studentText.setEditable(false);
+		studentText.setFont(studentText.getFont().deriveFont(14f));
 		JScrollPane scroll = new JScrollPane(studentText);
 		scroll.setPreferredSize(new Dimension(studentText.getWidth(), 100));
 		scroll.setWheelScrollingEnabled(true);

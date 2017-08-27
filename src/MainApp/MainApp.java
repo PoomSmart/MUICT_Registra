@@ -29,6 +29,7 @@ import Objects.Constants;
 import Objects.Position;
 import Objects.Student;
 import Utilities.CommonUtils;
+import Utilities.DBUtils;
 import Utilities.DateUtils;
 import Utilities.WindowUtils;
 import Visualizers.SeatVisualizer;
@@ -148,6 +149,35 @@ public class MainApp {
 				createPathIfNecessary(datePath);
 			}
 
+			/*Map<Integer,Student> std = DBUtils.getStudentsAllTime();
+			StringBuilder come80 = new StringBuilder();
+			StringBuilder comefridayfirst = new StringBuilder();
+			StringBuilder other = new StringBuilder();
+			
+			come80.append("come 80 %\n");
+			comefridayfirst.append("come first time on friday\n");
+			other.append("other cases\n");
+			for(Student s: std.values())
+			{
+				double come = s.getPresentCount() + s.getLeaveCount();
+				double dontcome = s.getAbsenceCount();
+				double total = s.getStatuses().size();
+				if(s.getPresentCount() > 0)
+				{
+					if((come/total)*100 >= 80)
+					{
+						come80.append(s.getID() + "\n");
+					}
+					else if(dontcome == s.getStatuses().size()-1 && s.isNormal("20170825"))
+						comefridayfirst.append(s.getID() + "\n");
+					else
+						other.append(s.getID() + "\n");
+				}
+			}
+			System.out.println(come80.toString());
+			System.out.println(comefridayfirst.toString());
+			System.out.println(other.toString());*/
+			
 			ScannerDialog scannerDialog = new ScannerDialog();
 			scannerDialog.setVisible(true);
 			runFrame(scannerDialog);

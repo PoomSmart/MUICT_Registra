@@ -9,8 +9,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -45,6 +47,13 @@ public class ControlCenterDialog extends JFrame {
 	public JButton clearPresentButton;
 	public JButton randomPresentButton;
 	public JButton clearLeaveButton;
+	public JButton ComeNDay;
+	public JButton dontcome;
+	public JButton ComeFirstDay;
+	public JButton Come80PercentOrMore;
+	public JButton MostAsked;
+	public JButton comeWed;
+	public JButton comeThurs;
 
 	private static Object[] dbOptions = { "Single", "All" };
 
@@ -61,7 +70,7 @@ public class ControlCenterDialog extends JFrame {
 
 	public ControlCenterDialog() {
 		this.setTitle(WindowUtils.realTitle("Control Center"));
-		this.setSize(600, MainApp.test ? 110 : 75);
+		this.setSize(500, 150);
 		WindowUtils.setRelativeCenter(this, 0, -200);
 		this.setLayout(new FlowLayout());
 
@@ -250,41 +259,266 @@ public class ControlCenterDialog extends JFrame {
 			getContentPane().add(randomPresentButton);
 		}
 		
-		JButton dontcome = new JButton("Who don't come today??");
+		/*dontcome = new JButton("Who don't come today??");
 		dontcome.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				try 
 				{
-					public void actionPerformed(ActionEvent arg0) {
-						// TODO Auto-generated method stub
-						try 
+					String path = CommonUtils.filePath(CommonUtils.FileType.REGULAR);
+					String destination = "Attendance/"+ DateUtils.getCurrentFormattedDate() +"/not_come.txt";
+					List<String> yList = FileUtils.readLines(new File("acceptance-y.csv"));
+					List<String> ComeToday = FileUtils.readLines(new File(path));
+					List<Integer> leave = LeaveDialog.IDs;
+					StringBuilder notsee = new StringBuilder();
+
+					for(String s: yList)
+					{
+						int id = 6088000 + Integer.parseInt(s);
+						if(!ComeToday.contains(Integer.toString(id)) && !leave.contains(id))
 						{
-							String path = CommonUtils.filePath(CommonUtils.FileType.REGULAR);
-							String destination = "Attendance/"+ DateUtils.getCurrentFormattedDate() +"/not_come.txt";
-							List<String> yList = FileUtils.readLines(new File("acceptance-y.csv"));
-							List<String> ComeToday = FileUtils.readLines(new File(path));
-							List<Integer> leave = LeaveDialog.IDs;
-							StringBuilder notsee = new StringBuilder();
-							
-							for(String s: yList)
-							{
-								int id = 6088000 + Integer.parseInt(s);
-								if(!ComeToday.contains(Integer.toString(id)) && !leave.contains(id))
-								{
-									notsee.append(s+"   ");
-								}	
-							}
-							FileUtils.write(new File(destination), notsee.toString());
-							JOptionPane.showMessageDialog(null, notsee.toString(), "Who don't come today",0);
-						} 
-						catch (IOException e) 
-						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
+							notsee.append(s+"   ");
+						}	
 					}
-				});
+					FileUtils.write(new File(destination), notsee.toString());
+					JOptionPane.showMessageDialog(null, notsee.toString(), "Who don't come today",0);
+				} 
+				catch (IOException e) 
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+		});
 		
-		getContentPane().add(dontcome);
+		getContentPane().add(dontcome);*/
+		
+		/*Come80PercentOrMore = new JButton("Who come equal or more than 80%");
+		Come80PercentOrMore.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent e) {
+				Map<Integer,Student> std = DBUtils.getStudentsAllTime();
+				int count = 0;
+				for(Student s: std.values())
+				{
+					double come = s.getPresentCount();
+					double total = s.getStatuses().size();
+					//System.out.println(total);
+
+					if((come/total)*100 >= 80)
+					{
+						count++;
+						//System.out.println(s.getID());
+					}
+						
+				}
+				JOptionPane.showMessageDialog(null,"There are " + count + " students who come equal or more than 80%", "Come more than 80%", JOptionPane.INFORMATION_MESSAGE);
+				
+			}
+		});
+		getContentPane().add(Come80PercentOrMore);*/
+		
+		ComeNDay = new JButton("Come in N day from 1st day to now");
+		ComeNDay.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				Map<Integer,Student> std = DBUtils.getStudentsAllTime();
+				int arr[] = new int[21];
+				int a; // for loop
+				Arrays.fill(arr, 0);
+				StringBuilder sb = new StringBuilder();
+				
+				for(Student s: std.values())
+				{
+					arr[s.getPresentCount()]++;
+				}
+				
+				sb.append("Come 1 day: " + arr[1] + " \n");
+				for(a=2; a<arr.length; a++)
+				{
+					sb.append("Come " + a + "days: " + arr[a] + " \n");
+				}
+				JOptionPane.showMessageDialog(null, sb.toString(), "Come in N day from 1st day to now", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		getContentPane().add(ComeNDay);
+		
+		comeWed = new JButton("Who comes on Wed");
+		comeWed.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				Map<Integer,Student> std = DBUtils.getStudentsAllTime();
+				String date[] = {"20170823", "20170830", "20170906", "20170913"};
+				Set<Integer> comeOnWed = new HashSet<Integer>();
+				int NumOfWeds = 1;
+				if(DateUtils.getCurrentFormattedDate().equals(date[1]))
+					NumOfWeds = 2;
+				else if(DateUtils.getCurrentFormattedDate().equals(date[2]))
+					NumOfWeds = 3;
+				else if(DateUtils.getCurrentFormattedDate().equals(date[3]))
+					NumOfWeds = 4;
+				//System.out.println(NumOfWeds);
+				
+				for(Student s: std.values())
+				{
+					for(int a = 0; a<NumOfWeds; a++)
+					{
+						if( (s.isNormal(date[a]) || s.isLeft(date[a])) && s.getAbsenceCount() == DateUtils.availableDates().size()-1)
+							comeOnWed.add(s.getID());
+					}
+				}		
+				JOptionPane.showMessageDialog(null, comeOnWed.size() + " students.", "Come on Wednesday", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		getContentPane().add(comeWed);
+		
+		comeThurs = new JButton("Who comes on Thurs");
+		comeThurs.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				// TODO Auto-generated method stub
+				Map<Integer,Student> std = DBUtils.getStudentsAllTime();
+				String date[] = {"20170824", "20170831", "20170907", "20170914"};
+				Set<Integer> comeOnWed = new HashSet<Integer>();
+				int NumOfWeds = 1;
+				if(DateUtils.getCurrentFormattedDate().equals(date[1]))
+					NumOfWeds = 2;
+				else if(DateUtils.getCurrentFormattedDate().equals(date[2]))
+					NumOfWeds = 3;
+				else if(DateUtils.getCurrentFormattedDate().equals(date[3]))
+					NumOfWeds = 4;
+				
+				for(Student s: std.values())
+				{
+					for(int a = 0; a<NumOfWeds; a++)
+					{
+						if((s.isNormal(date[a]) || s.isLeft(date[a])) && s.getAbsenceCount() == DateUtils.availableDates().size()-1)
+							comeOnWed.add(s.getID());
+					}
+				}		
+				JOptionPane.showMessageDialog(null, comeOnWed.size() + " students.", "Come on Thursday", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		getContentPane().add(comeThurs);
+		
+		/*ComeFirstDay = new JButton("Who come first day?");
+		ComeFirstDay.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				Map<Integer,Student> std = DBUtils.getStudentsAllTime();
+				StringBuilder sb = new StringBuilder();
+				String date = DateUtils.getCurrentFormattedDate();
+				int count = 0;
+				for(Student s : std.values())
+				{
+					int period = s.getStatuses().size();
+					if(s.getAbsenceCount() == period-1 && (s.isNormal(date) || s.isLeft(date)))
+					{
+						sb.append(s.getID() + " " + s.getName() + "\n");
+						count++;
+					}
+				}
+				sb.append("\nTotal new students for today is " + count);
+				
+				if(sb.length() > 0)
+					JOptionPane.showMessageDialog(null, sb.toString(), "Who come first day?", JOptionPane.INFORMATION_MESSAGE);
+				else
+					JOptionPane.showMessageDialog(null, "No new comer today", "Who come first day?", JOptionPane.INFORMATION_MESSAGE);
+				//System.out.println(DateUtils.getCurrentFormattedDate());
+			}
+		});
+		getContentPane().add(ComeFirstDay);*/
+		
+		MostAsked = new JButton("Summary of most asked question");
+		MostAsked.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				Map<Integer,Student> std = DBUtils.getStudentsAllTime();
+				StringBuilder sb = new StringBuilder();
+				StringBuilder ft = new StringBuilder(); // who come first day?
+				StringBuilder allBann = new StringBuilder();
+				String date = "20170825";//DateUtils.getCurrentFormattedDate();
+				
+				int present = 0, men = 0, women = 0, everyday = 0;
+				int comeFirstTime = 0;
+				int MoreOrEqual80Percent = 0;
+				int bann[] = new int[10];	//who comes for each bann
+				int section[] = new int[3];	//who comes for each section
+				Arrays.fill(bann, 0);
+				Arrays.fill(section, 0);
+				
+				for(Student s: std.values())
+				{
+					double period = s.getStatuses().size();
+					double come = s.getPresentCount() + s.getLeaveCount();
+
+					if(s.isNormal(date))
+					{
+						section[s.getSection()-1]++;
+						if(s.isMan())
+							men++;
+						else if(s.isWoman())
+							women++;
+						present++;
+						bann[s.getBann()-1]++;
+					}
+					if(s.getPresentCount() == s.getStatuses().size())
+						everyday++;
+					
+					/*if(s.isLeft(DateUtils.getCurrentFormattedDate()))
+						come++;*/
+					if((come/period)*100 >= 80)
+						MoreOrEqual80Percent++;
+					if(s.getAbsenceCount() == period-1 && (s.isNormal(date) || s.isLeft(date)))
+					{
+						ft.append(s.getID() + " " + s.getName() + "\n");
+						comeFirstTime++;
+					}
+				}
+				sb.append("Total present student is " + present + "\n");
+				sb.append("Total men: " + men + ", Total women: " + women + "\n\n");
+				sb.append("Freshmen for each Bann\n");
+				for(int i = 0; i<bann.length; i++)
+				{
+					sb.append("Bann" + (i+1) + ": " + bann[i] );
+					if(i<bann.length-1)
+						sb.append(", ");
+				}	
+				sb.append("\n\n");
+				
+				for(int i =0; i<section.length; i++)
+				{
+					sb.append("Sec" + (i+1) + " present: " + section[i]);
+					if(i<section.length-1)
+						sb.append(", ");
+				}	
+		
+				if(everyday > 0) 
+					sb.append("\nThere are " + everyday + " freshmen who come everyday\n");
+				else
+					sb.append("\nNo one comes everyday T-T");
+				sb.append("There are " + MoreOrEqual80Percent + " students who come equal or more than 80%\n\n");
+				
+				if(comeFirstTime > 0)
+				{
+					sb.append("Freshmen come here first time \n");
+					sb.append(ft.toString());
+					sb.append("Total: " + comeFirstTime);
+				}
+				else
+					sb.append("No new freshman comes here");
+				JOptionPane.showMessageDialog(null, sb.toString(), "Summary", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		
+		getContentPane().add(MostAsked);
 		JButton aboutButton = new JButton("About");
 		aboutButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

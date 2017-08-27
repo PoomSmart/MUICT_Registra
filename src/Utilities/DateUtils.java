@@ -130,13 +130,13 @@ public class DateUtils {
 		if ((diffDay > 0 && diffMonth > 0) || (diffDay < 0 && diffMonth < 0))
 			return false;
 		// Exception: holidays
-		/*if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
-			return false;*/
+		if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+			return false;
 		// Exception: special days
 		/*if (cal.get(Calendar.DAY_OF_MONTH) == 31 && cal.get(Calendar.MONTH) == Calendar.AUGUST)
-			return false;
-		if (cal.get(Calendar.DAY_OF_MONTH) == 2 && cal.get(Calendar.MONTH) == Calendar.SEPTEMBER)
 			return false;*/
+		if (cal.get(Calendar.DAY_OF_MONTH) == 12 && cal.get(Calendar.MONTH) == Calendar.SEPTEMBER)
+			return false;
 		return true;
 	}
 }

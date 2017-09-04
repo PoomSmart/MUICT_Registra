@@ -328,19 +328,23 @@ public class ControlCenterDialog extends JFrame {
 				Map<Integer,Student> std = DBUtils.getStudentsAllTime();
 				int arr[] = new int[21];
 				int a; // for loop
+				int comeMorethan2days = 0;
 				Arrays.fill(arr, 0);
 				StringBuilder sb = new StringBuilder();
 				
 				for(Student s: std.values())
 				{
-					arr[s.getPresentCount()]++;
+					arr[s.getPresentCount() + s.getLeaveCount()]++;
 				}
 				
 				sb.append("Come 1 day: " + arr[1] + " \n");
 				for(a=2; a<arr.length; a++)
 				{
 					sb.append("Come " + a + "days: " + arr[a] + " \n");
+					comeMorethan2days+=arr[a];
 				}
+				sb.append("\nCome more than 2 days: " + comeMorethan2days);
+				sb.append("\nTotal freshmen who come here: " + (comeMorethan2days+arr[1]));
 				JOptionPane.showMessageDialog(null, sb.toString(), "Come in N day from 1st day to now", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
@@ -367,14 +371,14 @@ public class ControlCenterDialog extends JFrame {
 				{
 					for(int a = 0; a<NumOfWeds; a++)
 					{
-						if( (s.isNormal(date[a]) || s.isLeft(date[a])) && s.getAbsenceCount() == DateUtils.availableDates().size()-1)
+						if( (s.isNormal(date[a]) || s.isLeft(date[a])) && s.getAbsenceCount() == DateUtils.availableDates().size()-2)
 							comeOnWed.add(s.getID());
 					}
 				}		
 				JOptionPane.showMessageDialog(null, comeOnWed.size() + " students.", "Come on Wednesday", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
-		getContentPane().add(comeWed);
+		//getContentPane().add(comeWed);
 		
 		comeThurs = new JButton("Who comes on Thurs");
 		comeThurs.addActionListener(new ActionListener() 
@@ -397,14 +401,39 @@ public class ControlCenterDialog extends JFrame {
 				{
 					for(int a = 0; a<NumOfWeds; a++)
 					{
-						if((s.isNormal(date[a]) || s.isLeft(date[a])) && s.getAbsenceCount() == DateUtils.availableDates().size()-1)
+						if((s.isNormal(date[a]) || s.isLeft(date[a])) && s.getAbsenceCount() == DateUtils.availableDates().size()-2)
 							comeOnWed.add(s.getID());
 					}
 				}		
 				JOptionPane.showMessageDialog(null, comeOnWed.size() + " students.", "Come on Thursday", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
-		getContentPane().add(comeThurs);
+		//getContentPane().add(comeThurs);
+		
+		JButton tan = new JButton("Tan's request");
+		tan.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				Map<Integer,Student> std = DBUtils.getStudentsAllTime();
+				StringBuilder sb = new StringBuilder();
+				int count = 0;
+				
+				for(Student s: std.values())
+				{
+					//System.out.println(s.isAbsent("20170821") + " " + s.isNormal("20170828"));
+					if(s.isAbsent("20170821") && s.isNormal("20170828"))
+					{
+						sb.append(s.getID() + ", " + s.getName() + ", " + s.getNickname() + "\n");
+						count++;
+					}
+				}
+				sb.append("\nCome this Monday but not come last week: " + count);
+				JOptionPane.showMessageDialog(null, sb.toString().length() > 0 ? sb.toString(): "No one...",
+												"Tan's request", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		getContentPane().add(tan);
 		
 		/*ComeFirstDay = new JButton("Who come first day?");
 		ComeFirstDay.addActionListener(new ActionListener()
@@ -444,22 +473,25 @@ public class ControlCenterDialog extends JFrame {
 				StringBuilder sb = new StringBuilder();
 				StringBuilder ft = new StringBuilder(); // who come first day?
 				StringBuilder allBann = new StringBuilder();
-				String date = "20170825";//DateUtils.getCurrentFormattedDate();
+				String date = DateUtils.getCurrentFormattedDate();
 				
-				int present = 0, men = 0, women = 0, everyday = 0;
+				int present = 0, men = 0, women = 0, everyday = 0, leave = 0;
+				int menleave = 0, womenleave = 0;
 				int comeFirstTime = 0;
 				int MoreOrEqual80Percent = 0;
 				int bann[] = new int[10];	//who comes for each bann
 				int section[] = new int[3];	//who comes for each section
+				int sectionLeave[] = new int[3];
 				Arrays.fill(bann, 0);
 				Arrays.fill(section, 0);
+				Arrays.fill(sectionLeave, 0);
 				
 				for(Student s: std.values())
 				{
 					double period = s.getStatuses().size();
 					double come = s.getPresentCount() + s.getLeaveCount();
 
-					if(s.isNormal(date))
+					if(s.isNormal(date) || s.isLeft(date))
 					{
 						section[s.getSection()-1]++;
 						if(s.isMan())
@@ -467,13 +499,19 @@ public class ControlCenterDialog extends JFrame {
 						else if(s.isWoman())
 							women++;
 						present++;
-						bann[s.getBann()-1]++;
 					}
-					if(s.getPresentCount() == s.getStatuses().size())
+					if(s.isNormal())
+						bann[s.getBann()-1]++;
+					if(s.getPresentCount()+s.getLeaveCount() == s.getStatuses().size())
 						everyday++;
 					
-					/*if(s.isLeft(DateUtils.getCurrentFormattedDate()))
-						come++;*/
+					if(s.isLeft(DateUtils.getCurrentFormattedDate()))
+					{
+						if(s.isMan())	menleave++;
+						else			womenleave++;
+						sectionLeave[s.getSection()-1]++;
+						leave++;
+					}	
 					if((come/period)*100 >= 80)
 						MoreOrEqual80Percent++;
 					if(s.getAbsenceCount() == period-1 && (s.isNormal(date) || s.isLeft(date)))
@@ -483,7 +521,10 @@ public class ControlCenterDialog extends JFrame {
 					}
 				}
 				sb.append("Total present student is " + present + "\n");
-				sb.append("Total men: " + men + ", Total women: " + women + "\n\n");
+				sb.append("Total freshmen leave: " + leave + "\n");
+				sb.append("Present student is " + (present-leave) + "\n");
+				sb.append("Total men: " + (men-menleave) + ", Total women: " + (women-womenleave) + "\n");
+				sb.append("Men leave: " + menleave + ", Women leave: " + womenleave + "\n\n");
 				sb.append("Freshmen for each Bann\n");
 				for(int i = 0; i<bann.length; i++)
 				{
@@ -495,15 +536,30 @@ public class ControlCenterDialog extends JFrame {
 				
 				for(int i =0; i<section.length; i++)
 				{
-					sb.append("Sec" + (i+1) + " present: " + section[i]);
+					sb.append("Sec" + (i+1) + " all: " + section[i]);
 					if(i<section.length-1)
 						sb.append(", ");
 				}	
-		
+				sb.append("\n");
+				for(int i =0; i<section.length; i++)
+				{
+					sb.append("Sec" + (i+1) + " present: " + (section[i]-sectionLeave[i]));
+					if(i<section.length-1)
+						sb.append(", ");
+				}	
+				sb.append("\n");
+				for(int i =0; i<section.length; i++)
+				{
+					sb.append("Sec" + (i+1) + " leave: " + sectionLeave[i]);
+					if(i<section.length-1)
+						sb.append(", ");
+				}	
+				sb.append("\n");
+				
 				if(everyday > 0) 
 					sb.append("\nThere are " + everyday + " freshmen who come everyday\n");
 				else
-					sb.append("\nNo one comes everyday T-T");
+					sb.append("\nNo one comes everyday T-T\n");
 				sb.append("There are " + MoreOrEqual80Percent + " students who come equal or more than 80%\n\n");
 				
 				if(comeFirstTime > 0)

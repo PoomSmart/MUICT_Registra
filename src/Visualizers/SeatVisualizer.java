@@ -118,8 +118,10 @@ class SeatPanel extends JPanel {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				g.setColor(Color.white);
-				Position<Integer, Integer> findPos = new Position<Integer, Integer>(height - x, width - y - 1);
+				Position<Integer, Integer> findPos = new Position<Integer, Integer>(width - x,height - y-1);
+				System.out.println(findPos.toString());
 				Student student = MainApp.studentsByPositions.get(findPos);
+				
 				Student student2 = null;
 				Integer ID = -1;
 				if (student != null) {
@@ -211,7 +213,7 @@ public class SeatVisualizer extends JFrame {
 
 	public static final int shiftLeft = 30;
 	public static final int shiftTop = 30;
-	public static final Dimension bounds = new Dimension(9, 9); // width and height of seat visualizer
+	public static final Dimension bounds = new Dimension(9, 7); // width and height of seat visualizer
 	public static final Dimension tileSize = new Dimension(55, 55); // width and height of each seat in seat visualizer
 	public static final Dimension absoluteSize = new Dimension(bounds.width * tileSize.width + shiftLeft,
 			bounds.height * tileSize.height + shiftTop);

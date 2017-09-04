@@ -117,11 +117,6 @@ public class StudentTable extends JFrame {
 		}
 	}
 	
-	public static void updateSummary()
-	{
-		
-	}
-
 	private Object[][] toData(Map<Integer, Student> students, int mode) {
 		Object[][] arr = new Object[students.size()][mode == 0 ? names.length : names_global.length];
 		Set<Map.Entry<Integer, Student>> entries = students.entrySet();
@@ -288,8 +283,9 @@ public class StudentTable extends JFrame {
 			for (Entry<Integer, Student> entry : internalStudents.entrySet()) {
 				Student student = entry.getValue();
 				int presentCount = student.getPresentCount();
+				int leaveCount = student.getLeaveCount();
 				if (presentCount > 0) {
-					if (presentCount == totalActivityDays)
+					if (presentCount+leaveCount == totalActivityDays)
 						totalEverydayAttend++;
 					else if (presentCount >= 1) {
 						if (presentCount > 1)
@@ -506,9 +502,6 @@ public class StudentTable extends JFrame {
 				if (student.unableToJoin()) {
 					c.setBackground(student.isCheerleader() ? Color.BLUE : Color.GRAY);
 					c.setForeground(Color.WHITE);
-				} else if (!student.isFreshman()) {
-					c.setBackground(Color.YELLOW);
-					c.setForeground(Color.DARK_GRAY);
 				} else {
 					c.setBackground(table.getBackground());
 					c.setForeground(table.getForeground());

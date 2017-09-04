@@ -162,13 +162,13 @@ public class MainApp {
 				double come = s.getPresentCount() + s.getLeaveCount();
 				double dontcome = s.getAbsenceCount();
 				double total = s.getStatuses().size();
-				if(s.getPresentCount() > 0)
+				if(come > 0 )
 				{
 					if((come/total)*100 >= 80)
 					{
 						come80.append(s.getID() + "\n");
 					}
-					else if(dontcome == s.getStatuses().size()-1 && s.isNormal("20170825"))
+					else if(dontcome == s.getStatuses().size()-1 && (s.isNormal("20170825")||s.isLeft("20170825")))
 						comefridayfirst.append(s.getID() + "\n");
 					else
 						other.append(s.getID() + "\n");
@@ -195,9 +195,9 @@ public class MainApp {
 			ccDialog.setVisible(true);
 			runFrame(ccDialog);
 
-			/*SeatVisualizer vis = new SeatVisualizer();
+			SeatVisualizer vis = new SeatVisualizer();
 			vis.setVisible(true);
-			runFrame(vis);*/
+			runFrame(vis);
 
 			// Initially focus scanner window
 			scannerDialog.toFront();

@@ -27,7 +27,11 @@ public class SeatAssigner {
 			for (String seat : seats) {
 				String[] tuples = seat.replaceAll("[^\\w\\s\\,]", "").trim().split(","); // FIXME: unwanted special characters from csv files
 				if (tuples.length == 2) {
-					Integer ID = Integer.parseInt(tuples[0]);
+					Integer ID ;
+					if(tuples[0].length() == 0)
+						ID = 6088000;
+					else
+						ID = Integer.parseInt(tuples[0]);
 					if (ID < 1000)
 						ID = 88000 + ID + DateUtils.studentYearInt() * 10000;
 					Student student = db.get(ID);

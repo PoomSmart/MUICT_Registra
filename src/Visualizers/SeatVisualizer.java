@@ -119,7 +119,7 @@ class SeatPanel extends JPanel {
 			for (int x = 0; x < width; x++) {
 				g.setColor(Color.white);
 				Position<Integer, Integer> findPos = new Position<Integer, Integer>(width - x,height - y-1);
-				System.out.println(findPos.toString());
+				
 				Student student = MainApp.studentsByPositions.get(findPos);
 				
 				Student student2 = null;

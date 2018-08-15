@@ -26,16 +26,19 @@ public class AcceptanceAssigner {
 			}*/
 			List<String> yList = FileUtils.readLines(new File("acceptance-y.csv"));
 			for (String fID : yList) {
-				Integer ID = CommonUtils.getID(DateUtils.studentYear() + "88" + fID);
+				int tmp = Integer.parseInt(DateUtils.studentYear() + "88")*1000;
+				Integer ID = CommonUtils.getID(Integer.toString(tmp + Integer.parseInt(fID)));
 				if (ID != -1) {
 					Student student = db.get(ID);
+					/*System.out.println(ID);*/
 					if (student != null)
 						student.setAcceptanceStatus(Student.AcceptanceType.Y);
 				}
 			}
 			List<String> nList = FileUtils.readLines(new File("acceptance-n.csv"));
 			for (String fID : nList) {
-				Integer ID = CommonUtils.getID(DateUtils.studentYear() + "88" + fID);
+				int tmp = Integer.parseInt(DateUtils.studentYear() + "88")*1000;
+				Integer ID = CommonUtils.getID(Integer.toString(tmp + Integer.parseInt(fID)));
 				if (ID != -1) {
 					Student student = db.get(ID);
 					if (student != null)

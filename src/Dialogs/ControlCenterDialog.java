@@ -24,6 +24,7 @@ import org.apache.commons.io.FileUtils;
 import MainApp.MainApp;
 import Objects.Constants;
 import Objects.Student;
+import Objects.Student.AcceptanceType;
 import Tables.StudentTable;
 import Utilities.CommonUtils;
 import Utilities.CommonUtils.FileType;
@@ -410,7 +411,7 @@ public class ControlCenterDialog extends JFrame {
 		});
 		//getContentPane().add(comeThurs);
 		
-		JButton tan = new JButton("Tan's request");
+		JButton tan = new JButton("Who don't come today???");
 		tan.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) {
@@ -422,13 +423,13 @@ public class ControlCenterDialog extends JFrame {
 				for(Student s: std.values())
 				{
 					//System.out.println(s.isAbsent("20170821") + " " + s.isNormal("20170828"));
-					if(s.isAbsent("20170821") && s.isNormal("20170828"))
+					if(s.isAbsent(DateUtils.getCurrentFormattedDate()) && s.getAcceptanceStatus() == "Y" && s.getPresentCount()+s.getLeaveCount() < 7)
 					{
 						sb.append(s.getID() + ", " + s.getName() + ", " + s.getNickname() + "\n");
 						count++;
 					}
 				}
-				sb.append("\nCome this Monday but not come last week: " + count);
+				//sb.append("\nCome this Monday but not come last week: " + count);
 				JOptionPane.showMessageDialog(null, sb.toString().length() > 0 ? sb.toString(): "No one...",
 												"Tan's request", JOptionPane.INFORMATION_MESSAGE);
 			}
